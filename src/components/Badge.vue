@@ -1,0 +1,32 @@
+<template>
+  <span :class="['inline-flex items-center gap-x-1.5 rounded-md px-1.5 py-0.5 text-sm/5 font-medium sm:text-xs/5 forced-colors:outline', colorClasses]">
+    <slot />
+  </span>
+</template>
+
+<script setup lang="ts">
+const props = withDefaults(defineProps<{ color?: string }>(), { color: 'zinc' })
+
+const colors: Record<string, string> = {
+  red:     'bg-red-500/15 text-red-700',
+  orange:  'bg-orange-500/15 text-orange-700',
+  amber:   'bg-amber-400/20 text-amber-700',
+  yellow:  'bg-yellow-400/20 text-yellow-700',
+  lime:    'bg-lime-400/20 text-lime-700',
+  green:   'bg-green-500/15 text-green-700',
+  emerald: 'bg-emerald-500/15 text-emerald-700',
+  teal:    'bg-teal-500/15 text-teal-700',
+  cyan:    'bg-cyan-400/20 text-cyan-700',
+  sky:     'bg-sky-500/15 text-sky-700',
+  blue:    'bg-blue-500/15 text-blue-700',
+  indigo:  'bg-indigo-500/15 text-indigo-700',
+  violet:  'bg-violet-500/15 text-violet-700',
+  purple:  'bg-purple-500/15 text-purple-700',
+  fuchsia: 'bg-fuchsia-400/15 text-fuchsia-700',
+  pink:    'bg-pink-400/15 text-pink-700',
+  rose:    'bg-rose-400/15 text-rose-700',
+  zinc:    'bg-gray-50 text-gray-600 inset-ring inset-ring-gray-500/10',
+}
+
+const colorClasses = colors[props.color] ?? colors.zinc
+</script>
