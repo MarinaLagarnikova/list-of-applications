@@ -30,18 +30,19 @@ const props = defineProps({
   plain:    { type: Boolean, default: false },
   soft:     { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
+  xs:       { type: Boolean, default: false },
+  pill:     { type: Boolean, default: false },
 })
-
-const base = [
-  'relative isolate inline-flex items-center justify-center gap-x-2 rounded-lg border text-sm/6 font-medium',
-  'h-8 px-3',
-  'focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500',
-  'disabled:opacity-50 cursor-pointer transition-colors',
-]
 
 const variants = {
   outline: 'border-zinc-950/10 bg-white text-zinc-950 shadow-xs hover:bg-zinc-50 active:bg-zinc-100',
   plain:   'border-transparent bg-transparent text-zinc-500 hover:bg-zinc-100 active:bg-zinc-200',
+}
+
+const plainColors = {
+  indigo: 'border-transparent bg-transparent text-indigo-600 hover:bg-indigo-50 active:bg-indigo-100',
+  red:    'border-transparent bg-transparent text-red-600 hover:bg-red-50 active:bg-red-100',
+  zinc:   'border-transparent bg-transparent text-zinc-900 hover:bg-zinc-100 active:bg-zinc-200',
 }
 
 const softColors = {
@@ -77,11 +78,15 @@ const colors = {
 }
 
 const classes = computed(() => [
-  ...base,
+  'relative isolate inline-flex items-center justify-center gap-x-2 border font-medium',
+  props.xs ? 'h-6 px-2.5 text-xs/5' : 'h-8 px-3 text-sm/6',
+  props.pill ? 'rounded-full' : 'rounded-lg',
+  'focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500',
+  'disabled:opacity-50 cursor-pointer transition-colors',
   props.outline
     ? variants.outline
     : props.plain
-      ? variants.plain
+      ? (props.color && plainColors[props.color] ? plainColors[props.color] : variants.plain)
       : props.soft
         ? (softColors[props.color ?? 'zinc'])
         : (colors[props.color ?? 'dark/zinc']),

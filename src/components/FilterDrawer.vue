@@ -3,7 +3,7 @@
     <!-- ─── Sticky header ───────────────────────── -->
       <div class="shrink-0 px-6 pt-6 pb-4">
         <div class="flex items-center justify-between">
-          <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">Фильтры и сортировка</span>
+          <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">Фильтры</span>
           <button
             @click="$emit('close')"
             class="flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors"
@@ -15,18 +15,6 @@
 
       <!-- ─── Scrollable content ──────────────────── -->
       <div class="flex-1 overflow-y-auto min-h-0">
-
-        <!-- Сортировка -->
-        <div class="px-6 py-4 flex flex-col gap-y-2">
-          <div class="flex items-center">
-            <input id="sort-filter-new" name="sort-filter" type="radio" value="new" v-model="sortOrder" class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 forced-colors:appearance-auto forced-colors:before:hidden" />
-            <label for="sort-filter-new" class="ml-3 text-[14px] font-light text-[#18181b]">Сначала новые</label>
-          </div>
-          <div class="flex items-center">
-            <input id="sort-filter-old" name="sort-filter" type="radio" value="old" v-model="sortOrder" class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 forced-colors:appearance-auto forced-colors:before:hidden" />
-            <label for="sort-filter-old" class="ml-3 text-[14px] font-light text-[#18181b]">Сначала старые</label>
-          </div>
-        </div>
 
         <!-- Дата создания -->
         <div class="px-6 py-4">
@@ -43,199 +31,238 @@
               v-for="badge in dateBadges"
               :key="badge"
               @click="selectedDateBadge === badge ? (selectedDateBadge = null, dateCustom = '') : (selectedDateBadge = badge, dateCustom = badgeToDate(badge))"
-              :class="[
-                'inline-flex items-center rounded-full border px-3 h-6 text-[13px] leading-none font-medium transition-colors',
-                selectedDateBadge === badge
-                  ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                  : 'bg-white border-[#e4e4e7] text-[#3f3f46] hover:bg-zinc-50',
-              ]"
+              :class="selectedDateBadge === badge
+                ? 'rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 shadow-xs hover:bg-indigo-100'
+                : 'rounded-full bg-white px-2.5 py-1 text-xs font-medium text-zinc-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50'"
             >{{ badge }}</button>
           </div>
-          <div class="flex items-center rounded-lg border border-[#e4e4e7] bg-white px-3 py-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition">
+          <div class="flex items-center rounded-lg border border-[#e4e4e7] bg-white px-3 py-[8px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition">
             <input
               type="text"
               placeholder=""
               v-model="dateCustom"
               @input="selectedDateBadge = null"
-              class="flex-1 min-w-0 bg-transparent text-[14px] font-medium text-[#18181b] placeholder:text-[#a1a1aa] focus:outline-none"
+              class="flex-1 min-w-0 bg-transparent text-[14px] font-normal text-zinc-900 placeholder:text-[#a1a1aa] focus:outline-none"
             />
+            <button v-if="dateCustom" @click="resetDate" class="shrink-0 mr-4 text-[#a1a1aa] hover:text-zinc-600 transition-colors">
+              <XIcon :size="16" />
+            </button>
             <CalendarIcon :size="16" class="shrink-0 text-[#a1a1aa] pointer-events-none" />
           </div>
         </div>
 
         <!-- Статус -->
-        <div class="px-6 py-4">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Статус</span>
-            <button
-              @click="selectedStatuses.size > 0 ? resetStatuses() : selectAllStatuses()"
-              class="text-[14px] font-medium text-indigo-600 hover:text-indigo-700"
-            >{{ selectedStatuses.size > 0 ? 'Сбросить' : 'Выбрать все' }}</button>
-          </div>
-          <div class="flex flex-col gap-y-3">
-            <div
-              v-for="status in applicationStatuses"
-              :key="status"
-              class="flex items-center justify-between cursor-pointer"
-              @click="toggleStatus(status)"
-            >
-              <span class="text-[14px] font-light text-[#18181b]">{{ status }}</span>
-              <span
-                :class="[
-                  'relative flex size-4 shrink-0 items-center justify-center rounded-sm border transition-colors',
-                  selectedStatuses.has(status)
-                    ? 'bg-indigo-600 border-indigo-600'
-                    : 'bg-white border-[#d4d4d8] hover:border-[#a1a1aa]',
-                ]"
-              >
-                <svg
-                  :class="['size-3 stroke-white transition-opacity', selectedStatuses.has(status) ? 'opacity-100' : 'opacity-0']"
-                  viewBox="0 0 14 14" fill="none"
-                >
-                  <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-            </div>
-          </div>
-        </div>
+        <FilterStatusGroup
+          label="Статус"
+          :options="applicationStatuses"
+          :model-value="selectedStatuses"
+          @update:model-value="selectedStatuses = $event"
+        />
 
         <!-- Менеджер -->
+        <FilterManagerGroup
+          label="Менеджер"
+          :options="managers"
+          :model-value="selectedManagers"
+          @update:model-value="selectedManagers = $event"
+        />
+
+        <!-- Регион -->
         <div class="px-6 py-4">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Менеджер</span>
+            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Регион</span>
             <button
-              @click="selectedManagers.size > 0 ? resetManagers() : selectAllManagers()"
+              v-if="selectedRegions.size > 0"
+              @click="selectedRegions = new Set()"
               class="text-[14px] font-medium text-indigo-600 hover:text-indigo-700"
-            >{{ selectedManagers.size > 0 ? 'Сбросить' : 'Выбрать все' }}</button>
+            >Сбросить</button>
           </div>
-          <div class="flex items-center gap-x-2 rounded-lg border border-[#e4e4e7] bg-white px-3 py-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition mb-3">
-            <SearchIcon :size="16" class="shrink-0 text-[#a1a1aa] pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Фамилия или имя"
-              v-model="managerSearch"
-              class="flex-1 min-w-0 bg-transparent text-[14px] font-normal text-[#18181b] placeholder:text-[#a1a1aa] focus:outline-none"
-            />
-          </div>
-          <div class="flex flex-col gap-y-3">
-            <div
-              v-for="mgr in filteredManagers"
-              :key="mgr.id"
-              class="flex items-center justify-between cursor-pointer"
-              @click="toggleManager(mgr.id)"
-            >
-              <span class="text-[14px] font-light text-[#18181b]">{{ mgr.name }}</span>
-              <span
-                :class="[
-                  'relative flex size-4 shrink-0 items-center justify-center rounded-sm border transition-colors',
-                  selectedManagers.has(mgr.id)
-                    ? 'bg-indigo-600 border-indigo-600'
-                    : 'bg-white border-[#d4d4d8] hover:border-[#a1a1aa]',
-                ]"
-              >
-                <svg
-                  :class="['size-3 stroke-white transition-opacity', selectedManagers.has(mgr.id) ? 'opacity-100' : 'opacity-0']"
-                  viewBox="0 0 14 14" fill="none"
-                >
-                  <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-            </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="region in regionOptions"
+              :key="region"
+              @click="toggleRegion(region)"
+              :class="selectedRegions.has(region)
+                ? 'rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 shadow-xs hover:bg-indigo-100'
+                : 'rounded-full bg-white px-2.5 py-1 text-xs font-medium text-zinc-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50'"
+            >{{ region }}</button>
           </div>
         </div>
 
         <!-- Проект -->
+        <FilterProjectGroup
+          label="Проект"
+          :groups="projectGroups"
+          :model-value="selectedProjects"
+          @update:model-value="selectedProjects = $event"
+        />
+
+        <!-- Тип ипотеки -->
         <div class="px-6 py-4">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Проект</span>
+            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Тип ипотеки</span>
             <button
-              @click="selectedProjects.size > 0 ? resetProjects() : selectAllProjects()"
+              v-if="selectedMortgageTypes.size > 0"
+              @click="selectedMortgageTypes = new Set()"
               class="text-[14px] font-medium text-indigo-600 hover:text-indigo-700"
-            >{{ selectedProjects.size > 0 ? 'Сбросить' : 'Выбрать все' }}</button>
+            >Сбросить</button>
           </div>
-          <div class="flex flex-col gap-y-3">
-            <div
-              v-for="project in projects"
-              :key="project"
-              class="flex items-center justify-between cursor-pointer"
-              @click="toggleProject(project)"
-            >
-              <span class="text-[14px] font-light text-[#18181b]">{{ project }}</span>
-              <span
-                :class="[
-                  'relative flex size-4 shrink-0 items-center justify-center rounded-sm border transition-colors',
-                  selectedProjects.has(project)
-                    ? 'bg-indigo-600 border-indigo-600'
-                    : 'bg-white border-[#d4d4d8] hover:border-[#a1a1aa]',
-                ]"
-              >
-                <svg
-                  :class="['size-3 stroke-white transition-opacity', selectedProjects.has(project) ? 'opacity-100' : 'opacity-0']"
-                  viewBox="0 0 14 14" fill="none"
-                >
-                  <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-            </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="type in mortgageTypes"
+              :key="type"
+              @click="toggleMortgageType(type)"
+              :class="selectedMortgageTypes.has(type)
+                ? 'rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 shadow-xs hover:bg-indigo-100'
+                : 'rounded-full bg-white px-2.5 py-1 text-xs font-medium text-zinc-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50'"
+            >{{ type }}</button>
           </div>
         </div>
 
-        <!-- Collapsible sections -->
-        <div
-          v-for="section in collapsibleSections"
-          :key="section"
-          class=""
-        >
-          <button
-            class="flex w-full items-center justify-between px-6 py-4 hover:bg-zinc-50 transition-colors"
-            @click="toggleSection(section)"
-          >
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">{{ section }}</span>
-            <ChevronRightIcon :size="16" class="text-[#a1a1aa]" />
-          </button>
+        <!-- Банк -->
+        <FilterBrandGroup
+          label="Банк"
+          :options="banks"
+          :model-value="selectedBanks"
+          search-placeholder="Название"
+          empty-text="Банк не найден"
+          @update:model-value="selectedBanks = $event"
+        />
+
+        <!-- Статус сделки -->
+        <FilterStatusGroup
+          label="Статус сделки"
+          :options="dealStatuses"
+          :model-value="selectedDealStatuses"
+          @update:model-value="selectedDealStatuses = $event"
+        />
+
+        <!-- Стоимость объекта -->
+        <FilterPriceRange
+          label="Стоимость объекта"
+          :model-value="priceObject"
+          @update:model-value="priceObject = $event"
+        />
+
+        <!-- Стоимость кредита -->
+        <FilterPriceRange
+          label="Сумма кредита"
+          :model-value="priceCredit"
+          @update:model-value="priceCredit = $event"
+        />
+
+        <!-- Первый взнос -->
+        <div class="px-6 py-4">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Первый взнос</span>
+            <button
+              v-if="selectedDownPayments.size > 0"
+              @click="selectedDownPayments = new Set()"
+              class="text-[14px] font-medium text-indigo-600 hover:text-indigo-700"
+            >Сбросить</button>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="pct in downPaymentOptions"
+              :key="pct"
+              @click="toggleDownPayment(pct)"
+              :class="selectedDownPayments.has(pct)
+                ? 'rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 shadow-xs hover:bg-indigo-100'
+                : 'rounded-full bg-white px-2.5 py-1 text-xs font-medium text-zinc-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50'"
+            >{{ pct }}%</button>
+          </div>
+        </div>
+
+        <!-- Дата отправки -->
+        <div class="px-6 py-4">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Дата отправки</span>
+            <button
+              v-if="selectedSendDateBadge || sendDateCustom"
+              @click="selectedSendDateBadge = null; sendDateCustom = ''"
+              class="text-[14px] font-medium text-indigo-600 hover:text-indigo-700"
+            >Сбросить</button>
+          </div>
+          <div class="flex flex-wrap gap-2 mb-3">
+            <button
+              v-for="badge in dateBadges"
+              :key="badge"
+              @click="selectedSendDateBadge === badge ? (selectedSendDateBadge = null, sendDateCustom = '') : (selectedSendDateBadge = badge, sendDateCustom = badgeToDate(badge))"
+              :class="selectedSendDateBadge === badge
+                ? 'rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 shadow-xs hover:bg-indigo-100'
+                : 'rounded-full bg-white px-2.5 py-1 text-xs font-medium text-zinc-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50'"
+            >{{ badge }}</button>
+          </div>
+          <div class="flex items-center rounded-lg border border-[#e4e4e7] bg-white px-3 py-[8px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition">
+            <input type="text" placeholder="" v-model="sendDateCustom" @input="selectedSendDateBadge = null" class="flex-1 min-w-0 bg-transparent text-[14px] font-normal text-zinc-900 placeholder:text-[#a1a1aa] focus:outline-none" />
+            <button v-if="sendDateCustom" @click="selectedSendDateBadge = null; sendDateCustom = ''" class="shrink-0 mr-4 text-[#a1a1aa] hover:text-zinc-600 transition-colors"><XIcon :size="16" /></button>
+            <CalendarIcon :size="16" class="shrink-0 text-[#a1a1aa] pointer-events-none" />
+          </div>
+        </div>
+
+        <!-- Дата выдачи кредита -->
+        <div class="px-6 py-4">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Дата выдачи кредита</span>
+            <button
+              v-if="selectedIssueDateBadge || issueDateCustom"
+              @click="selectedIssueDateBadge = null; issueDateCustom = ''"
+              class="text-[14px] font-medium text-indigo-600 hover:text-indigo-700"
+            >Сбросить</button>
+          </div>
+          <div class="flex flex-wrap gap-2 mb-3">
+            <button
+              v-for="badge in dateBadges"
+              :key="badge"
+              @click="selectedIssueDateBadge === badge ? (selectedIssueDateBadge = null, issueDateCustom = '') : (selectedIssueDateBadge = badge, issueDateCustom = badgeToDate(badge))"
+              :class="selectedIssueDateBadge === badge
+                ? 'rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 shadow-xs hover:bg-indigo-100'
+                : 'rounded-full bg-white px-2.5 py-1 text-xs font-medium text-zinc-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50'"
+            >{{ badge }}</button>
+          </div>
+          <div class="flex items-center rounded-lg border border-[#e4e4e7] bg-white px-3 py-[8px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition">
+            <input type="text" placeholder="" v-model="issueDateCustom" @input="selectedIssueDateBadge = null" class="flex-1 min-w-0 bg-transparent text-[14px] font-normal text-zinc-900 placeholder:text-[#a1a1aa] focus:outline-none" />
+            <button v-if="issueDateCustom" @click="selectedIssueDateBadge = null; issueDateCustom = ''" class="shrink-0 mr-4 text-[#a1a1aa] hover:text-zinc-600 transition-colors"><XIcon :size="16" /></button>
+            <CalendarIcon :size="16" class="shrink-0 text-[#a1a1aa] pointer-events-none" />
+          </div>
         </div>
 
         <div class="h-4" />
       </div>
 
       <!-- ─── Sticky footer ───────────────────────── -->
-      <div class="shrink-0 border-t border-[#f4f4f5] px-6 py-4 flex items-center gap-x-3">
-        <button
-          @click="resetAll"
-          :class="[
-            'flex items-center justify-center rounded-lg border h-9 px-4 text-[14px] font-medium transition-colors',
-            hasActiveFilters
-              ? 'border-[#e4e4e7] text-[#18181b] hover:bg-zinc-50'
-              : 'border-[#e4e4e7] text-[#a1a1aa] cursor-default',
-          ]"
-        >Сбросить все</button>
-
-        <button
-          @click="props.count > 0 && $emit('close')"
-          :class="['flex flex-1 items-center justify-center rounded-lg h-9 px-4 text-[14px] font-medium text-white transition-colors',
-            props.count > 0 ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-indigo-300 cursor-default']"
-        >{{ buttonLabel }}</button>
-      </div>
+      <FilterFooter
+        :count="props.count"
+        :has-active-filters="hasActiveFilters"
+        :filter-count="filterCount"
+        :tags="activeFilterTags"
+        @reset="resetAll"
+        @close="$emit('close')"
+      />
 
   </BaseDrawer>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import BaseDrawer from './BaseDrawer.vue'
+import FilterCheckboxGroup from './FilterCheckboxGroup.vue'
+import FilterManagerGroup from './FilterManagerGroup.vue'
+import FilterProjectGroup from './FilterProjectGroup.vue'
+import FilterBrandGroup from './FilterBrandGroup.vue'
+import FilterPriceRange from './FilterPriceRange.vue'
+import FilterStatusGroup from './FilterStatusGroup.vue'
+import FilterFooter from './FilterFooter.vue'
 import {
   X as XIcon,
   ChevronRight as ChevronRightIcon,
   Calendar as CalendarIcon,
-  Search as SearchIcon,
 } from 'lucide-vue-next'
 
 const props = defineProps({ open: Boolean, count: { type: Number, default: 0 } })
-defineEmits(['close'])
+const emit = defineEmits(['close', 'update:filterCount', 'update:filters', 'update:filterTags'])
 
-const sortOrder = ref('new')
-
-const dateBadges = ['Сегодня', 'Вчера', 'Неделя', '2 недели']
+const dateBadges = ['Сегодня', 'Вчера', 'Неделя', '2 недели', 'Май', '2 квартал']
 const selectedDateBadge = ref(null)
 const dateCustom = ref('')
 
@@ -245,92 +272,150 @@ const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); r
 const badgeToDate = (badge) => {
   if (badge === 'Сегодня') return fmtDate(today)
   if (badge === 'Вчера') return fmtDate(addDays(today, -1))
-  if (badge === 'Неделя') return `${fmtDate(addDays(today, -7))} – ${fmtDate(today)}`
-  if (badge === '2 недели') return `${fmtDate(addDays(today, -14))} – ${fmtDate(today)}`
+  if (badge === 'Неделя') return `${fmtDate(addDays(today, -7))} — ${fmtDate(today)}`
+  if (badge === '2 недели') return `${fmtDate(addDays(today, -14))} — ${fmtDate(today)}`
+  if (badge === 'Май') return '01.05.2026 — 31.05.2026'
+  if (badge === '2 квартал') return '01.04.2026 — 30.06.2026'
   return ''
 }
 
-const toggleDateBadge = (badge) => {
-  selectedDateBadge.value = selectedDateBadge.value === badge ? null : badge
-}
 const resetDate = () => {
   selectedDateBadge.value = null
   dateCustom.value = ''
 }
 
 const managers = [
-  { id: 1, name: 'Иванов Иван' },
-  { id: 2, name: 'Сергеев Сергей' },
-  { id: 3, name: 'Петров Пётр' },
-  { id: 4, name: 'Сидоров Игорь' },
-  { id: 5, name: 'Новиков Алексей' },
+  { name: 'Смирнова Юлия',  initials: 'СЮ', role: 'Администратор'    },
+  { name: 'Орлов Дмитрий',  initials: 'ОД', role: 'Продажи'          },
+  { name: 'Лебедев Игорь',  initials: 'ЛИ', role: 'Менеджер ипотеки' },
+  { name: 'Воронова Анна',  initials: 'ВА', role: 'Менеджер ипотеки' },
+  { name: 'Морозов Сергей', initials: 'МС', role: 'Руководитель'      },
 ]
-const managerSearch = ref('')
 const selectedManagers = ref(new Set())
 
-const filteredManagers = computed(() =>
-  managerSearch.value
-    ? managers.filter(m => m.name.toLowerCase().includes(managerSearch.value.toLowerCase()))
-    : managers
-)
-
-const toggleManager = (id) => {
-  const s = new Set(selectedManagers.value)
-  s.has(id) ? s.delete(id) : s.add(id)
-  selectedManagers.value = s
-}
-const selectAllManagers = () => { selectedManagers.value = new Set(managers.map(m => m.id)) }
-const resetManagers = () => { selectedManagers.value = new Set() }
-
 const applicationStatuses = [
-  'Одобрена',
-  'Банк выбран',
-  'ДДУ согласован',
-  'Кредит одобрен',
-  'Договор подписан',
-  'Средства переведены',
-  'Сделка закрыта',
+  { name: 'Новая заявка',         dot: 'border-gray-400 bg-gray-50'   },
+  { name: 'Подготовка',           dot: 'border-gray-400 bg-gray-50'   },
+  { name: 'Консультация',         dot: 'border-gray-400 bg-gray-50'   },
+  { name: 'На подписании',        dot: 'border-amber-400 bg-amber-50' },
+  { name: 'Банк выбран',          dot: 'border-blue-400 bg-blue-50'   },
+  { name: 'Ожидает решения',      dot: 'border-amber-400 bg-amber-50' },
+  { name: 'Одобрена',             dot: 'border-green-400 bg-green-50' },
+  { name: 'Согласование ДДУ',     dot: 'border-amber-400 bg-amber-50' },
+  { name: 'ДДУ согласован',       dot: 'border-green-400 bg-green-50' },
+  { name: 'ДДУ зарегистрирован',  dot: 'border-green-400 bg-green-50' },
+  { name: 'Объект на согласовании', dot: 'border-amber-400 bg-amber-50' },
+  { name: 'Кредит выдан',         dot: 'border-green-400 bg-green-50' },
+  { name: 'Отказано',             dot: 'border-red-400 bg-red-50'     },
 ]
 const selectedStatuses = ref(new Set())
 
-const toggleStatus = (s) => {
-  const set = new Set(selectedStatuses.value)
-  set.has(s) ? set.delete(s) : set.add(s)
-  selectedStatuses.value = set
-}
-const selectAllStatuses = () => { selectedStatuses.value = new Set(applicationStatuses) }
-const resetStatuses = () => { selectedStatuses.value = new Set() }
-
-const projects = [
-  'Самолет/Новые Ватутинки',
-  'А101/Прокшино',
-  'MR Group/Савёловский Сити',
-  'ФСК/Южная Битца',
-  'ЛСР/Морская набережная',
-  'Донстрой/Символ',
-  'ПИК/Люберцы Парк',
-  'Эталон/Галактика',
+const projectGroups = [
+  {
+    city: 'Москва',
+    options: [
+      'Самолет/Новые Ватутинки',
+      'Самолет/Пригород Лесное',
+      'Самолет/Жилой район Южный',
+      'Самолет/Митино О2',
+      'Самолет/Путилково',
+    ],
+  },
+  {
+    city: 'Санкт-Петербург',
+    options: [
+      'ЛСР/Морская набережная (СПб)',
+      'Группа ЛСР/Зенит (СПб)',
+      'ЛСР/Цивилизация (СПб)',
+      'ПИК/Кудрово (СПб)',
+    ],
+  },
+  {
+    city: 'Краснодар',
+    options: [
+      'DOGMA/Самолет (Краснодар)',
+    ],
+  },
 ]
 const selectedProjects = ref(new Set())
-const toggleProject = (p) => {
-  const s = new Set(selectedProjects.value)
-  s.has(p) ? s.delete(p) : s.add(p)
-  selectedProjects.value = s
-}
-const selectAllProjects = () => { selectedProjects.value = new Set(projects) }
-const resetProjects = () => { selectedProjects.value = new Set() }
 
-const collapsibleSections = [
-  'Регион',
-  'Банк',
-  'Статус сделки',
-  'Стоимость недвижимости',
-  'Стоимость кредита',
-  'Первый взнос',
-  'Дата отправки заявки',
-  'Дата выдачи кредита',
-  'Тип ипотеки',
+const regionOptions = [
+  'Город Москва',
+  'Город Санкт-Петербург',
+  'Красноярский край',
 ]
+const selectedRegions = ref(new Set())
+
+// Банк
+const banks = [
+  { name: 'Сбербанк',         initial: 'С', color: '#21A038' },
+  { name: 'ВТБ',              initial: 'В', color: '#009FDF' },
+  { name: 'Альфа-Банк',       initial: 'А', color: '#EF3124' },
+  { name: 'Газпромбанк',      initial: 'Г', color: '#0066B3' },
+  { name: 'Россельхозбанк',   initial: 'Р', color: '#00703C' },
+  { name: 'Открытие',         initial: 'О', color: '#FF6600' },
+  { name: 'Райффайзенбанк',   initial: 'Р', color: '#FFDD00' },
+  { name: 'Совкомбанк',       initial: 'С', color: '#E31E24' },
+  { name: 'Промсвязьбанк',    initial: 'П', color: '#FF6B00' },
+  { name: 'Росбанк',          initial: 'Р', color: '#6C2D8F' },
+  { name: 'Уралсиб',          initial: 'У', color: '#0070C0' },
+  { name: 'МКБ',              initial: 'М', color: '#E4002B' },
+]
+const selectedBanks = ref(new Set())
+
+// Статус сделки
+const dealStatuses = [
+  { name: 'Одобрена',               dot: 'border-green-400 bg-green-50'  },
+  { name: 'Сделка выбрана',         dot: 'border-gray-400 bg-gray-50'    },
+  { name: 'Отказ клиента',          dot: 'border-red-400 bg-red-50'      },
+  { name: 'ДДУ согласован',         dot: 'border-green-400 bg-green-50'  },
+  { name: 'ДДУ зарегистрирован',    dot: 'border-amber-400 bg-amber-50'  },
+  { name: 'Объект на согласовании', dot: 'border-blue-400 bg-blue-50'    },
+  { name: 'Кредит выдан',           dot: 'border-amber-400 bg-amber-50'  },
+  { name: 'На подписании',          dot: 'border-amber-400 bg-amber-50'  },
+  { name: 'Новая сделка',           dot: 'border-gray-400 bg-gray-50'    },
+  { name: 'Готово к отправке',      dot: 'border-green-400 bg-green-50'  },
+  { name: 'Отказано',               dot: 'border-red-400 bg-red-50'      },
+  { name: 'На доработке',           dot: 'border-gray-400 bg-gray-50'    },
+  { name: 'Отправлена',             dot: 'border-blue-400 bg-blue-50'    },
+  { name: 'Ошибка',                 dot: 'border-red-400 bg-red-50'      },
+]
+const selectedDealStatuses = ref(new Set())
+
+const priceObject = ref({ from: null, to: null })
+const priceCredit = ref({ from: null, to: null })
+
+const downPaymentOptions = [15, 20, 30, 40, 50, 60, 70]
+const selectedDownPayments = ref(new Set())
+const toggleDownPayment = (pct) => {
+  const s = new Set(selectedDownPayments.value)
+  s.has(pct) ? s.delete(pct) : s.add(pct)
+  selectedDownPayments.value = s
+}
+
+const toggleRegion = (region) => {
+  const s = new Set(selectedRegions.value)
+  s.has(region) ? s.delete(region) : s.add(region)
+  selectedRegions.value = s
+}
+
+const collapsibleSections = []
+
+const mortgageTypes = ['Семейная', 'Гос.поддержка', 'Стандартная', 'Военная', 'ИТ', 'Сельская', 'Дальневосточная', 'Арктическая']
+const selectedMortgageTypes = ref(new Set())
+const toggleMortgageType = (type) => {
+  const s = new Set(selectedMortgageTypes.value)
+  s.has(type) ? s.delete(type) : s.add(type)
+  selectedMortgageTypes.value = s
+}
+
+// Дата отправки
+const selectedSendDateBadge = ref(null)
+const sendDateCustom = ref('')
+
+// Дата выдачи кредита
+const selectedIssueDateBadge = ref(null)
+const issueDateCustom = ref('')
 const toggleSection = (_name) => { /* future expansion */ }
 
 const hasActiveFilters = computed(() =>
@@ -338,22 +423,111 @@ const hasActiveFilters = computed(() =>
   dateCustom.value !== '' ||
   selectedManagers.value.size > 0 ||
   selectedStatuses.value.size > 0 ||
-  selectedProjects.value.size > 0
+  selectedProjects.value.size > 0 ||
+  selectedRegions.value.size > 0 ||
+  selectedBanks.value.size > 0 ||
+  selectedDealStatuses.value.size > 0 ||
+  priceObject.value.from !== null ||
+  priceObject.value.to !== null ||
+  priceCredit.value.from !== null ||
+  priceCredit.value.to !== null ||
+  selectedDownPayments.value.size > 0 ||
+  selectedSendDateBadge.value !== null || sendDateCustom.value !== '' ||
+  selectedIssueDateBadge.value !== null || issueDateCustom.value !== '' ||
+  selectedMortgageTypes.value.size > 0
 )
 
-const buttonLabel = computed(() => {
-  if (props.count === 0) return 'Заявок нет'
-  const n = props.count, m10 = n % 10, m100 = n % 100
-  if (m100 >= 11 && m100 <= 14) return `${n} заявок`
-  if (m10 === 1) return `${n} заявка`
-  if (m10 >= 2 && m10 <= 4) return `${n} заявки`
-  return `${n} заявок`
+const filterCount = computed(() =>
+  (selectedDateBadge.value !== null || dateCustom.value !== '' ? 1 : 0) +
+  selectedManagers.value.size +
+  selectedStatuses.value.size +
+  selectedProjects.value.size +
+  selectedRegions.value.size +
+  selectedBanks.value.size +
+  selectedDealStatuses.value.size +
+  (priceObject.value.from !== null || priceObject.value.to !== null ? 1 : 0) +
+  (priceCredit.value.from !== null || priceCredit.value.to !== null ? 1 : 0) +
+  selectedDownPayments.value.size +
+  (selectedSendDateBadge.value !== null || sendDateCustom.value !== '' ? 1 : 0) +
+  (selectedIssueDateBadge.value !== null || issueDateCustom.value !== '' ? 1 : 0) +
+  selectedMortgageTypes.value.size
+)
+
+watch(filterCount, val => emit('update:filterCount', val), { immediate: true })
+
+const activeFilterTags = computed(() => {
+  const tags = []
+  if (selectedDateBadge.value || dateCustom.value)
+    tags.push({ label: `Дата создания: ${selectedDateBadge.value || dateCustom.value}`, reset: resetDate })
+  selectedStatuses.value.forEach(s =>
+    tags.push({ label: s, reset: () => { const set = new Set(selectedStatuses.value); set.delete(s); selectedStatuses.value = set } })
+  )
+  selectedManagers.value.forEach(m =>
+    tags.push({ label: m, reset: () => { const set = new Set(selectedManagers.value); set.delete(m); selectedManagers.value = set } })
+  )
+  selectedProjects.value.forEach(p =>
+    tags.push({ label: p, reset: () => { const set = new Set(selectedProjects.value); set.delete(p); selectedProjects.value = set } })
+  )
+  selectedRegions.value.forEach(r =>
+    tags.push({ label: r, reset: () => { const set = new Set(selectedRegions.value); set.delete(r); selectedRegions.value = set } })
+  )
+  selectedBanks.value.forEach(b =>
+    tags.push({ label: b, reset: () => { const set = new Set(selectedBanks.value); set.delete(b); selectedBanks.value = set } })
+  )
+  selectedDealStatuses.value.forEach(ds =>
+    tags.push({ label: ds, reset: () => { const set = new Set(selectedDealStatuses.value); set.delete(ds); selectedDealStatuses.value = set } })
+  )
+  selectedMortgageTypes.value.forEach(mt =>
+    tags.push({ label: mt, reset: () => { const set = new Set(selectedMortgageTypes.value); set.delete(mt); selectedMortgageTypes.value = set } })
+  )
+  selectedDownPayments.value.forEach(dp =>
+    tags.push({ label: `ПВ ${dp}%`, reset: () => { const set = new Set(selectedDownPayments.value); set.delete(dp); selectedDownPayments.value = set } })
+  )
+  if (priceObject.value.from !== null || priceObject.value.to !== null)
+    tags.push({ label: `Стоимость объекта: ${priceObject.value.from ?? ''}–${priceObject.value.to ?? ''}`, reset: () => { priceObject.value = { from: null, to: null } } })
+  if (priceCredit.value.from !== null || priceCredit.value.to !== null)
+    tags.push({ label: `Сумма кредита: ${priceCredit.value.from ?? ''}–${priceCredit.value.to ?? ''}`, reset: () => { priceCredit.value = { from: null, to: null } } })
+  if (selectedSendDateBadge.value || sendDateCustom.value)
+    tags.push({ label: `Дата отправки: ${selectedSendDateBadge.value || sendDateCustom.value}`, reset: () => { selectedSendDateBadge.value = null; sendDateCustom.value = '' } })
+  if (selectedIssueDateBadge.value || issueDateCustom.value)
+    tags.push({ label: `Дата выдачи: ${selectedIssueDateBadge.value || issueDateCustom.value}`, reset: () => { selectedIssueDateBadge.value = null; issueDateCustom.value = '' } })
+  return tags
 })
+watch(activeFilterTags, val => emit('update:filterTags', val), { immediate: true })
+
+const emitFilters = () => emit('update:filters', {
+  statuses: selectedStatuses.value,
+  managers: selectedManagers.value,
+  projects: selectedProjects.value,
+  regions: selectedRegions.value,
+  banks: selectedBanks.value,
+  dealStatuses: selectedDealStatuses.value,
+  priceObject: priceObject.value,
+  priceCredit: priceCredit.value,
+  downPayments: selectedDownPayments.value,
+  sendDate: sendDateCustom.value || null,
+  issueDate: issueDateCustom.value || null,
+  mortgageTypes: selectedMortgageTypes.value,
+})
+watch([selectedStatuses, selectedManagers, selectedProjects, selectedRegions, selectedBanks, selectedDealStatuses, priceObject, priceCredit, selectedDownPayments, sendDateCustom, issueDateCustom, selectedMortgageTypes], emitFilters, { immediate: true })
 
 const resetAll = () => {
   resetDate()
-  resetManagers()
-  resetStatuses()
-  resetProjects()
+  selectedManagers.value = new Set()
+  selectedStatuses.value = new Set()
+  selectedProjects.value = new Set()
+  selectedRegions.value = new Set()
+  selectedBanks.value = new Set()
+  selectedDealStatuses.value = new Set()
+  priceObject.value = { from: null, to: null }
+  priceCredit.value = { from: null, to: null }
+  selectedDownPayments.value = new Set()
+  selectedSendDateBadge.value = null
+  sendDateCustom.value = ''
+  selectedIssueDateBadge.value = null
+  issueDateCustom.value = ''
+  selectedMortgageTypes.value = new Set()
 }
+
+defineExpose({ resetAll })
 </script>

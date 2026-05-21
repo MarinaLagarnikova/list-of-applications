@@ -4,7 +4,7 @@
       <!-- Sticky header -->
       <div class="shrink-0 px-6 pt-6 pb-4">
         <div class="flex items-center justify-between">
-          <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">Фильтры и сортировка</span>
+          <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">Фильтры</span>
           <button
             @click="$emit('close')"
             class="flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors"
@@ -17,18 +17,6 @@
       <!-- Scrollable content -->
       <div class="flex-1 overflow-y-auto min-h-0">
 
-        <!-- Сортировка -->
-        <div class="px-6 py-4 flex flex-col gap-y-2">
-          <div class="flex items-center">
-            <input id="sort-scoring-new" name="sort-scoring" type="radio" value="new" v-model="sortOrder" class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 forced-colors:appearance-auto forced-colors:before:hidden" />
-            <label for="sort-scoring-new" class="ml-3 text-[14px] font-light text-[#18181b]">Сначала новые</label>
-          </div>
-          <div class="flex items-center">
-            <input id="sort-scoring-old" name="sort-scoring" type="radio" value="old" v-model="sortOrder" class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 forced-colors:appearance-auto forced-colors:before:hidden" />
-            <label for="sort-scoring-old" class="ml-3 text-[14px] font-light text-[#18181b]">Сначала старые</label>
-          </div>
-        </div>
-
         <!-- Дата создания -->
         <div class="px-6 py-4">
           <div class="flex items-center justify-between mb-3">
@@ -40,80 +28,41 @@
               v-for="badge in dateBadges"
               :key="badge"
               @click="selectedDateBadge === badge ? (selectedDateBadge = null, dateCustom = '') : (selectedDateBadge = badge, dateCustom = badgeToDate(badge))"
-              :class="['inline-flex items-center rounded-full border px-3 h-6 text-[13px] leading-none font-medium transition-colors', selectedDateBadge === badge ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-[#e4e4e7] text-[#3f3f46] hover:bg-zinc-50']"
+              :class="selectedDateBadge === badge ? 'rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 shadow-xs hover:bg-indigo-100' : 'rounded-full bg-white px-2.5 py-1 text-xs font-medium text-zinc-900 shadow-xs inset-ring inset-ring-gray-300 hover:bg-gray-50'"
             >{{ badge }}</button>
           </div>
-          <div class="flex items-center rounded-lg border border-[#e4e4e7] bg-white px-3 py-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition">
+          <div class="flex items-center rounded-lg border border-[#e4e4e7] bg-white px-3 py-[8px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition">
             <input
               type="text"
               placeholder=""
               v-model="dateCustom"
               @input="selectedDateBadge = null"
-              class="flex-1 min-w-0 bg-transparent text-[14px] font-medium text-[#18181b] placeholder:text-[#a1a1aa] focus:outline-none"
+              class="flex-1 min-w-0 bg-transparent text-[14px] font-normal text-zinc-900 placeholder:text-[#a1a1aa] focus:outline-none"
             />
+            <button v-if="dateCustom" @click="resetDate" class="shrink-0 mr-4 text-[#a1a1aa] hover:text-zinc-600 transition-colors">
+              <XIcon :size="16" />
+            </button>
             <CalendarIcon :size="16" class="shrink-0 text-[#a1a1aa] pointer-events-none" />
           </div>
         </div>
 
         <!-- Статус проверки -->
-        <div class="px-6 py-4">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Статус проверки</span>
-            <button
-              @click="selectedStatuses.size > 0 ? resetStatuses() : selectAllStatuses()"
-              class="text-[14px] font-medium text-indigo-600 hover:text-indigo-700"
-            >{{ selectedStatuses.size > 0 ? 'Сбросить' : 'Выбрать все' }}</button>
-          </div>
-          <div class="flex flex-col gap-y-3">
-            <div
-              v-for="status in scoringStatuses"
-              :key="status"
-              class="flex items-center justify-between cursor-pointer"
-              @click="toggleStatus(status)"
-            >
-              <span class="text-[14px] font-light text-[#18181b]">{{ status }}</span>
-              <span :class="['relative flex size-4 shrink-0 items-center justify-center rounded-sm border transition-colors', selectedStatuses.has(status) ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-[#d4d4d8] hover:border-[#a1a1aa]']">
-                <svg :class="['size-3 stroke-white transition-opacity', selectedStatuses.has(status) ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none">
-                  <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Менеджер -->
-        <div class="px-6 py-4">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Менеджер</span>
-            <button @click="selectedManagers.size > 0 ? resetManagers() : selectAllManagers()" class="text-[14px] font-medium text-indigo-600 hover:text-indigo-700">
-              {{ selectedManagers.size > 0 ? 'Сбросить' : 'Выбрать все' }}
-            </button>
-          </div>
-          <div class="flex items-center gap-x-2 rounded-lg border border-[#e4e4e7] bg-white px-3 py-[6px] shadow-[0px_1px_2px_rgba(0,0,0,0.05)] focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition mb-3">
-            <SearchIcon :size="16" class="shrink-0 text-[#a1a1aa] pointer-events-none" />
-            <input type="text" placeholder="Фамилия или имя" v-model="managerSearch"
-              class="flex-1 min-w-0 bg-transparent text-[14px] font-normal text-[#18181b] placeholder:text-[#a1a1aa] focus:outline-none" />
-          </div>
-          <div class="flex flex-col gap-y-3">
-            <div v-for="mgr in filteredManagers" :key="mgr.id" class="flex items-center justify-between cursor-pointer" @click="toggleManager(mgr.id)">
-              <span class="text-[14px] font-light text-[#18181b]">{{ mgr.name }}</span>
-              <span :class="['relative flex size-4 shrink-0 items-center justify-center rounded-sm border transition-colors', selectedManagers.has(mgr.id) ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-[#d4d4d8] hover:border-[#a1a1aa]']">
-                <svg :class="['size-3 stroke-white transition-opacity', selectedManagers.has(mgr.id) ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none">
-                  <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </span>
-            </div>
-          </div>
-        </div>
+        <FilterStatusGroup
+          label="Статус проверки"
+          :options="scoringStatuses"
+          :model-value="selectedStatuses"
+          @update:model-value="selectedStatuses = $event"
+        />
 
         <!-- Рейтинг -->
         <div class="px-6 py-4">
           <div class="flex items-center justify-between mb-3">
             <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Рейтинг</span>
             <button
-              @click="selectedRatings.size > 0 ? resetRatings() : selectAllRatings()"
+              v-if="selectedRatings.size > 0"
+              @click="selectedRatings = new Set()"
               class="text-[14px] font-medium text-indigo-600 hover:text-indigo-700"
-            >{{ selectedRatings.size > 0 ? 'Сбросить' : 'Выбрать все' }}</button>
+            >Сбросить</button>
           </div>
           <div class="flex flex-col gap-y-3">
             <div
@@ -122,9 +71,11 @@
               class="flex items-center justify-between cursor-pointer"
               @click="toggleRating(rating.label)"
             >
-              <div class="flex items-center gap-x-2">
-                <span :style="{ display:'flex', padding:'4px', borderRadius:'9999px', background: rating.halo, flexShrink:0 }">
-                  <span class="size-2 rounded-full" :style="{ background: rating.dot }" />
+              <div class="flex items-center gap-x-2.5">
+                <span class="flex w-6 shrink-0 items-center justify-center">
+                  <span :style="{ display:'flex', padding:'4px', borderRadius:'9999px', background: rating.halo }">
+                    <span class="size-2 rounded-full" :style="{ background: rating.dot }" />
+                  </span>
                 </span>
                 <span class="text-[14px] font-light text-[#18181b]">{{ rating.label }}</span>
               </div>
@@ -137,44 +88,52 @@
           </div>
         </div>
 
+        <!-- Менеджер -->
+        <FilterManagerGroup
+          label="Менеджер"
+          :options="managers"
+          :model-value="selectedManagers"
+          @update:model-value="selectedManagers = $event"
+        />
+
         <div class="h-4" />
       </div>
 
-      <!-- Sticky footer -->
-      <div class="shrink-0 border-t border-[#f4f4f5] px-6 py-4 flex items-center gap-x-3">
-        <button
-          @click="resetAll"
-          :class="['flex items-center justify-center rounded-lg border h-9 px-4 text-[14px] font-medium transition-colors', hasActiveFilters ? 'border-[#e4e4e7] text-[#18181b] hover:bg-zinc-50' : 'border-[#e4e4e7] text-[#a1a1aa] cursor-default']"
-        >Сбросить все</button>
-        <button
-          @click="props.count > 0 && $emit('close')"
-          :class="['flex flex-1 items-center justify-center rounded-lg h-9 px-4 text-[14px] font-medium text-white transition-colors',
-            props.count > 0 ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-indigo-300 cursor-default']"
-        >{{ buttonLabel }}</button>
-      </div>
+      <!-- ─── Sticky footer ───────────────────────── -->
+      <FilterFooter
+        :count="props.count"
+        :has-active-filters="hasActiveFilters"
+        :filter-count="filterCount"
+        :tags="activeFilterTags"
+        @reset="resetAll"
+        @close="$emit('close')"
+      />
 
   </BaseDrawer>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import BaseDrawer from './BaseDrawer.vue'
+import FilterCheckboxGroup from './FilterCheckboxGroup.vue'
+import FilterManagerGroup from './FilterManagerGroup.vue'
+import FilterStatusGroup from './FilterStatusGroup.vue'
+import FilterFooter from './FilterFooter.vue'
 import {
   X as XIcon,
   Calendar as CalendarIcon,
-  Search as SearchIcon,
 } from 'lucide-vue-next'
 
 const props = defineProps({ open: Boolean, count: { type: Number, default: 0 } })
-defineEmits(['close'])
+const emit = defineEmits(['close', 'update:filterCount', 'update:filters', 'update:filterTags'])
 
-const sortOrder = ref('new')
-
-const scoringStatuses = ['Проверка выполнена', 'На проверке', 'Ошибка проверки']
+const scoringStatuses = [
+  { name: 'Новая заявка',  dot: 'border-gray-400 bg-gray-50'   },
+  { name: 'На проверке',   dot: 'border-amber-400 bg-amber-50' },
+  { name: 'Выполнена',     dot: 'border-green-400 bg-green-50' },
+  { name: 'Остановлена',   dot: 'border-red-400 bg-red-50'     },
+]
 const selectedStatuses = ref(new Set())
-const toggleStatus = (s) => { const set = new Set(selectedStatuses.value); set.has(s) ? set.delete(s) : set.add(s); selectedStatuses.value = set }
-const selectAllStatuses = () => { selectedStatuses.value = new Set(scoringStatuses) }
-const resetStatuses = () => { selectedStatuses.value = new Set() }
 
 const scoringRatings = [
   { label: 'Отличный', dot: '#16a34a', halo: 'rgba(22,163,74,0.10)'  },
@@ -183,11 +142,13 @@ const scoringRatings = [
   { label: 'Низкий',   dot: '#e11d48', halo: 'rgba(225,29,72,0.10)'  },
 ]
 const selectedRatings = ref(new Set())
-const toggleRating = (r) => { const set = new Set(selectedRatings.value); set.has(r) ? set.delete(r) : set.add(r); selectedRatings.value = set }
-const selectAllRatings = () => { selectedRatings.value = new Set(scoringRatings.map(r => r.label)) }
-const resetRatings = () => { selectedRatings.value = new Set() }
+const toggleRating = (r) => {
+  const set = new Set(selectedRatings.value)
+  set.has(r) ? set.delete(r) : set.add(r)
+  selectedRatings.value = set
+}
 
-const dateBadges = ['Сегодня', 'Вчера', 'Неделя', '2 недели']
+const dateBadges = ['Сегодня', 'Вчера', 'Неделя', '2 недели', 'Май', '2 квартал']
 const selectedDateBadge = ref(null)
 const dateCustom = ref('')
 
@@ -197,29 +158,23 @@ const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); r
 const badgeToDate = (badge) => {
   if (badge === 'Сегодня') return fmtDate(today)
   if (badge === 'Вчера') return fmtDate(addDays(today, -1))
-  if (badge === 'Неделя') return `${fmtDate(addDays(today, -7))} – ${fmtDate(today)}`
-  if (badge === '2 недели') return `${fmtDate(addDays(today, -14))} – ${fmtDate(today)}`
+  if (badge === 'Неделя') return `${fmtDate(addDays(today, -7))} — ${fmtDate(today)}`
+  if (badge === '2 недели') return `${fmtDate(addDays(today, -14))} — ${fmtDate(today)}`
+  if (badge === 'Май') return '01.05.2026 — 31.05.2026'
+  if (badge === '2 квартал') return '01.04.2026 — 30.06.2026'
   return ''
 }
 
-const toggleDateBadge = (badge) => { selectedDateBadge.value = selectedDateBadge.value === badge ? null : badge }
 const resetDate = () => { selectedDateBadge.value = null; dateCustom.value = '' }
 
 const managers = [
-  { id: 1, name: 'Иванов Иван' },
-  { id: 2, name: 'Сергеев Сергей' },
-  { id: 3, name: 'Петров Пётр' },
-  { id: 4, name: 'Сидоров Игорь' },
-  { id: 5, name: 'Новиков Алексей' },
+  { name: 'Иванов Иван',     initials: 'ИИ', role: 'Менеджер ипотеки' },
+  { name: 'Сергеев Сергей',  initials: 'СС', role: 'Менеджер ипотеки' },
+  { name: 'Петров Пётр',     initials: 'ПП', role: 'Продажи'           },
+  { name: 'Сидоров Игорь',   initials: 'СИ', role: 'Руководитель'      },
+  { name: 'Новиков Алексей', initials: 'НА', role: 'Администратор'     },
 ]
-const managerSearch = ref('')
 const selectedManagers = ref(new Set())
-const filteredManagers = computed(() =>
-  managerSearch.value ? managers.filter(m => m.name.toLowerCase().includes(managerSearch.value.toLowerCase())) : managers
-)
-const toggleManager = (id) => { const s = new Set(selectedManagers.value); s.has(id) ? s.delete(id) : s.add(id); selectedManagers.value = s }
-const selectAllManagers = () => { selectedManagers.value = new Set(managers.map(m => m.id)) }
-const resetManagers = () => { selectedManagers.value = new Set() }
 
 const hasActiveFilters = computed(() =>
   selectedStatuses.value.size > 0 ||
@@ -229,14 +184,45 @@ const hasActiveFilters = computed(() =>
   selectedManagers.value.size > 0
 )
 
-const buttonLabel = computed(() => {
-  if (props.count === 0) return 'Заявок нет'
-  const n = props.count, m10 = n % 10, m100 = n % 100
-  if (m100 >= 11 && m100 <= 14) return `${n} заявок`
-  if (m10 === 1) return `${n} заявка`
-  if (m10 >= 2 && m10 <= 4) return `${n} заявки`
-  return `${n} заявок`
-})
+const filterCount = computed(() =>
+  selectedStatuses.value.size +
+  selectedRatings.value.size +
+  (selectedDateBadge.value !== null || dateCustom.value !== '' ? 1 : 0) +
+  selectedManagers.value.size
+)
 
-const resetAll = () => { resetStatuses(); resetRatings(); resetDate(); resetManagers() }
+watch(filterCount, val => emit('update:filterCount', val), { immediate: true })
+
+const emitFilters = () => emit('update:filters', {
+  statuses: selectedStatuses.value,
+  ratings: selectedRatings.value,
+  managers: selectedManagers.value,
+})
+watch([selectedStatuses, selectedRatings, selectedManagers], emitFilters, { immediate: true })
+
+const activeFilterTags = computed(() => {
+  const tags = []
+  if (selectedDateBadge.value || dateCustom.value)
+    tags.push({ label: `Дата создания: ${selectedDateBadge.value || dateCustom.value}`, reset: resetDate })
+  selectedStatuses.value.forEach(s =>
+    tags.push({ label: s, reset: () => { const set = new Set(selectedStatuses.value); set.delete(s); selectedStatuses.value = set } })
+  )
+  selectedRatings.value.forEach(r =>
+    tags.push({ label: r, reset: () => { const set = new Set(selectedRatings.value); set.delete(r); selectedRatings.value = set } })
+  )
+  selectedManagers.value.forEach(m =>
+    tags.push({ label: m, reset: () => { const set = new Set(selectedManagers.value); set.delete(m); selectedManagers.value = set } })
+  )
+  return tags
+})
+watch(activeFilterTags, val => emit('update:filterTags', val), { immediate: true })
+
+const resetAll = () => {
+  selectedStatuses.value = new Set()
+  selectedRatings.value = new Set()
+  resetDate()
+  selectedManagers.value = new Set()
+}
+
+defineExpose({ resetAll })
 </script>

@@ -19,8 +19,8 @@
       </div>
 
 
-      <!-- Sidebar Create button (только в режиме ипотеки) -->
-      <div v-if="mode === 'mortgage'" class="shrink-0 px-1">
+      <!-- Sidebar Create button (все модули кроме Калькулятора и Аналитики, когда сайдбар раскрыт) -->
+      <div v-if="!sidebarCollapsed && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" class="shrink-0 px-1">
         <Button color="indigo" class="w-full justify-center" @click="createModalOpen = true">
           <PlusIcon :size="16" class="shrink-0" />
           Создать
@@ -86,7 +86,19 @@
                   </DisclosureButton>
                   <DisclosurePanel as="ul" class="mt-1 px-2">
                     <li v-for="sub in item.children" :key="sub.name">
+                      <!-- Action item (e.g. Импортировать) -->
                       <a
+                        v-if="sub.action"
+                        :href="sub.href"
+                        class="group flex items-center justify-between rounded-md py-2 pr-0 pl-9 text-sm/6 text-zinc-700 hover:bg-gray-50 hover:text-indigo-600"
+                        @click.prevent="handleSubAction(sub.action)"
+                      >
+                        <span>{{ sub.name }}</span>
+                        <ArrowUpFromLineIcon :size="16" class="shrink-0 text-zinc-400 group-hover:text-indigo-600" />
+                      </a>
+                      <!-- Regular nav item -->
+                      <a
+                        v-else
                         :href="sub.href"
                         :class="[
                           sub.name === activeSubItem && activeModule === item.name ? 'bg-gray-50 text-indigo-600' : 'text-zinc-700 hover:bg-gray-50 hover:text-indigo-600',
@@ -226,13 +238,15 @@
     <div class="relative flex flex-1 flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-200">
 
       <!-- ─── Filter Drawer ────────────────────────── -->
-      <FilterDrawer :open="filterDrawerOpen" :count="activeCount ?? 0" @close="filterDrawerOpen = false" />
+      <FilterDrawer ref="mortgageFilterDrawerRef" :open="filterDrawerOpen" :count="activeCount ?? 0" @close="filterDrawerOpen = false" @update:filterCount="mortgageFilterCount = $event" @update:filters="mortgageFilters = $event" @update:filterTags="mortgageFilterTags = $event" />
 
       <!-- ─── Scoring Filter Drawer ───────────────── -->
-      <ScoringFilterDrawer :open="scoringFilterDrawerOpen" :count="activeCount ?? 0" @close="scoringFilterDrawerOpen = false" />
+      <ScoringImportDrawer :open="scoringImportOpen" @close="scoringImportOpen = false" />
+
+      <ScoringFilterDrawer ref="scoringFilterDrawerRef" :open="scoringFilterDrawerOpen" :count="activeCount ?? 0" @close="scoringFilterDrawerOpen = false" @update:filterCount="scoringFilterCount = $event" @update:filters="scoringFilters = $event" @update:filterTags="scoringFilterTags = $event" />
 
       <!-- ─── Document Packages Filter Drawer ─────── -->
-      <DocumentPackagesFilterDrawer :open="docPackagesFilterOpen" :count="activeCount ?? 0" @close="docPackagesFilterOpen = false" />
+      <DocumentPackagesFilterDrawer ref="docPackagesFilterDrawerRef" :open="docPackagesFilterOpen" :count="activeCount ?? 0" @close="docPackagesFilterOpen = false" @update:filterCount="docPackagesFilterCount = $event" @update:filters="docPackagesFilters = $event" @update:filterTags="docPackagesFilterTags = $event" />
 
       <!-- ─── Document Package Preview Drawer ──────── -->
       <DocumentPackagePreviewDrawer :open="docPackagePreviewOpen" :item="selectedDocPackage" @close="docPackagePreviewOpen = false" />
@@ -254,7 +268,10 @@
       />
 
       <!-- ─── Registration Filter Drawer ─────────────────── -->
-      <RegistrationFilterDrawer :open="registrationFilterOpen" :count="activeCount ?? 0" @close="registrationFilterOpen = false" />
+      <RegistrationFilterDrawer ref="registrationFilterDrawerRef" :open="registrationFilterOpen" :count="activeCount ?? 0" @close="registrationFilterOpen = false" @update:filterCount="registrationFilterCount = $event" @update:filters="registrationFilters = $event" @update:filterTags="registrationFilterTags = $event" />
+
+      <!-- ─── Batch Registration Filter Drawer ──────────────── -->
+      <BatchRegistrationFilterDrawer ref="batchRegistrationFilterDrawerRef" :open="batchRegistrationFilterOpen" :count="activeCount ?? 0" @close="batchRegistrationFilterOpen = false" @update:filterCount="batchRegistrationFilterCount = $event" @update:filters="batchRegistrationFilters = $event" @update:filterTags="batchRegistrationFilterTags = $event" />
 
       <!-- ─── App Preview Drawer (Регистрация) ──────────── -->
       <AppPreviewDrawer
@@ -268,7 +285,7 @@
       />
 
       <!-- ─── Digital Signatures Filter Drawer ───────── -->
-      <DigitalSignaturesFilterDrawer :open="digitalSignaturesFilterOpen" :count="activeCount ?? 0" @close="digitalSignaturesFilterOpen = false" />
+      <DigitalSignaturesFilterDrawer ref="digitalSignaturesFilterDrawerRef" :open="digitalSignaturesFilterOpen" :count="activeCount ?? 0" @close="digitalSignaturesFilterOpen = false" @update:filterCount="digitalSignaturesFilterCount = $event" @update:filters="digitalSignaturesFilters = $event" @update:filterTags="digitalSignaturesFilterTags = $event" />
 
       <!-- ─── Digital Signatures Preview Drawer ───────── -->
       <AppPreviewDrawer
@@ -284,7 +301,7 @@
       />
 
       <!-- ─── Insurance Filter Drawer ──────────────────── -->
-      <InsuranceFilterDrawer :open="insuranceFilterOpen" :count="activeCount ?? 0" @close="insuranceFilterOpen = false" />
+      <InsuranceFilterDrawer ref="insuranceFilterDrawerRef" :open="insuranceFilterOpen" :count="activeCount ?? 0" @close="insuranceFilterOpen = false" @update:filterCount="insuranceFilterCount = $event" @update:filters="insuranceFilters = $event" @update:filterTags="insuranceFilterTags = $event" />
 
       <!-- ─── App Preview Drawer (Страховка) ───────────── -->
       <AppPreviewDrawer
@@ -304,20 +321,20 @@
       />
 
       <!-- Шапка: строка 1 — toggle + заголовок + кнопки -->
-      <div class="shrink-0 flex items-center gap-x-3 pl-6 pr-8 py-2.5 border-b border-[#f4f4f5]">
+      <div class="shrink-0 flex items-center gap-x-3 pl-6 pr-8 py-2.5">
         <Button plain class="size-8 px-0 text-gray-400 hover:text-gray-600" @click="sidebarCollapsed = !sidebarCollapsed">
           <PanelLeftIcon :size="16" :stroke-width="1.5" class="shrink-0 aspect-square" style="width:16px;height:16px;stroke:#18181B;" aria-hidden="true" />
         </Button>
         <div class="flex items-center gap-x-4">
-          <div class="flex items-center gap-x-3">
+          <div class="flex items-center gap-x-2">
             <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">{{ activeModule }}</span>
-            <Badge
+            <span
               v-if="activeCount !== null && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'"
-              color="zinc"
-            >{{ activeCount.toLocaleString('ru-RU') }}</Badge>
+              class="inline-flex items-center rounded-md bg-zinc-50 px-1.5 py-0.5 text-xs font-medium text-zinc-600 inset-ring inset-ring-zinc-500/10"
+            >{{ activeCount.toLocaleString('ru-RU') }}</span>
           </div>
 
-          <Button v-if="(mode === 'all' || sidebarCollapsed) && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" color="indigo" @click="createModalOpen = true">
+          <Button v-if="sidebarCollapsed && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" color="indigo" @click="createModalOpen = true">
             <PlusIcon :size="16" class="shrink-0" />
             Создать
           </Button>
@@ -325,7 +342,7 @@
       </div>
 
       <!-- Шапка: строка 2 — поиск + фильтры (только Ипотека) -->
-      <div v-if="activeModule === 'Ипотека'" class="shrink-0 flex items-center justify-between border-b border-[#f4f4f5] px-8 py-2">
+      <div v-if="activeModule === 'Ипотека'" :class="['shrink-0 flex items-center justify-between px-8 py-2', isScrolled && !mortgageFilterTags.length && 'border-b border-[#f4f4f5]']">
         <SearchInput v-model="searchQuery" placeholder="Поиск по ID, ФИО или телефону" />
         <div class="flex items-center gap-x-3">
           <span v-if="searchQuery.trim()" class="text-[14px] font-light text-[#71717a] mr-5">
@@ -333,35 +350,42 @@
           </span>
           <Button outline @click="filterDrawerOpen = true">
             <FunnelIcon :size="16" class="shrink-0 aspect-square" style="width:16px;height:16px;" />
-            Фильтры и сортировка
+            Фильтры
+            <span v-if="mortgageFilterCount > 0" class="inline-flex items-center justify-center size-[18px] rounded-full bg-indigo-600 text-white text-[11px] font-medium leading-none">{{ mortgageFilterCount }}</span>
           </Button>
+          <SortDropdown v-model="mortgageSortOrder" />
           <ExportPopover :count="filteredApplications.length" />
         </div>
       </div>
 
+      <!-- Applied filters strip (Ипотека) -->
+      <div v-if="activeModule === 'Ипотека' && mortgageFilterTags && mortgageFilterTags.length > 0" :class="['shrink-0 pl-[60px] pr-8 pt-2 pb-4', isScrolled && 'border-b border-[#f4f4f5]']">
+        <FilterTagsBar :tags="mortgageFilterTags" @reset="mortgageFilterDrawerRef?.resetAll()" @show-more="filterDrawerOpen = true" />
+      </div>
+
       <!-- Scrollable content -->
-      <div class="flex-1 overflow-auto">
+      <div class="flex-1 overflow-auto" @scroll="isScrolled = $event.target.scrollTop > 0">
 
         <!-- Ипотека -->
-        <div v-if="activeModule === 'Ипотека'" class="px-6 pt-6 pr-8 pb-10">
-        <table class="border-separate border-spacing-0">
+        <div v-if="activeModule === 'Ипотека'" class="pt-6 pb-10">
+        <table class="w-full border-separate border-spacing-0">
         <tbody>
 
-          <tr v-for="app in filteredApplications" :key="app.id" class="group cursor-pointer" @click="openApp(app)">
-            <td class="rounded-l-2xl group-hover:bg-zinc-50 align-middle py-3 pl-2 pr-2" @click.stop="toggleRow(app.id)">
+          <tr v-for="app in filteredApplications" :key="app.id" :class="['group cursor-pointer', checkedRows.has(app.id) && 'selected']" @click="openApp(app)">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top pt-[16px] pb-3 pl-8 pr-2" @click.stop="toggleRow(app.id)">
               <label class="inline-flex cursor-pointer">
                 <span :class="['relative flex size-4 items-center justify-center rounded-sm border', checkedRows.has(app.id) ? 'bg-indigo-600 border-transparent' : 'bg-white border-zinc-950/15 hover:border-zinc-950/30']">
                   <svg :class="['size-3 stroke-white transition-opacity', checkedRows.has(app.id) ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none"><path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
                 </span>
               </label>
             </td>
-            <td class="group-hover:bg-zinc-50 align-top px-3 py-[20.5px] whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex flex-col gap-y-1">
                 <TableLink @click="openDrawer(app)">{{ app.id }}</TableLink>
                 <span class="text-[14px] leading-[20px] font-light text-zinc-900">от {{ app.date }}</span>
               </div>
             </td>
-            <td class="group-hover:bg-zinc-50 align-top px-3 py-[20.5px] whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex items-start gap-x-3">
                 <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] font-medium text-[#71717a]">{{ app.initials }}</span>
                 <div class="flex flex-col gap-y-1">
@@ -370,35 +394,35 @@
                 </div>
               </div>
             </td>
-            <td class="group-hover:bg-zinc-50 align-top px-3 py-[20.5px] whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
               <span v-if="app.status" :class="statusBadgeClass(app.status)">{{ app.status }}</span>
             </td>
-            <td class="group-hover:bg-zinc-50 align-top px-3 py-[20.5px] whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex flex-col gap-y-1">
                 <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ app.complex }}</span>
                 <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ app.complexPrice }}</span>
               </div>
             </td>
-            <td class="group-hover:bg-zinc-50 align-top px-3 py-[20.5px] whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex flex-col gap-y-1">
                 <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ app.amount }}<span v-if="app.pv" class="text-[#71717a]"> ПВ {{ app.pv }}</span></span>
                 <span v-if="app.term" class="text-[14px] leading-[20px] font-light text-zinc-900">{{ app.term }}</span>
               </div>
             </td>
-            <td class="group-hover:bg-zinc-50 align-top px-3 py-[20.5px] whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex flex-col gap-y-1">
                 <span v-if="app.houseType" class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ app.houseType }}</span>
                 <span v-if="app.mortgageType" class="text-[14px] leading-[20px] font-light text-zinc-900">{{ app.mortgageType }}</span>
               </div>
             </td>
-            <td class="group-hover:bg-zinc-50 align-top px-3 py-[20.5px] whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex flex-col gap-y-1">
                 <span class="text-[14px] leading-[20px] font-light text-[#18181b]">Создана {{ app.createdAt.slice(0, 5) }}</span>
                 <span class="text-[14px] leading-[20px] font-light text-zinc-900">Обновлена {{ app.updatedAt.replace(/\.\d{4}/, '') }}</span>
               </div>
             </td>
             <!-- Менеджер -->
-            <td class="rounded-r-2xl group-hover:bg-zinc-50 align-top px-3 py-[20.5px] whitespace-nowrap" @click.stop>
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top pl-3 pr-8 py-4 whitespace-nowrap" @click.stop>
               <CatalystListbox
                 :options="managerSelectOptions"
                 :model-value="mortgageManagerSelections[app.id]"
@@ -410,16 +434,15 @@
         </tbody>
         </table>
 
-        <!-- Empty state при поиске -->
-        <div v-if="filteredApplications.length === 0 && searchQuery.trim()" class="flex flex-col items-center justify-center py-24 text-center">
+        <!-- Empty state при поиске или фильтрации -->
+        <div v-if="filteredApplications.length === 0 && (searchQuery.trim() || mortgageFilterCount > 0)" class="flex flex-col items-center justify-center py-24 text-center">
           <svg class="mx-auto size-12 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
           </svg>
           <h3 class="mt-3 text-sm font-medium text-zinc-900">Заявки не найдены</h3>
           <p class="mt-1 text-sm font-light text-zinc-500">Попробуйте изменить параметры поиска или фильтрации</p>
-          <div class="mt-6">
-            <Button outline @click="searchQuery = ''">Сбросить поиск</Button>
-          </div>
+          <Button v-if="searchQuery.trim() && !mortgageFilterCount" outline class="mt-6" @click="searchQuery = ''">Сбросить поиск</Button>
+          <Button v-else-if="!searchQuery.trim() && mortgageFilterCount > 0" outline class="mt-6" @click="mortgageFilterDrawerRef?.resetAll()">Сбросить фильтры</Button>
         </div>
 
         </div>
@@ -428,19 +451,22 @@
         <CalculatorPage v-else-if="activeModule === 'Калькулятор ипотеки'" @open-bank="openBankDrawer" />
 
         <!-- Скоринг -->
-        <ScoringPage v-else-if="activeModule === 'Скоринг'" :active-sub-item="activeSubItem" @open-filter="scoringFilterDrawerOpen = true" @open-preview="openScoringDrawer" @update:count="activeCount = $event" />
+        <ScoringPage v-else-if="activeModule === 'Скоринг'" :active-sub-item="activeSubItem" :filter-count="scoringFilterCount" :filters="scoringFilters" :filter-tags="scoringFilterTags" @open-filter="scoringFilterDrawerOpen = true" @open-preview="openScoringDrawer" @update:count="activeCount = $event" @reset-filters="scoringFilterDrawerRef?.resetAll()" />
 
         <!-- Пакеты документов -->
-        <DocumentPackagesPage v-else-if="activeModule === 'Пакеты документов'" :active-sub-item="activeSubItem" @open-filter="docPackagesFilterOpen = true" @open-preview="item => { selectedDocPackage = item; docPackagePreviewOpen = true }" @update:count="activeCount = $event" />
+        <DocumentPackagesPage v-else-if="activeModule === 'Пакеты документов'" :active-sub-item="activeSubItem" :filter-count="docPackagesFilterCount" :filters="docPackagesFilters" :filter-tags="docPackagesFilterTags" @open-filter="docPackagesFilterOpen = true" @open-preview="item => { selectedDocPackage = item; docPackagePreviewOpen = true }" @update:count="activeCount = $event" @reset-filters="docPackagesFilterDrawerRef?.resetAll()" />
 
         <!-- Регистрация -->
-        <RegistrationPage v-else-if="activeModule === 'Регистрация'" :active-sub-item="activeSubItem" @open-filter="registrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" />
+        <RegistrationPage v-else-if="activeModule === 'Регистрация'" :active-sub-item="activeSubItem" :filter-count="registrationFilterCount" :filters="registrationFilters" :filter-tags="registrationFilterTags" @open-filter="registrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="registrationFilterDrawerRef?.resetAll()" />
+
+        <!-- Пакетная регистрация -->
+        <BatchRegistrationPage v-else-if="activeModule === 'Пакетная регистрация'" :active-sub-item="activeSubItem" :filter-count="batchRegistrationFilterCount" :filters="batchRegistrationFilters" :filter-tags="batchRegistrationFilterTags" @open-filter="batchRegistrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="batchRegistrationFilterDrawerRef?.resetAll()" />
 
         <!-- Страховка -->
-        <InsurancePage v-else-if="activeModule === 'Страховка'" :active-sub-item="activeSubItem" @open-filter="insuranceFilterOpen = true" @open-preview="openInsurancePreview" @update:count="activeCount = $event" />
+        <InsurancePage v-else-if="activeModule === 'Страховка'" :active-sub-item="activeSubItem" :filter-count="insuranceFilterCount" :filters="insuranceFilters" :filter-tags="insuranceFilterTags" @open-filter="insuranceFilterOpen = true" @open-preview="openInsurancePreview" @update:count="activeCount = $event" @reset-filters="insuranceFilterDrawerRef?.resetAll()" />
 
         <!-- Цифровые подписи -->
-        <DigitalSignaturesPage v-else-if="activeModule === 'Цифровые подписи'" :active-sub-item="activeSubItem" @open-filter="digitalSignaturesFilterOpen = true" @open-preview="openDigitalSignaturesPreview" @update:count="activeCount = $event" />
+        <DigitalSignaturesPage v-else-if="activeModule === 'Цифровые подписи'" :active-sub-item="activeSubItem" :filter-count="digitalSignaturesFilterCount" :filters="digitalSignaturesFilters" :filter-tags="digitalSignaturesFilterTags" @open-filter="digitalSignaturesFilterOpen = true" @open-preview="openDigitalSignaturesPreview" @update:count="activeCount = $event" @reset-filters="digitalSignaturesFilterDrawerRef?.resetAll()" />
 
         <!-- Аналитика -->
         <AnalyticsPage v-else-if="activeModule === 'Аналитика'" />
@@ -472,6 +498,7 @@ import CalculatorPage from './src/components/CalculatorPage.vue'
 import ScoringPage from './src/components/ScoringPage.vue'
 import AnalyticsPage from './src/components/AnalyticsPage.vue'
 import ScoringFilterDrawer from './src/components/ScoringFilterDrawer.vue'
+import ScoringImportDrawer from './src/components/ScoringImportDrawer.vue'
 import CreateApplicationModal from './src/components/CreateApplicationModal.vue'
 import ExportPopover from './src/components/ExportPopover.vue'
 import ToastNotification from './src/components/ToastNotification.vue'
@@ -481,11 +508,15 @@ import DocumentPackagesFilterDrawer from './src/components/DocumentPackagesFilte
 import DocumentPackagePreviewDrawer from './src/components/DocumentPackagePreviewDrawer.vue'
 import RegistrationPage from './src/components/RegistrationPage.vue'
 import RegistrationFilterDrawer from './src/components/RegistrationFilterDrawer.vue'
+import BatchRegistrationPage from './src/components/BatchRegistrationPage.vue'
+import BatchRegistrationFilterDrawer from './src/components/BatchRegistrationFilterDrawer.vue'
 import InsurancePage from './src/components/InsurancePage.vue'
 import InsuranceFilterDrawer from './src/components/InsuranceFilterDrawer.vue'
 import DigitalSignaturesPage from './src/components/DigitalSignaturesPage.vue'
 import DigitalSignaturesFilterDrawer from './src/components/DigitalSignaturesFilterDrawer.vue'
 import SelectionBar from './src/components/SelectionBar.vue'
+import SortDropdown from './src/components/SortDropdown.vue'
+import FilterTagsBar from './src/components/FilterTagsBar.vue'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
 import {
   CloudOff as CloudOffIcon,
@@ -520,6 +551,8 @@ import {
   MessageCircleQuestion as MessageCircleQuestionIcon,
   CircleUser as CircleUserIcon,
   Ellipsis as EllipsisIcon,
+  ArrowUpToLine as ArrowUpFromLineIcon,
+  Layers as LayersIcon,
 } from 'lucide-vue-next'
 
 const isOffline = ref(true)
@@ -534,12 +567,16 @@ onUnmounted(() => {
 
 const activeModule = ref('Ипотека')
 const sidebarCollapsed = ref(false)
+const mortgageSortOrder = ref('new')
+const isScrolled = ref(false)
 const filterDrawerOpen = ref(false)
 const scoringFilterDrawerOpen = ref(false)
+const scoringImportOpen = ref(false)
 const docPackagesFilterOpen = ref(false)
 const docPackagePreviewOpen = ref(false)
 const selectedDocPackage = ref(null)
 const registrationFilterOpen = ref(false)
+const batchRegistrationFilterOpen = ref(false)
 const registrationDrawerOpen = ref(false)
 const selectedRegistration = ref(null)
 const digitalSignaturesFilterOpen = ref(false)
@@ -620,6 +657,37 @@ watch(activeModule, () => {
 
 const activeCount = ref(null)
 
+const mortgageFilterDrawerRef = ref(null)
+const scoringFilterDrawerRef = ref(null)
+const docPackagesFilterDrawerRef = ref(null)
+const registrationFilterDrawerRef = ref(null)
+const batchRegistrationFilterDrawerRef = ref(null)
+const insuranceFilterDrawerRef = ref(null)
+const digitalSignaturesFilterDrawerRef = ref(null)
+
+const mortgageFilterCount = ref(0)
+const mortgageFilters = ref({})
+const mortgageFilterTags = ref([])
+
+const scoringFilterCount = ref(0)
+const scoringFilters = ref({})
+const scoringFilterTags = ref([])
+const docPackagesFilterCount = ref(0)
+const docPackagesFilters = ref({})
+const docPackagesFilterTags = ref([])
+const registrationFilterCount = ref(0)
+const registrationFilterTags = ref([])
+const registrationFilters = ref(null)
+const batchRegistrationFilterCount = ref(0)
+const batchRegistrationFilterTags = ref([])
+const batchRegistrationFilters = ref(null)
+const insuranceFilterCount = ref(0)
+const insuranceFilterTags = ref([])
+const insuranceFilters = ref(null)
+const digitalSignaturesFilterCount = ref(0)
+const digitalSignaturesFilters = ref(null)
+const digitalSignaturesFilterTags = ref([])
+
 const pluralCount = (n) => {
   const mod10 = n % 10
   const mod100 = n % 100
@@ -651,6 +719,10 @@ const scoringDrawerOpen = ref(false)
 const selectedScoringApp = ref(null)
 const openScoringDrawer = (item) => { selectedScoringApp.value = item; scoringDrawerOpen.value = true }
 
+const handleSubAction = (action) => {
+  if (action === 'scoring-import') scoringImportOpen.value = true
+}
+
 
 const managerSelectOptions = ['Я', 'Смирнова Юлия', 'Орлов Дмитрий', 'Лебедев Игорь', 'Воронова Анна', 'Морозов Сергей']
 const mortgageManagerSelections = reactive({})
@@ -674,14 +746,18 @@ const statusColWidth = computed(() => {
   return `${maxLen * 7 + 24}px`
 })
 
-const statusFilterItems = new Set(['Ожидает решения', 'Одобрено', 'Отказано', 'Кредит выдан'])
+const statusFilterItems = new Set(['Ожидает решения', 'Одобрена', 'Отказано', 'Кредит выдан'])
 
 const filteredApplications = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
   const statusFilter = statusFilterItems.has(activeSubItem.value) ? activeSubItem.value : null
+  const { statuses, managers: filterManagers, projects: filterProjects } = mortgageFilters.value
 
-  return applications.filter(app => {
+  let result = applications.filter(app => {
     if (statusFilter && app.status !== statusFilter) return false
+    if (statuses?.size > 0 && !statuses.has(app.status)) return false
+    if (filterManagers?.size > 0 && !filterManagers.has(mortgageManagerSelections[app.id])) return false
+    if (filterProjects?.size > 0 && !filterProjects.has(app.complex)) return false
     if (!q) return true
     return (
       app.id.toLowerCase().includes(q) ||
@@ -690,6 +766,16 @@ const filteredApplications = computed(() => {
       app.phone.replace(/\s/g, '').includes(q.replace(/\s/g, ''))
     )
   })
+
+  if (mortgageSortOrder.value === 'old') {
+    result = [...result].sort((a, b) => {
+      const [da, ma, ya] = a.createdAt.split('.')
+      const [db, mb, yb] = b.createdAt.split('.')
+      return new Date(ya, ma - 1, da) - new Date(yb, mb - 1, db)
+    })
+  }
+
+  return result
 })
 
 const checkedRows = ref(new Set())
@@ -702,9 +788,11 @@ watch(activeModule, () => { checkedRows.value = new Set() })
 
 const statusBadgeClass = (status) => {
   const base = 'inline-flex items-center rounded-md px-1.5 py-1 text-[12px] leading-[16px] font-normal inset-ring'
-  if (status === 'Одобрено')          return `${base} bg-green-50 text-green-700 inset-ring-green-600/20`
-  if (status === 'Кредит выдан')      return `${base} bg-green-50 text-green-700 inset-ring-green-600/20`
-  if (status === 'Ожидает решения')   return `${base} bg-amber-50 text-amber-700 inset-ring-amber-600/20`
+  if (['Одобрена', 'ДДУ согласован', 'ДДУ зарегистрирован', 'Кредит выдан'].includes(status))
+    return `${base} bg-green-50 text-green-700 inset-ring-green-600/20`
+  if (['Ожидает решения', 'На подписании', 'Согласование ДДУ', 'Объект на согласовании'].includes(status))
+    return `${base} bg-amber-50 text-amber-700 inset-ring-amber-600/20`
+  if (status === 'Банк выбран')       return `${base} bg-blue-50 text-blue-700 inset-ring-blue-700/10`
   if (status === 'Отказано')          return `${base} bg-red-50 text-red-700 inset-ring-red-600/10`
   return `${base} bg-gray-50 text-gray-600 inset-ring-gray-500/10`
 }
@@ -719,7 +807,7 @@ const navigation = [
       { name: 'Все заявки',        href: '#', current: true,  count: 12456 },
       { name: 'Мои заявки',        href: '#', current: false, count: 34    },
       { name: 'Ожидает решения',   href: '#', current: false, count: 143   },
-      { name: 'Одобрено',          href: '#', current: false, count: 28    },
+      { name: 'Одобрена',          href: '#', current: false, count: 28    },
       { name: 'Отказано',          href: '#', current: false               },
       { name: 'Кредит выдан',      href: '#', current: false, count: 5     },
     ],
@@ -732,6 +820,7 @@ const navigation = [
     children: [
       { name: 'Все заявки', href: '#', current: false, count: 1247 },
       { name: 'Мои заявки', href: '#', current: false, count: 18  },
+      { name: 'Импортировать', href: '#', action: 'scoring-import' },
     ],
   },
   {
@@ -752,6 +841,16 @@ const navigation = [
     children: [
       { name: 'Все заявки', href: '#', current: false, count: 34 },
       { name: 'Мои заявки', href: '#', current: false, count: 10 },
+    ],
+  },
+  {
+    name: 'Пакетная регистрация',
+    href: '#',
+    icon: LayersIcon,
+    current: false,
+    children: [
+      { name: 'Все пакеты', href: '#', current: false, count: 21 },
+      { name: 'Мои пакеты', href: '#', current: false, count: 5  },
     ],
   },
   {
@@ -832,7 +931,7 @@ const applications = [
   },
   {
     id: 'ИП 1257843', date: '03.05',
-    status: 'Одобрено',
+    status: 'Одобрена',
     initials: 'ЛИ', client: 'Лебедев И.Н.', phone: '+7 967 ***-**-19',
     fullName: 'Лебедев Игорь Николаевич', fullPhone: '+7 967 302-58-19',
     complex: 'ЛСР/Морская набережная (СПб)', complexPrice: '9 600 000 ₽',
