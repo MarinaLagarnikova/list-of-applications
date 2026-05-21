@@ -372,20 +372,20 @@
         <tbody>
 
           <tr v-for="app in filteredApplications" :key="app.id" :class="['group cursor-pointer', checkedRows.has(app.id) && 'selected']" @click="openApp(app)">
-            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top pt-[16px] pb-3 pl-8 pr-2" @click.stop="toggleRow(app.id)">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pt-[16px] pb-3 pl-8 pr-2" @click.stop="toggleRow(app.id)">
               <label class="inline-flex cursor-pointer">
                 <span :class="['relative flex size-4 items-center justify-center rounded-sm border', checkedRows.has(app.id) ? 'bg-indigo-600 border-transparent' : 'bg-white border-zinc-950/15 hover:border-zinc-950/30']">
                   <svg :class="['size-3 stroke-white transition-opacity', checkedRows.has(app.id) ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none"><path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
                 </span>
               </label>
             </td>
-            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex flex-col gap-y-1">
                 <TableLink @click="openDrawer(app)">{{ app.id }}</TableLink>
                 <span class="text-[14px] leading-[20px] font-light text-zinc-900">от {{ app.date }}</span>
               </div>
             </td>
-            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex items-start gap-x-3">
                 <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] font-medium text-[#71717a]">{{ app.initials }}</span>
                 <div class="flex flex-col gap-y-1">
@@ -394,35 +394,38 @@
                 </div>
               </div>
             </td>
-            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-3 py-4 whitespace-nowrap">
               <span v-if="app.status" :class="statusBadgeClass(app.status)">{{ app.status }}</span>
             </td>
-            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex flex-col gap-y-1">
                 <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ app.complex }}</span>
-                <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ app.complexPrice }}</span>
+                <span class="flex items-center gap-x-1.5 text-[14px] leading-[20px] font-light text-zinc-900">
+                  <HouseIcon :size="16" class="shrink-0 text-zinc-400" />
+                  {{ app.complexPrice }}
+                </span>
               </div>
             </td>
-            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex flex-col gap-y-1">
                 <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ app.amount }}<span v-if="app.pv" class="text-[#71717a]"> ПВ {{ app.pv }}</span></span>
                 <span v-if="app.term" class="text-[14px] leading-[20px] font-light text-zinc-900">{{ app.term }}</span>
               </div>
             </td>
-            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex flex-col gap-y-1">
                 <span v-if="app.houseType" class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ app.houseType }}</span>
                 <span v-if="app.mortgageType" class="text-[14px] leading-[20px] font-light text-zinc-900">{{ app.mortgageType }}</span>
               </div>
             </td>
-            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-3 py-4 whitespace-nowrap">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex flex-col gap-y-1">
-                <span class="text-[14px] leading-[20px] font-light text-[#18181b]">Создана {{ app.createdAt.slice(0, 5) }}</span>
-                <span class="text-[14px] leading-[20px] font-light text-zinc-900">Обновлена {{ app.updatedAt.replace(/\.\d{4}/, '') }}</span>
+                <span class="text-[14px] leading-[20px] font-light text-[#18181b]">Обновлена</span>
+                <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ relativeTime(app.updatedAt) }}</span>
               </div>
             </td>
             <!-- Менеджер -->
-            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top pl-3 pr-8 py-4 whitespace-nowrap" @click.stop>
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pl-3 pr-8 py-4 whitespace-nowrap" @click.stop>
               <CatalystListbox
                 :options="managerSelectOptions"
                 :model-value="mortgageManagerSelections[app.id]"
@@ -553,6 +556,7 @@ import {
   Ellipsis as EllipsisIcon,
   ArrowUpToLine as ArrowUpFromLineIcon,
   Layers as LayersIcon,
+  House as HouseIcon,
 } from 'lucide-vue-next'
 
 const isOffline = ref(true)
@@ -888,6 +892,25 @@ const secondaryNavigation = [
   { name: 'Аналитика',           href: '#', initial: 'А' },
 ]
 
+const relativeTime = (dateStr) => {
+  const [datePart, timePart] = dateStr.split(' ')
+  const [d, m, y] = datePart.split('.')
+  const [h, min] = timePart ? timePart.split(':') : ['12', '00']
+  const date = new Date(+y, +m - 1, +d, +h, +min)
+  const diffMs = Date.now() - date
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+  const diffWeeks = Math.floor(diffDays / 7)
+  if (diffMins < 1) return 'только что'
+  if (diffMins < 60) return `${diffMins} мин назад`
+  if (diffHours < 24) return `${diffHours} ч назад`
+  if (diffDays < 7) return `${diffDays} д назад`
+  if (diffWeeks === 1) return 'неделю назад'
+  if (diffWeeks < 5) return `${diffWeeks} ${diffWeeks < 5 ? 'недели' : 'недель'} назад`
+  return `${diffWeeks} недель назад`
+}
+
 const applications = [
   {
     id: 'ИП 1257847', date: '05.05',
@@ -896,7 +919,7 @@ const applications = [
     fullName: 'Новикова Екатерина Дмитриевна', fullPhone: '+7 925 413-87-31',
     complex: 'Самолет/Новые Ватутинки', complexPrice: '7 200 000 ₽',
     amount: '5 400 000 ₽', pv: '25%', term: '20 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Семейная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
     createdAt: '05.05.2026', updatedAt: '05.05.2026 10:14',
   },
   {
@@ -906,7 +929,7 @@ const applications = [
     fullName: 'Новикова Екатерина Дмитриевна', fullPhone: '+7 925 413-87-31',
     complex: 'А101/Прокшино', complexPrice: '6 800 000 ₽',
     amount: '4 760 000 ₽', pv: '30%', term: '18 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Льготная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
     createdAt: '05.05.2026', updatedAt: '05.05.2026 09:02',
   },
   {
@@ -916,7 +939,7 @@ const applications = [
     fullName: 'Орлов Дмитрий Павлович', fullPhone: '+7 912 635-20-07',
     complex: 'MR Group/Савёловский Сити', complexPrice: '18 500 000 ₽',
     amount: '13 875 000 ₽', pv: '25%', term: '30 лет',
-    houseType: 'Первичное жильё', mortgageType: 'ИТ-ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
     createdAt: '04.05.2026', updatedAt: '04.05.2026 17:48',
   },
   {
@@ -926,7 +949,7 @@ const applications = [
     fullName: 'Воронова Анна Сергеевна', fullPhone: '+7 926 184-53-64',
     complex: 'ФСК/Южная Битца', complexPrice: '10 100 000 ₽',
     amount: '7 070 000 ₽', pv: '30%', term: '22 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Стандартная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '04.05.2026', updatedAt: '04.05.2026 15:30',
   },
   {
@@ -936,7 +959,7 @@ const applications = [
     fullName: 'Лебедев Игорь Николаевич', fullPhone: '+7 967 302-58-19',
     complex: 'ЛСР/Морская набережная (СПб)', complexPrice: '9 600 000 ₽',
     amount: '6 720 000 ₽', pv: '30%', term: '15 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Льготная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
     createdAt: '03.05.2026', updatedAt: '04.05.2026 11:22',
   },
   {
@@ -946,7 +969,7 @@ const applications = [
     fullName: 'Лебедев Игорь Николаевич', fullPhone: '+7 967 302-58-19',
     complex: 'Группа ЛСР/Зенит (СПб)', complexPrice: '8 200 000 ₽',
     amount: '5 740 000 ₽', pv: '30%', term: '15 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Льготная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
     createdAt: '03.05.2026', updatedAt: '03.05.2026 14:07',
   },
   {
@@ -956,7 +979,7 @@ const applications = [
     fullName: 'Смирнова Юлия Андреевна', fullPhone: '+7 918 749-61-56',
     complex: 'Донстрой/Символ', complexPrice: '22 000 000 ₽',
     amount: '15 400 000 ₽', pv: '30%', term: '25 лет',
-    houseType: 'Первичное жильё', mortgageType: 'ИТ-ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
     createdAt: '03.05.2026', updatedAt: '03.05.2026 12:45',
   },
   {
@@ -966,7 +989,7 @@ const applications = [
     fullName: 'Морозов Сергей Владимирович', fullPhone: '+7 963 827-44-93',
     complex: 'ПИК/Люберцы Парк', complexPrice: '6 300 000 ₽',
     amount: '4 410 000 ₽', pv: '30%', term: '20 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Стандартная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '02.05.2026', updatedAt: '02.05.2026 18:55',
   },
   {
@@ -976,7 +999,7 @@ const applications = [
     fullName: 'Фёдорова Ирина Константиновна', fullPhone: '+7 931 560-39-27',
     complex: 'Самолет/Пригород Лесное', complexPrice: '5 900 000 ₽',
     amount: '4 130 000 ₽', pv: '30%', term: '17 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Семейная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
     createdAt: '02.05.2026', updatedAt: '02.05.2026 13:10',
   },
   {
@@ -996,7 +1019,7 @@ const applications = [
     fullName: 'Козлова Мария Петровна', fullPhone: '+7 977 094-82-48',
     complex: 'ЛСР/Цивилизация (СПб)', complexPrice: '11 200 000 ₽',
     amount: '7 840 000 ₽', pv: '30%', term: '25 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Льготная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
     createdAt: '01.05.2026', updatedAt: '01.05.2026 16:44',
   },
   {
@@ -1006,7 +1029,7 @@ const applications = [
     fullName: 'Васильев Александр Юрьевич', fullPhone: '+7 915 371-05-62',
     complex: 'Эталон/Галактика', complexPrice: '14 600 000 ₽',
     amount: '10 220 000 ₽', pv: '30%', term: '28 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Стандартная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '30.04.2026', updatedAt: '30.04.2026 19:20',
   },
   {
@@ -1016,7 +1039,7 @@ const applications = [
     fullName: 'Павлова Надежда Олеговна', fullPhone: '+7 936 458-17-85',
     complex: 'Самолет/Жилой район Южный', complexPrice: '5 500 000 ₽',
     amount: '3 850 000 ₽', pv: '30%', term: '15 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Семейная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
     createdAt: '30.04.2026', updatedAt: '30.04.2026 14:55',
   },
   {
@@ -1036,7 +1059,7 @@ const applications = [
     fullName: 'Ильина Татьяна Владимировна', fullPhone: '+7 906 542-33-53',
     complex: 'ФСК/Архитектор', complexPrice: '16 300 000 ₽',
     amount: '11 410 000 ₽', pv: '30%', term: '27 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Стандартная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '29.04.2026', updatedAt: '29.04.2026 18:37',
   },
   {
@@ -1046,7 +1069,7 @@ const applications = [
     fullName: 'Никитин Артём Сергеевич', fullPhone: '+7 945 219-64-91',
     complex: 'Донстрой/Остров', complexPrice: '19 000 000 ₽',
     amount: '13 300 000 ₽', pv: '30%', term: '30 лет',
-    houseType: 'Первичное жильё', mortgageType: 'ИТ-ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
     createdAt: '29.04.2026', updatedAt: '29.04.2026 17:14',
   },
   {
@@ -1056,7 +1079,7 @@ const applications = [
     fullName: 'Могиль Михаил Валерьевич', fullPhone: '+7 901 234-56-19',
     complex: 'DOGMA/Самолет (Краснодар)', complexPrice: '5 000 000 ₽',
     amount: '3 750 000 ₽', pv: '25%', term: '16 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Стандартная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '29.04.2026', updatedAt: '29.04.2026 16:03',
   },
   {
@@ -1076,7 +1099,7 @@ const applications = [
     fullName: 'Могиль Михаил Валерьевич', fullPhone: '+7 901 234-56-19',
     complex: 'Самолет/Митино О2', complexPrice: '15 000 000 ₽',
     amount: '8 000 000 ₽', pv: '47%', term: '30 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Стандартная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '28.04.2026', updatedAt: '28.04.2026 14:22',
   },
   {
@@ -1086,7 +1109,7 @@ const applications = [
     fullName: 'Захаров Алексей Игоревич', fullPhone: '+7 916 548-23-42',
     complex: 'ПИК/Береговой (Москва)', complexPrice: '12 400 000 ₽',
     amount: '9 300 000 ₽', pv: '25%', term: '25 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Льготная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
     createdAt: '28.04.2026', updatedAt: '28.04.2026 09:10',
   },
   {
@@ -1096,7 +1119,7 @@ const applications = [
     fullName: 'Кривцова Татьяна Сергеевна', fullPhone: '+7 985 321-09-67',
     complex: 'Самолет/Путилково', complexPrice: '9 000 000 ₽',
     amount: '4 000 000 ₽', pv: '56%', term: '11 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Стандартная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '28.04.2026', updatedAt: '29.04.2026 10:30',
   },
   {
@@ -1106,7 +1129,7 @@ const applications = [
     fullName: 'Кривцова Татьяна Сергеевна', fullPhone: '+7 985 321-09-67',
     complex: 'Самолет/Путилково', complexPrice: '9 000 000 ₽',
     amount: '4 000 000 ₽', pv: '56%', term: '11 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Стандартная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '27.04.2026', updatedAt: '27.04.2026 17:05',
   },
   {
@@ -1116,7 +1139,7 @@ const applications = [
     fullName: 'Кривцова Татьяна Сергеевна', fullPhone: '+7 985 321-09-67',
     complex: 'Самолет/Путилково', complexPrice: '9 000 000 ₽',
     amount: '4 000 000 ₽', pv: '56%', term: '11 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Стандартная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '27.04.2026', updatedAt: '27.04.2026 15:48',
   },
   {
@@ -1126,7 +1149,7 @@ const applications = [
     fullName: 'Кривцова Татьяна Сергеевна', fullPhone: '+7 985 321-09-67',
     complex: 'Самолет/Путилково', complexPrice: '9 000 000 ₽',
     amount: '4 000 000 ₽', pv: '56%', term: '11 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Стандартная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '27.04.2026', updatedAt: '29.04.2026 11:12',
   },
   {
@@ -1136,7 +1159,7 @@ const applications = [
     fullName: 'Соколова Полина Вячеславовна', fullPhone: '+7 903 762-14-88',
     complex: 'Эталон/Серебряный бор', complexPrice: '8 750 000 ₽',
     amount: '6 125 000 ₽', pv: '30%', term: '20 лет',
-    houseType: 'Первичное жильё', mortgageType: 'Семейная ипотека',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
     createdAt: '27.04.2026', updatedAt: '28.04.2026 08:55',
   },
 ]

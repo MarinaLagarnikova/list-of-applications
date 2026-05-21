@@ -34,7 +34,7 @@
               @click="openApp(item)"
             >
               <!-- Checkbox -->
-              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top pt-[16px] pb-3 pl-8 pr-2" @click.stop="toggleRow(item.id)">
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pt-[16px] pb-3 pl-8 pr-2" @click.stop="toggleRow(item.id)">
                 <label class="inline-flex cursor-pointer">
                   <span :class="['relative flex size-4 items-center justify-center rounded-sm border', checkedRows.has(item.id) ? 'bg-indigo-600 border-transparent' : 'bg-white border-zinc-950/15 hover:border-zinc-950/30']">
                     <svg :class="['size-3 stroke-white transition-opacity', checkedRows.has(item.id) ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none"><path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -43,7 +43,7 @@
               </td>
 
               <!-- ID + дата -->
-              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top pl-3 pr-[22px] py-4 whitespace-nowrap">
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pl-3 pr-[22px] py-4 whitespace-nowrap">
                 <div class="flex flex-col gap-y-1">
                   <TableLink @click="$emit('open-preview', item)">{{ item.id }}</TableLink>
                   <span class="text-[14px] leading-[20px] font-light text-zinc-900">от {{ item.date }}</span>
@@ -51,7 +51,7 @@
               </td>
 
               <!-- Аватар + ФИО + Телефон -->
-              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-[22px] py-4 whitespace-nowrap">
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                 <div class="flex items-start gap-x-3">
                   <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] font-medium text-[#71717a]">{{ item.initials }}</span>
                   <div class="flex flex-col gap-y-1">
@@ -62,12 +62,12 @@
               </td>
 
               <!-- Статус -->
-              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-[22px] py-4 whitespace-nowrap">
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                 <span :class="statusBadgeClass(item.status)">{{ item.status }}</span>
               </td>
 
               <!-- Компания + Проект -->
-              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-[22px] py-4">
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4">
                 <div class="flex flex-col gap-y-1" style="width: 400px">
                   <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ item.project }}</span>
                   <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.company }}</span>
@@ -75,7 +75,7 @@
               </td>
 
               <!-- Тип недвижимости + Адрес -->
-              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-[22px] py-4">
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4">
                 <div class="flex flex-col gap-y-1" style="width: 400px">
                   <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ item.propertyType }}</span>
                   <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.address }}</span>
@@ -83,7 +83,7 @@
               </td>
 
               <!-- РР + КУВД -->
-              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-[22px] py-4 whitespace-nowrap">
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                 <div v-if="item.status === 'Зарегистрировано'" class="flex flex-col gap-y-1">
                   <span class="text-[14px] leading-[20px] font-light text-[#18181b]">РР {{ item.rr }}</span>
                   <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.kuvd }}</span>
@@ -91,7 +91,7 @@
               </td>
 
               <!-- Дата отправки в РР + Регистрация -->
-              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top px-[22px] py-4 whitespace-nowrap">
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                 <div v-if="item.status === 'Зарегистрировано'" class="flex flex-col gap-y-1">
                   <span class="text-[14px] leading-[20px] font-light text-[#18181b]">Отправка {{ item.sendDate }}</span>
                   <span class="text-[14px] leading-[20px] font-light text-zinc-900">Регистрация {{ item.regDate }}</span>
@@ -99,7 +99,7 @@
               </td>
 
               <!-- Менеджер -->
-              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-indigo-50 align-top pl-[22px] pr-8 py-4 whitespace-nowrap" @click.stop>
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pl-[22px] pr-8 py-4 whitespace-nowrap" @click.stop>
                 <CatalystListbox
                   :options="managerOptions"
                   :model-value="managerSelections[item.id]"

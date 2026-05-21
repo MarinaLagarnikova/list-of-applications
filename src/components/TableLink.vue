@@ -2,7 +2,7 @@
   <button
     @click.stop="$emit('click')"
     :class="[
-      'cursor-pointer text-[14px] leading-[20px] text-indigo-600 hover:text-indigo-800 transition-colors',
+      'cursor-pointer text-[14px] leading-[20px] text-zinc-900 group-hover:text-indigo-600 hover:underline transition-colors',
       weight === 'medium' ? 'font-medium' : 'font-normal',
     ]"
   >
