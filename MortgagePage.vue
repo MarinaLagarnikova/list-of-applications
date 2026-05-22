@@ -401,14 +401,14 @@
               <div class="flex flex-col gap-y-1">
                 <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ app.complex }}</span>
                 <span class="flex items-center gap-x-1.5 text-[14px] leading-[20px] font-light text-zinc-900">
-                  <HouseIcon :size="16" class="shrink-0 text-zinc-400" />
+                  <HouseIcon :size="16" class="shrink-0 text-zinc-900" />
                   {{ app.complexPrice }}
                 </span>
               </div>
             </td>
             <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-3 py-4 whitespace-nowrap">
               <div class="flex flex-col gap-y-1">
-                <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ app.amount }}<span v-if="app.pv" class="text-[#71717a]"> ПВ {{ app.pv }}</span></span>
+                <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ app.amount }}<span v-if="app.pv" class="text-zinc-400"> ПВ {{ app.pv }}</span></span>
                 <span v-if="app.term" class="text-[14px] leading-[20px] font-light text-zinc-900">{{ app.term }}</span>
               </div>
             </td>

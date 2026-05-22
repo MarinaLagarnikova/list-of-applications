@@ -68,29 +68,27 @@
               <span :class="statusBadgeClass(item.status)">{{ item.status }}</span>
             </td>
 
-            <!-- Рейтинг 1 + Дата -->
+            <!-- Рейтинг + Нагрузка -->
             <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
-              <div class="flex flex-col gap-y-1">
-                <div v-if="item.lastCheck" class="flex items-center gap-x-1.5">
-                  <span :style="{ display:'flex', padding:'4px', borderRadius:'9999px', background:scoreHaloBg(item.lastCheck.score), flexShrink:0 }">
-                    <span class="size-2 rounded-full" :style="{ background: scoreDotColor(item.lastCheck.score) }" />
-                  </span>
-                  <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ scoreLabel(item.lastCheck.score) }}</span>
+              <div v-if="item.lastCheck && item.status !== 'На проверке'" class="flex items-start gap-x-6">
+                <!-- Рейтинг -->
+                <div class="flex flex-col gap-y-1 w-[160px]">
+                  <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ scoreLabel(item.lastCheck.score) }} рейтинг</span>
+                  <div class="flex items-center gap-x-2">
+                    <div class="relative h-2 w-[61px] rounded-full bg-[#e4e4e7] overflow-hidden shrink-0">
+                      <div class="absolute inset-y-0 left-0 rounded-full" :style="{ width: scoreBarWidth(item.lastCheck.score), background: scoreDotColor(item.lastCheck.score) }" />
+                    </div>
+                    <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.lastCheck.score }}</span>
+                  </div>
                 </div>
-                <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ formatCheckDate(item.lastCheckDate) ?? '' }}</span>
-              </div>
-            </td>
-
-            <!-- Рейтинг 2 + Дата -->
-            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
-              <div class="flex flex-col gap-y-1">
-                <div v-if="item.prevCheck" class="flex items-center gap-x-1.5">
-                  <span :style="{ display:'flex', padding:'4px', borderRadius:'9999px', background:scoreHaloBg(item.prevCheck.score), flexShrink:0 }">
-                    <span class="size-2 rounded-full" :style="{ background: scoreDotColor(item.prevCheck.score) }" />
-                  </span>
-                  <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ scoreLabel(item.prevCheck.score) }}</span>
+                <!-- Нагрузка -->
+                <div class="flex flex-col gap-y-1">
+                  <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ debtLoadLabel(item.lastCheck.debtLoad) }}</span>
+                  <div class="flex items-center gap-x-2">
+                    <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.lastCheck.debtLoad }}%</span>
+                    <span v-if="item.lastCheck.totalPayments" class="text-[14px] leading-[20px] font-light text-zinc-400">{{ item.lastCheck.totalPayments }}</span>
+                  </div>
                 </div>
-                <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ formatCheckDate(item.prevCheckDate) ?? '' }}</span>
               </div>
             </td>
 
@@ -103,6 +101,8 @@
                 placeholder="Менеджер"
               />
             </td>
+            <!-- Spacer -->
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 w-full"></td>
           </tr>
         </tbody>
       </table>
@@ -217,11 +217,34 @@ const scoreDotColor = (score) => {
 }
 
 const debtLoadColor = (v) => {
-  if (v <= 20) return '#16a34a'  // green-600  — Низкая
-  if (v <= 50) return '#ca8a04'  // yellow-600 — Допустимая
-  if (v <= 80) return '#b45309'  // amber-700  — Средняя
-  return '#dc2626'               // red-600    — Высокая
+  if (v <= 20) return '#16a34a'
+  if (v <= 50) return '#ca8a04'
+  if (v <= 80) return '#b45309'
+  return '#dc2626'
 }
+
+const debtLoadDotColor = (v) => {
+  if (v <= 20) return '#16a34a'
+  if (v <= 50) return '#ca8a04'
+  if (v <= 80) return '#b45309'
+  return '#dc2626'
+}
+
+const debtLoadHaloBg = (v) => {
+  if (v <= 20) return 'rgba(22,163,74,0.10)'
+  if (v <= 50) return 'rgba(202,138,4,0.10)'
+  if (v <= 80) return 'rgba(180,83,9,0.10)'
+  return 'rgba(220,38,38,0.10)'
+}
+
+const debtLoadLabel = (v) => {
+  if (v <= 20) return 'Низкая нагрузка'
+  if (v <= 50) return 'Допустимая нагрузка'
+  if (v <= 80) return 'Средняя нагрузка'
+  return 'Высокая нагрузка'
+}
+
+const scoreBarWidth = (score) => Math.min(Math.round((score / 850) * 100), 100) + '%'
 
 const scoreHaloBg = (score) => {
   if (score >= 800) return 'rgba(22,163,74,0.10)'

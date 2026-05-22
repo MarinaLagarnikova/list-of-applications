@@ -35,7 +35,7 @@
               @click="openApp(item)"
             >
               <!-- Checkbox -->
-              <td class="w-px group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pt-[16px] pb-3 pl-8 pr-2" @click.stop="toggleRow(item.id)">
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pt-[16px] pb-3 pl-8 pr-2" @click.stop="toggleRow(item.id)">
                 <label class="inline-flex cursor-pointer">
                   <span :class="['relative flex size-4 items-center justify-center rounded-sm border', checkedRows.has(item.id) ? 'bg-indigo-600 border-transparent' : 'bg-white border-zinc-950/15 hover:border-zinc-950/30']">
                     <svg :class="['size-3 stroke-white transition-opacity', checkedRows.has(item.id) ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none"><path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -57,8 +57,28 @@
               </td>
 
               <!-- Название -->
-              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-middle px-[22px] py-4 whitespace-nowrap">
-                <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item.name }}</span>
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
+                <div class="flex flex-col gap-y-1">
+                  <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item.name }}</span>
+                  <span v-if="item.status !== 'Черновик'" class="inline-flex items-center gap-x-1 text-[14px] leading-[20px] font-light text-zinc-900">
+                    {{ pluralizeSigners(item.signers) }}
+                    <span class="inline-flex items-center gap-x-0.5 ml-1">
+                      <svg v-for="i in item.signers" :key="i" width="16" height="16" viewBox="0 0 24 24" :class="i <= item.signedCount ? 'text-green-600' : 'text-zinc-400'">
+                        <path fill="currentColor" d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/>
+                        <path fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 12 2 2 4-4"/>
+                      </svg>
+                    </span>
+                  </span>
+                  <span v-else class="block h-[20px]"></span>
+                </div>
+              </td>
+
+              <!-- Дата подписания -->
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
+                <div v-if="item.status === 'Подписан'" class="flex flex-col gap-y-1">
+                  <span class="text-[14px] leading-[20px] font-light text-zinc-900">Подписан</span>
+                  <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ formatDate(item.statusDate) }}</span>
+                </div>
               </td>
 
               <!-- Менеджер -->
@@ -70,6 +90,8 @@
                   placeholder="Менеджер"
                 />
               </td>
+              <!-- Spacer -->
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 w-full"></td>
             </tr>
           </tbody>
         </table>
@@ -142,18 +164,33 @@ const pluralize = (n) => {
   return `найдено ${n} пакетов`
 }
 
+const pluralizeSigners = (n) => {
+  const mod10 = n % 10, mod100 = n % 100
+  if (mod100 >= 11 && mod100 <= 14) return `${n} подписантов`
+  if (mod10 === 1) return `${n} подписант`
+  if (mod10 >= 2 && mod10 <= 4) return `${n} подписанта`
+  return `${n} подписантов`
+}
+
+const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']
+const formatDate = (d) => {
+  if (!d) return ''
+  const [day, month] = d.split('.')
+  return `${parseInt(day)} ${months[parseInt(month) - 1]}`
+}
+
 const managerOptions = ['Я', 'Смирнова Юлия', 'Орлов Дмитрий', 'Лебедев Игорь', 'Воронова Анна', 'Морозов Сергей']
 const managerSelections = reactive({})
 
 const items = [
-  { id: 'ПД 1150', date: '17.04', status: 'Подписан',           statusDate: '17.04', name: 'Ипотека Сбербанк — Новикова Е.Д.',      manager: 'Новиков Алексей' },
-  { id: 'ПД 1149', date: '17.04', status: 'Подписан',           statusDate: '17.04', name: 'Семейная ипотека — Орлов Д.П.',          manager: 'Орлов Дмитрий'   },
-  { id: 'ПД 1148', date: '16.04', status: 'Черновик',           statusDate: null,    name: 'Льготная ипотека — Смирнова Ю.А.',       manager: 'Смирнова Юлия'   },
-  { id: 'ПД 1147', date: '08.04', status: 'Готов к подписанию', statusDate: null,    name: 'Рефинансирование — Лебедев И.Н.',        manager: 'Лебедев Игорь'   },
-  { id: 'ПД 1146', date: '21.01', status: 'Готов к подписанию', statusDate: null,    name: 'Ипотека ВТБ — Воронова А.С.',           manager: 'Воронова Анна'   },
-  { id: 'ПД 1145', date: '15.01', status: 'Подписан',           statusDate: '16.01', name: 'Договор долевого участия — Могиль М.В.', manager: 'Новиков Алексей' },
-  { id: 'ПД 1144', date: '10.01', status: 'Черновик',           statusDate: null,    name: 'IT-ипотека — Андреев Р.Е.',             manager: 'Морозов Сергей'  },
-  { id: 'ПД 1143', date: '05.01', status: 'Готов к подписанию', statusDate: null,    name: 'Ипотека Альфа-Банк — Морозов С.В.',     manager: 'Смирнова Юлия'  },
+  { id: 'ПД 1150', date: '17.04', status: 'Подписан',           statusDate: '17.04', name: 'Ипотека Сбербанк — Новикова Е.Д.',      signers: 2, signedCount: 2, manager: 'Новиков Алексей' },
+  { id: 'ПД 1149', date: '17.04', status: 'Подписан',           statusDate: '17.04', name: 'Семейная ипотека — Орлов Д.П.',          signers: 1, signedCount: 1, manager: 'Орлов Дмитрий'   },
+  { id: 'ПД 1148', date: '16.04', status: 'Черновик',           statusDate: null,    name: 'Льготная ипотека — Смирнова Ю.А.',       signers: 3, signedCount: 0, manager: 'Смирнова Юлия'   },
+  { id: 'ПД 1147', date: '08.04', status: 'Готов к подписанию', statusDate: null,    name: 'Рефинансирование — Лебедев И.Н.',        signers: 2, signedCount: 1, manager: 'Лебедев Игорь'   },
+  { id: 'ПД 1146', date: '21.01', status: 'Готов к подписанию', statusDate: null,    name: 'Ипотека ВТБ — Воронова А.С.',           signers: 2, signedCount: 0, manager: 'Воронова Анна'   },
+  { id: 'ПД 1145', date: '15.01', status: 'Подписан',           statusDate: '16.01', name: 'Договор долевого участия — Могиль М.В.', signers: 4, signedCount: 4, manager: 'Новиков Алексей' },
+  { id: 'ПД 1144', date: '10.01', status: 'Черновик',           statusDate: null,    name: 'IT-ипотека — Андреев Р.Е.',             signers: 1, signedCount: 0, manager: 'Морозов Сергей'  },
+  { id: 'ПД 1143', date: '05.01', status: 'Готов к подписанию', statusDate: null,    name: 'Ипотека Альфа-Банк — Морозов С.В.',     signers: 3, signedCount: 2, manager: 'Смирнова Юлия'  },
 ]
 
 items.forEach(item => { managerSelections[item.id] = item.manager })
