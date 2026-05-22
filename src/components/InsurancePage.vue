@@ -70,7 +70,7 @@
               <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                 <div class="flex flex-col gap-y-1">
                   <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ item.insurer }}</span>
-                  <span class="text-[14px] leading-[20px] font-light text-zinc-400">{{ item.insuranceType }}</span>
+                  <span class="text-[14px] leading-[20px] font-light text-zinc-500">{{ item.insuranceType }}</span>
                 </div>
               </td>
 
@@ -78,8 +78,8 @@
               <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                 <div class="flex flex-col gap-y-1">
                   <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ item.price }}</span>
-                  <span class="inline-flex items-center gap-x-[6px] text-[14px] leading-[20px] font-light text-zinc-400">
-                    <CirclePercentIcon :size="16" class="shrink-0 text-zinc-400" />
+                  <span class="inline-flex items-center gap-x-[6px] text-[14px] leading-[20px] font-light text-zinc-500">
+                    <CirclePercentIcon :size="16" class="shrink-0 text-zinc-500" />
                     {{ item.kv }}
                   </span>
                 </div>

@@ -75,9 +75,17 @@
                       :size="16"
                       class="shrink-0 text-zinc-900"
                     />
-                    {{ item.signMethod }}<span v-if="item.courierMeeting" class="text-zinc-400">{{ item.courierMeeting }}</span>
+                    {{ item.signMethod }}
                   </span>
                   <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.center }}</span>
+                </div>
+              </td>
+
+              <!-- Встреча с курьером -->
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
+                <div v-if="item.signMethod === 'Курьер' && item.courierMeeting" class="flex flex-col gap-y-1">
+                  <span class="text-[14px] leading-[20px] font-light text-zinc-900">Встреча</span>
+                  <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.courierMeeting }}</span>
                 </div>
               </td>
 
@@ -85,7 +93,7 @@
               <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                 <div v-if="item.status === 'Активирована'" class="flex flex-col gap-y-1">
                   <span class="text-[14px] leading-[20px] font-light text-zinc-900">С {{ formatFull(item.activationDate) }}</span>
-                  <span class="text-[14px] leading-[20px] font-light text-zinc-400">Действует {{ item.duration }}</span>
+                  <span class="text-[14px] leading-[20px] font-light text-zinc-500">Действует {{ item.duration }}</span>
                 </div>
               </td>
 
@@ -191,13 +199,13 @@ const managerSelections = reactive({})
 
 const items = [
   { id: 'ЦП 3047', date: '12.05', initials: 'НЕ', client: 'Новикова Елена',  phone: '+7 916 ***-**-09', fullPhone: '+7 916 234-11-09', center: 'SignMe',  signMethod: 'Офис',    activationDate: '12.05.2026', expiryDate: '12.05.2027', duration: '1 год',    courierDate: null,           status: 'Активирована',                   manager: 'Смирнова Юлия'  },
-  { id: 'ЦП 3046', date: '11.05', initials: 'ОД', client: 'Орлов Дмитрий',   phone: '+7 903 ***-**-72', fullPhone: '+7 903 811-45-72', center: 'Контур',  signMethod: 'Курьер',  activationDate: '11.05.2026', expiryDate: '11.11.2027', duration: '1,5 года', courierDate: '18.05.2026', courierMeeting: '18 мая 14:30', status: 'Встреча с курьером назначена',   manager: 'Орлов Дмитрий'  },
+  { id: 'ЦП 3046', date: '11.05', initials: 'ОД', client: 'Орлов Дмитрий',   phone: '+7 903 ***-**-72', fullPhone: '+7 903 811-45-72', center: 'Контур',  signMethod: 'Курьер',  activationDate: '11.05.2026', expiryDate: '11.11.2027', duration: '1,5 года', courierDate: '18.05.2026', courierMeeting: '18 мая с 10 до 15', status: 'Встреча с курьером назначена',   manager: 'Орлов Дмитрий'  },
   { id: 'ЦП 3045', date: '10.05', initials: 'СЮ', client: 'Смирнова Юлия',   phone: '+7 925 ***-**-18', fullPhone: '+7 925 007-33-18', center: 'SignMe',  signMethod: 'Офис',    activationDate: '10.05.2026', expiryDate: '10.05.2027', duration: '1 год',    courierDate: null,           status: 'Процесс выпуска создан',         manager: 'Лебедев Игорь'  },
-  { id: 'ЦП 3044', date: '07.05', initials: 'ЛИ', client: 'Лебедев Игорь',   phone: '+7 499 ***-**-55', fullPhone: '+7 499 123-00-55', center: 'Тензор',  signMethod: 'Паспорт', activationDate: '07.05.2026', expiryDate: '07.11.2027', duration: '1,5 года', courierDate: '14 мая 2026',  status: 'Ожидает назначение курьера',     manager: 'Воронова Анна'  },
-  { id: 'ЦП 3043', date: '05.05', initials: 'ВА', client: 'Воронова Анна',    phone: '+7 916 ***-**-77', fullPhone: '+7 916 540-29-77', center: 'Контур',  signMethod: 'Офис',    activationDate: '05.05.2026', expiryDate: '05.05.2027', duration: '1 год',    courierDate: '16 мая 2026',  status: 'Встреча с курьером назначена',   manager: 'Смирнова Юлия'  },
-  { id: 'ЦП 3042', date: '04.05', initials: 'МС', client: 'Морозов Сергей',   phone: '+7 912 ***-**-88', fullPhone: '+7 912 300-14-88', center: 'SignMe',  signMethod: 'Курьер',  activationDate: '04.05.2026', expiryDate: '04.11.2027', duration: '1,5 года', courierDate: '20.05.2026', courierMeeting: '20 мая 10:00', status: 'Встреча с курьером назначена',   manager: 'Орлов Дмитрий'  },
-  { id: 'ЦП 3041', date: '01.05', initials: 'КМ', client: 'Кузнецова Мария',  phone: '+7 926 ***-**-04', fullPhone: '+7 926 711-88-04', center: 'Тензор',  signMethod: 'Паспорт', activationDate: '01.05.2026', expiryDate: '01.05.2027', duration: '1 год',    courierDate: '19 мая 2026',  status: 'Встреча с курьером состоялась',  manager: 'Морозов Сергей' },
-  { id: 'ЦП 3040', date: '28.04', initials: 'АП', client: 'Алексеев Пётр',    phone: '+7 915 ***-**-31', fullPhone: '+7 915 462-55-31', center: 'Контур',  signMethod: 'Курьер',  activationDate: '28.04.2026', expiryDate: '28.10.2027', duration: '1,5 года', courierDate: '25.05.2026', courierMeeting: '25 мая 11:30', status: 'Встреча с курьером назначена',   manager: 'Лебедев Игорь'  },
+  { id: 'ЦП 3044', date: '07.05', initials: 'ЛИ', client: 'Лебедев Игорь',   phone: '+7 499 ***-**-55', fullPhone: '+7 499 123-00-55', center: 'Тензор',  signMethod: 'Паспорт', activationDate: '07.05.2026', expiryDate: '07.11.2027', duration: '1,5 года', courierDate: '14 мая 2026',  courierMeeting: '14 мая с 12 до 17', status: 'Ожидает назначение курьера',     manager: 'Воронова Анна'  },
+  { id: 'ЦП 3043', date: '05.05', initials: 'ВА', client: 'Воронова Анна',    phone: '+7 916 ***-**-77', fullPhone: '+7 916 540-29-77', center: 'Контур',  signMethod: 'Офис',    activationDate: '05.05.2026', expiryDate: '05.05.2027', duration: '1 год',    courierDate: '16 мая 2026',  courierMeeting: '16 мая с 9 до 14', status: 'Встреча с курьером назначена',   manager: 'Смирнова Юлия'  },
+  { id: 'ЦП 3042', date: '04.05', initials: 'МС', client: 'Морозов Сергей',   phone: '+7 912 ***-**-88', fullPhone: '+7 912 300-14-88', center: 'SignMe',  signMethod: 'Курьер',  activationDate: '04.05.2026', expiryDate: '04.11.2027', duration: '1,5 года', courierDate: '20.05.2026', courierMeeting: '20 мая с 10 до 14', status: 'Встреча с курьером назначена',   manager: 'Орлов Дмитрий'  },
+  { id: 'ЦП 3041', date: '01.05', initials: 'КМ', client: 'Кузнецова Мария',  phone: '+7 926 ***-**-04', fullPhone: '+7 926 711-88-04', center: 'Тензор',  signMethod: 'Паспорт', activationDate: '01.05.2026', expiryDate: '01.05.2027', duration: '1 год',    courierDate: '19 мая 2026',  courierMeeting: '19 мая с 11 до 16', status: 'Встреча с курьером состоялась',  manager: 'Морозов Сергей' },
+  { id: 'ЦП 3040', date: '28.04', initials: 'АП', client: 'Алексеев Пётр',    phone: '+7 915 ***-**-31', fullPhone: '+7 915 462-55-31', center: 'Контур',  signMethod: 'Курьер',  activationDate: '28.04.2026', expiryDate: '28.10.2027', duration: '1,5 года', courierDate: '25.05.2026', courierMeeting: '25 мая с 11 до 15', status: 'Встреча с курьером назначена',   manager: 'Лебедев Игорь'  },
   { id: 'ЦП 3039', date: '25.04', initials: 'ЗО', client: 'Захарова Ольга',   phone: '+7 968 ***-**-12', fullPhone: '+7 968 224-77-12', center: 'SignMe',  signMethod: 'Офис',    activationDate: '25.04.2026', expiryDate: '25.04.2027', duration: '1 год',    courierDate: null,           status: 'Активирована',                   manager: 'Воронова Анна'  },
   { id: 'ЦП 3038', date: '22.04', initials: 'ТВ', client: 'Тихонов Виктор',   phone: '+7 903 ***-**-45', fullPhone: '+7 903 159-60-45', center: 'Тензор',  signMethod: 'Паспорт', activationDate: '22.04.2026', expiryDate: '22.10.2027', duration: '1,5 года', courierDate: null,           status: 'Активирована',                   manager: 'Смирнова Юлия'  },
 ]

@@ -60,10 +60,10 @@
               <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                 <div class="flex flex-col gap-y-1">
                   <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item.name }}</span>
-                  <span v-if="item.status !== 'Черновик'" class="inline-flex items-center gap-x-1 text-[14px] leading-[20px] font-light text-zinc-900">
+                  <span v-if="item.status !== 'Черновик'" class="inline-flex items-center gap-x-1 text-[14px] leading-[20px] font-light text-zinc-500">
                     {{ pluralizeSigners(item.signers) }}
                     <span class="inline-flex items-center gap-x-0.5 ml-1">
-                      <svg v-for="i in item.signers" :key="i" width="16" height="16" viewBox="0 0 24 24" :class="i <= item.signedCount ? 'text-green-600' : 'text-zinc-400'">
+                      <svg v-for="i in item.signers" :key="i" width="16" height="16" viewBox="0 0 24 24" :class="i <= item.signedCount ? 'text-green-600' : 'text-zinc-300'">
                         <path fill="currentColor" d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/>
                         <path fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 12 2 2 4-4"/>
                       </svg>

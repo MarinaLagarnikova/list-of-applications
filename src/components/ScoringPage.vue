@@ -86,7 +86,7 @@
                   <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ debtLoadLabel(item.lastCheck.debtLoad) }}</span>
                   <div class="flex items-center gap-x-2">
                     <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.lastCheck.debtLoad }}%</span>
-                    <span v-if="item.lastCheck.totalPayments" class="text-[14px] leading-[20px] font-light text-zinc-400">{{ item.lastCheck.totalPayments }}</span>
+                    <span v-if="item.lastCheck.totalPayments" class="text-[14px] leading-[20px] font-light text-zinc-500">{{ item.lastCheck.totalPayments }}</span>
                   </div>
                 </div>
               </div>
