@@ -41,10 +41,45 @@
       <template v-else-if="!appIsInitialLoading">
       <!-- Sidebar Create button (все модули кроме Калькулятора и Аналитики, когда сайдбар раскрыт) -->
       <div v-if="!sidebarCollapsed && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" class="shrink-0 px-1">
-        <Button color="indigo" class="w-full justify-center" @click="createModalOpen = true">
+        <!-- mortgage-only: простая кнопка без поповера -->
+        <Button v-if="mode === 'mortgage-only'" color="indigo" class="w-full justify-center" @click="createModalTitle = 'Создание заявки на ипотеку'; createModalOpen = true">
           <PlusIcon :size="16" class="shrink-0" />
           Создать
         </Button>
+        <!-- все остальные режимы: кнопка с шевроном и поповером -->
+        <div v-else class="relative w-full">
+          <div v-if="createPopoverOpen" class="fixed inset-0 z-40" @click="createPopoverOpen = false" />
+          <Button color="indigo" class="w-full justify-between" @click="createPopoverOpen = !createPopoverOpen">
+            <span class="flex items-center gap-2">
+              <PlusIcon :size="16" class="shrink-0" />
+              Создать
+            </span>
+            <ChevronDownIcon :size="14" class="shrink-0 transition-transform duration-150" :class="createPopoverOpen ? 'rotate-180' : ''" />
+          </Button>
+          <Transition
+            enter-active-class="transition ease-out duration-100"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition ease-in duration-75"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+          >
+            <div
+              v-if="createPopoverOpen"
+              class="absolute left-0 top-full mt-1 z-50 w-full origin-top rounded-xl p-1 bg-white/75 backdrop-blur-xl shadow-lg ring-1 ring-zinc-950/10"
+            >
+              <template v-for="item in createModuleItems" :key="item.name">
+                <button
+                  @click="openCreateModal(item, () => { createPopoverOpen = false })"
+                  class="group flex w-full items-center gap-x-2.5 rounded-lg px-3 py-1.5 text-sm/6 text-zinc-950 hover:bg-indigo-600 hover:text-white transition-colors text-left"
+                >
+                  <component :is="item.icon" :size="16" class="size-4 shrink-0 text-zinc-500 group-hover:text-white" stroke-width="1.5" />
+                  {{ item.label ?? item.name }}
+                </button>
+              </template>
+            </div>
+          </Transition>
+        </div>
       </div>
 
       <!-- Nav -->
@@ -137,7 +172,7 @@
           </li>
 
           <!-- Secondary nav group -->
-          <li>
+          <li v-if="mode !== 'mortgage-only' && mode !== 'registration'">
             <div class="pl-2 text-xs/6 font-medium text-zinc-500">Инструменты</div>
             <ul role="list" class="mt-2 space-y-1">
               <li v-for="item in secondaryNavigation" :key="item.name">
@@ -276,7 +311,7 @@
       <BankDrawer :open="bankDrawerOpen" :bank="selectedBank" @close="bankDrawerOpen = false" />
 
       <!-- ─── Create Application Modal ─────────────── -->
-      <CreateApplicationModal :open="createModalOpen" :mode="mode" @close="createModalOpen = false" />
+      <CreateApplicationModal :open="createModalOpen" :mode="mode" :title="createModalTitle" @close="createModalOpen = false" />
       <ToastNotification />
 
       <!-- ─── App Preview Drawer (Ипотека) ───────────── -->
@@ -364,7 +399,7 @@
             </template>
           </div>
 
-          <Button v-if="sidebarCollapsed && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" color="indigo" @click="createModalOpen = true">
+          <Button v-if="sidebarCollapsed && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" color="indigo" @click="openCreateModalForModule(activeModule)">
             <PlusIcon :size="16" class="shrink-0" />
             Создать
           </Button>
@@ -559,7 +594,7 @@
           <FilePlusCornerIcon :size="48" class="mx-auto text-zinc-400" />
           <h3 class="mt-3 text-sm font-medium text-zinc-900">Пока здесь пусто</h3>
           <p class="mt-1 text-sm font-light text-zinc-500">В этом списке пока нет заявок</p>
-          <Button outline class="mt-6" @click="createModalOpen = true">
+          <Button outline class="mt-6" @click="openCreateModalForModule(activeModule)">
             <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
             Создать
           </Button>
@@ -580,22 +615,22 @@
         <CalculatorPage v-else-if="activeModule === 'Калькулятор ипотеки'" @open-bank="openBankDrawer" />
 
         <!-- Скоринг -->
-        <ScoringPage v-else-if="activeModule === 'Скоринг'" :active-sub-item="activeSubItem" :filter-count="scoringFilterCount" :filters="scoringFilters" :filter-tags="scoringFilterTags" @open-filter="scoringFilterDrawerOpen = true" @open-preview="openScoringDrawer" @update:count="activeCount = $event" @reset-filters="scoringFilterDrawerRef?.resetAll()" @create="createModalOpen = true" />
+        <ScoringPage v-else-if="activeModule === 'Скоринг'" :active-sub-item="activeSubItem" :filter-count="scoringFilterCount" :filters="scoringFilters" :filter-tags="scoringFilterTags" @open-filter="scoringFilterDrawerOpen = true" @open-preview="openScoringDrawer" @update:count="activeCount = $event" @reset-filters="scoringFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" />
 
         <!-- Пакеты документов -->
-        <DocumentPackagesPage v-else-if="activeModule === 'Пакеты документов'" :active-sub-item="activeSubItem" :filter-count="docPackagesFilterCount" :filters="docPackagesFilters" :filter-tags="docPackagesFilterTags" @open-filter="docPackagesFilterOpen = true" @open-preview="item => { selectedDocPackage = item; docPackagePreviewOpen = true }" @update:count="activeCount = $event" @reset-filters="docPackagesFilterDrawerRef?.resetAll()" @create="createModalOpen = true" />
+        <DocumentPackagesPage v-else-if="activeModule === 'Пакеты документов'" :active-sub-item="activeSubItem" :filter-count="docPackagesFilterCount" :filters="docPackagesFilters" :filter-tags="docPackagesFilterTags" @open-filter="docPackagesFilterOpen = true" @open-preview="item => { selectedDocPackage = item; docPackagePreviewOpen = true }" @update:count="activeCount = $event" @reset-filters="docPackagesFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" />
 
         <!-- Регистрация -->
-        <RegistrationPage v-else-if="activeModule === 'Регистрация'" :active-sub-item="activeSubItem" :filter-count="registrationFilterCount" :filters="registrationFilters" :filter-tags="registrationFilterTags" @open-filter="registrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="registrationFilterDrawerRef?.resetAll()" @create="createModalOpen = true" />
+        <RegistrationPage v-else-if="activeModule === 'Регистрация'" :active-sub-item="activeSubItem" :filter-count="registrationFilterCount" :filters="registrationFilters" :filter-tags="registrationFilterTags" @open-filter="registrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="registrationFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" />
 
         <!-- Пакетная регистрация -->
-        <BatchRegistrationPage v-else-if="activeModule === 'Пакетная регистрация'" :active-sub-item="activeSubItem" :filter-count="batchRegistrationFilterCount" :filters="batchRegistrationFilters" :filter-tags="batchRegistrationFilterTags" @open-filter="batchRegistrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="batchRegistrationFilterDrawerRef?.resetAll()" @create="createModalOpen = true" />
+        <BatchRegistrationPage v-else-if="activeModule === 'Пакетная регистрация'" :active-sub-item="activeSubItem" :filter-count="batchRegistrationFilterCount" :filters="batchRegistrationFilters" :filter-tags="batchRegistrationFilterTags" @open-filter="batchRegistrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="batchRegistrationFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" />
 
         <!-- Страховка -->
-        <InsurancePage v-else-if="activeModule === 'Страховка'" :active-sub-item="activeSubItem" :filter-count="insuranceFilterCount" :filters="insuranceFilters" :filter-tags="insuranceFilterTags" @open-filter="insuranceFilterOpen = true" @open-preview="openInsurancePreview" @update:count="activeCount = $event" @reset-filters="insuranceFilterDrawerRef?.resetAll()" @create="createModalOpen = true" />
+        <InsurancePage v-else-if="activeModule === 'Страховка'" :active-sub-item="activeSubItem" :filter-count="insuranceFilterCount" :filters="insuranceFilters" :filter-tags="insuranceFilterTags" @open-filter="insuranceFilterOpen = true" @open-preview="openInsurancePreview" @update:count="activeCount = $event" @reset-filters="insuranceFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" />
 
         <!-- Цифровые подписи -->
-        <DigitalSignaturesPage v-else-if="activeModule === 'Цифровые подписи'" :active-sub-item="activeSubItem" :filter-count="digitalSignaturesFilterCount" :filters="digitalSignaturesFilters" :filter-tags="digitalSignaturesFilterTags" @open-filter="digitalSignaturesFilterOpen = true" @open-preview="openDigitalSignaturesPreview" @update:count="activeCount = $event" @reset-filters="digitalSignaturesFilterDrawerRef?.resetAll()" @create="createModalOpen = true" />
+        <DigitalSignaturesPage v-else-if="activeModule === 'Цифровые подписи'" :active-sub-item="activeSubItem" :filter-count="digitalSignaturesFilterCount" :filters="digitalSignaturesFilters" :filter-tags="digitalSignaturesFilterTags" @open-filter="digitalSignaturesFilterOpen = true" @open-preview="openDigitalSignaturesPreview" @update:count="activeCount = $event" @reset-filters="digitalSignaturesFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" />
 
         <!-- Аналитика -->
         <AnalyticsPage v-else-if="activeModule === 'Аналитика'" />
@@ -646,7 +681,7 @@ import DigitalSignaturesFilterDrawer from './src/components/DigitalSignaturesFil
 import SelectionBar from './src/components/SelectionBar.vue'
 import SortDropdown from './src/components/SortDropdown.vue'
 import FilterTagsBar from './src/components/FilterTagsBar.vue'
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
+import { Disclosure, DisclosureButton, DisclosurePanel, Popover, PopoverButton, PopoverPanel } from '@headlessui/vue'
 import {
   CloudOff as CloudOffIcon,
   ChevronRight as ChevronRightIcon,
@@ -706,7 +741,7 @@ onUnmounted(() => {
   window.removeEventListener('offline', () => { isOffline.value = true  })
 })
 
-const activeModule = ref('Ипотека')
+const activeModule = ref(props.mode === 'registration' ? 'Регистрация' : 'Ипотека')
 const sidebarCollapsed = ref(false)
 const mortgageSortOrder = ref('new')
 const isScrolled = ref(false)
@@ -851,6 +886,38 @@ const searchResultText = computed(() => {
 const activeSubItem = ref('Все заявки')
 
 const createModalOpen = ref(false)
+const createPopoverOpen = ref(false)
+const createModalTitle = ref('Создание заявки')
+
+const moduleCreateItemsMap = {
+  'Ипотека':              { icon: HomeIcon,             title: 'Создание заявки на ипотеку' },
+  'Скоринг':              { icon: ChartPieIcon,          title: 'Создание заявки на скоринг' },
+  'Страховка':            { icon: ShieldCheckIcon,       title: 'Создание заявки на страховку' },
+  'Регистрация':          { icon: BriefcaseIcon,         title: 'Создание заявки на регистрацию' },
+  'Пакетная регистрация': { icon: LayersIcon,            title: 'Создание пакета на регистрацию' },
+  'Пакеты документов':    { icon: DocumentDuplicateIcon, title: 'Создание пакета документов', label: 'Пакет документов', dividerBefore: true },
+  'Цифровые подписи':     { icon: DocumentCheckIcon,     title: 'Создание заявки на выпуск ЭЦП' },
+}
+
+const createModuleItems = computed(() => {
+  const namesByMode = {
+    'all':          ['Ипотека', 'Скоринг', 'Страховка', 'Пакеты документов', 'Регистрация', 'Пакетная регистрация', 'Цифровые подписи'],
+    'mortgage':     ['Ипотека', 'Скоринг', 'Страховка'],
+    'registration': ['Регистрация', 'Пакетная регистрация', 'Цифровые подписи', 'Пакеты документов'],
+  }
+  return (namesByMode[props.mode] ?? []).map(name => ({ name, ...moduleCreateItemsMap[name] }))
+})
+
+const openCreateModal = (item, close) => {
+  createModalTitle.value = item.title
+  close()
+  createModalOpen.value = true
+}
+
+const openCreateModalForModule = (moduleName) => {
+  createModalTitle.value = moduleCreateItemsMap[moduleName]?.title ?? 'Создание заявки'
+  createModalOpen.value = true
+}
 const drawerOpen = ref(false)
 const selectedApp = ref(null)
 const openDrawer = (app) => { selectedApp.value = app; drawerOpen.value = true }
@@ -1086,9 +1153,15 @@ const navigation = [
 
 
 const mortgageModules = new Set(['Ипотека', 'Скоринг', 'Страховка'])
-const filteredNavigation = computed(() =>
-  props.mode === 'mortgage' ? navigation.filter(item => mortgageModules.has(item.name)) : navigation
-)
+const mortgageOnlyModules = new Set(['Ипотека'])
+const registrationModules = new Set(['Регистрация', 'Пакетная регистрация', 'Цифровые подписи', 'Пакеты документов'])
+const registrationOrder = ['Регистрация', 'Пакетная регистрация', 'Цифровые подписи', 'Пакеты документов']
+const filteredNavigation = computed(() => {
+  if (props.mode === 'mortgage') return navigation.filter(item => mortgageModules.has(item.name))
+  if (props.mode === 'mortgage-only') return navigation.filter(item => mortgageOnlyModules.has(item.name))
+  if (props.mode === 'registration') return registrationOrder.map(name => navigation.find(item => item.name === name))
+  return navigation
+})
 
 const secondaryNavigation = [
   { name: 'Калькулятор ипотеки', href: '#', initial: 'К' },

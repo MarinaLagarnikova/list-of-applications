@@ -15,7 +15,7 @@
       </svg>
 
       <!-- Buttons -->
-      <div class="flex gap-4">
+      <div class="flex flex-wrap justify-center gap-4">
         <button
           @click="$emit('select', 'all')"
           class="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white px-8 py-6 text-left shadow-sm transition hover:border-indigo-300 hover:shadow-md w-64 cursor-pointer"
@@ -43,6 +43,36 @@
           <div>
             <div class="text-sm font-semibold text-zinc-900">Модули ипотеки</div>
             <div class="mt-1 text-xs text-zinc-500">Ипотека, Скоринг, Страховка, Аналитика, Калькулятор</div>
+          </div>
+        </button>
+
+        <button
+          @click="$emit('select', 'mortgage-only')"
+          class="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white px-8 py-6 text-left shadow-sm transition hover:border-indigo-300 hover:shadow-md w-64 cursor-pointer"
+        >
+          <span class="flex size-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </span>
+          <div>
+            <div class="text-sm font-semibold text-zinc-900">Только ипотека</div>
+            <div class="mt-1 text-xs text-zinc-500">Один модуль ипотеки</div>
+          </div>
+        </button>
+
+        <button
+          @click="$emit('select', 'registration')"
+          class="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white px-8 py-6 text-left shadow-sm transition hover:border-indigo-300 hover:shadow-md w-64 cursor-pointer"
+        >
+          <span class="flex size-10 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            </svg>
+          </span>
+          <div>
+            <div class="text-sm font-semibold text-zinc-900">Регистрация</div>
+            <div class="mt-1 text-xs text-zinc-500">Пакеты документов, Регистрация, Пакетная регистрация, Цифровые подписи</div>
           </div>
         </button>
       </div>

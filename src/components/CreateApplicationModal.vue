@@ -23,7 +23,7 @@
               <!-- Header -->
               <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#f4f4f5]">
                 <DialogTitle class="text-[18px] leading-[28px] font-semibold text-[#18181b]">
-                  Создание заявки
+                  {{ title }}
                 </DialogTitle>
                 <button
                   @click="$emit('close')"
@@ -35,30 +35,6 @@
 
               <!-- Body -->
               <div class="px-6 py-6 flex flex-col gap-6">
-                <fieldset v-if="mode === 'mortgage'">
-                  <legend class="sr-only">Тип заявки</legend>
-                  <div class="grid grid-cols-3 gap-3">
-                    <label
-                      v-for="option in applicationTypes"
-                      :key="option.id"
-                      class="group relative flex flex-col gap-2 rounded-lg border border-[#d1d5db] bg-white p-[17px] cursor-pointer drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)]"
-                    >
-                      <input type="radio" name="application-type" :value="option.id" v-model="selectedType" class="sr-only" />
-                      <!-- Overlay при выборе -->
-                      <div v-if="selectedType === option.id" class="pointer-events-none absolute inset-[-1px] rounded-lg border-2 border-indigo-600" />
-                      <div class="flex items-center justify-between">
-                        <component :is="option.icon" :size="18" :class="selectedType === option.id ? 'text-indigo-600' : 'text-zinc-400'" />
-                        <span v-if="selectedType === option.id" class="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-indigo-600">
-                          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                            <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                          </svg>
-                        </span>
-                      </div>
-                      <span class="text-[13px] font-medium text-[#18181b]">{{ option.label }}</span>
-                    </label>
-                  </div>
-                </fieldset>
-
                 <!-- ФИО -->
                 <div class="flex flex-col gap-[4px]">
                   <label class="text-[14px] font-medium leading-[20px] text-[#18181b]">ФИО</label>
@@ -128,7 +104,11 @@ import { ref } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import { X as XIcon, Home as HomeIcon, ChartPie as ChartPieIcon, ShieldCheck as ShieldCheckIcon, CircleCheck as CircleCheckIcon, ChevronDown as ChevronDownIcon } from 'lucide-vue-next'
 
-defineProps({ open: Boolean, mode: { type: String, default: 'all' } })
+defineProps({
+  open: Boolean,
+  mode: { type: String, default: 'all' },
+  title: { type: String, default: 'Создание заявки' },
+})
 defineEmits(['close'])
 
 const selectedType = ref('mortgage')
