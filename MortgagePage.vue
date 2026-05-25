@@ -19,6 +19,26 @@
       </div>
 
 
+      <!-- Sidebar skeleton on initial load -->
+      <template v-if="showSidebarSkeleton">
+        <div class="flex flex-col gap-1 p-1 animate-pulse">
+          <!-- Create button skeleton -->
+          <div class="mb-2 h-9 w-full rounded-md bg-zinc-100" />
+          <!-- Nav item skeletons -->
+          <div v-for="i in 7" :key="`snav-${i}`" class="flex items-center gap-3 px-2 py-2">
+            <div class="size-5 shrink-0 rounded bg-zinc-100" />
+            <div class="h-2.5 rounded bg-zinc-100" :style="`width: ${55 + (i % 3) * 15}%`" />
+          </div>
+          <!-- Divider + tools -->
+          <div class="my-3 h-px bg-gray-100" />
+          <div v-for="i in 2" :key="`stool-${i}`" class="flex items-center gap-3 px-2 py-2">
+            <div class="size-5 shrink-0 rounded bg-zinc-100" />
+            <div class="h-2.5 w-3/5 rounded bg-zinc-100" />
+          </div>
+        </div>
+      </template>
+
+      <template v-else-if="!appIsInitialLoading">
       <!-- Sidebar Create button (все модули кроме Калькулятора и Аналитики, когда сайдбар раскрыт) -->
       <div v-if="!sidebarCollapsed && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" class="shrink-0 px-1">
         <Button color="indigo" class="w-full justify-center" @click="createModalOpen = true">
@@ -232,6 +252,7 @@
           </li>
         </ul>
       </nav>
+      </template><!-- /sidebar skeleton v-else -->
     </div>
 
     <!-- ─── Main content ──────────────────────────── -->
@@ -327,11 +348,20 @@
         </Button>
         <div class="flex items-center gap-x-4">
           <div class="flex items-center gap-x-2">
-            <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">{{ activeModule }}</span>
-            <span
-              v-if="activeCount !== null && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'"
-              class="inline-flex items-center rounded-md bg-zinc-50 px-1.5 py-0.5 text-xs font-medium text-zinc-600 inset-ring inset-ring-zinc-500/10"
-            >{{ activeCount.toLocaleString('ru-RU') }}</span>
+            <!-- Title + counter skeleton on initial load -->
+            <template v-if="showSidebarSkeleton">
+              <div class="animate-pulse flex items-center gap-x-2">
+                <div class="h-6 w-32 rounded bg-zinc-100" />
+                <div class="h-5 w-7 rounded bg-zinc-100" />
+              </div>
+            </template>
+            <template v-else-if="!appIsInitialLoading">
+              <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">{{ activeModule }}</span>
+              <span
+                v-if="activeCount !== null && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'"
+                class="inline-flex items-center rounded-md bg-zinc-50 px-1.5 py-0.5 text-xs font-medium text-zinc-600 inset-ring inset-ring-zinc-500/10"
+              >{{ activeCount.toLocaleString('ru-RU') }}</span>
+            </template>
           </div>
 
           <Button v-if="sidebarCollapsed && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" color="indigo" @click="createModalOpen = true">
@@ -343,19 +373,30 @@
 
       <!-- Шапка: строка 2 — поиск + фильтры (только Ипотека) -->
       <div v-if="activeModule === 'Ипотека'" :class="['shrink-0 flex items-center justify-between px-8 py-2', isScrolled && !mortgageFilterTags.length && 'border-b border-[#f4f4f5]']">
-        <SearchInput v-model="searchQuery" placeholder="Поиск по ID, ФИО или телефону" />
-        <div class="flex items-center gap-x-3">
-          <span v-if="searchQuery.trim()" class="text-[14px] font-light text-[#71717a] mr-5">
-            {{ searchResultText }}
-          </span>
-          <Button outline @click="filterDrawerOpen = true">
-            <FunnelIcon :size="16" class="shrink-0 aspect-square" style="width:16px;height:16px;" />
-            Фильтры
-            <span v-if="mortgageFilterCount > 0" class="inline-flex items-center justify-center size-[18px] rounded-full bg-indigo-600 text-white text-[11px] font-medium leading-none">{{ mortgageFilterCount }}</span>
-          </Button>
-          <SortDropdown v-model="mortgageSortOrder" />
-          <ExportPopover :count="filteredApplications.length" />
-        </div>
+        <!-- Filter bar skeleton on initial load -->
+        <template v-if="showSidebarSkeleton">
+          <div class="flex items-center gap-x-3 animate-pulse">
+            <div class="h-8 w-72 rounded-md bg-zinc-100" />
+            <div class="h-8 w-24 rounded-md bg-zinc-100" />
+            <div class="h-8 w-32 rounded-md bg-zinc-100" />
+            <div class="ml-auto h-8 w-8 rounded-md bg-zinc-100" />
+          </div>
+        </template>
+        <template v-else-if="!appIsInitialLoading">
+          <SearchInput v-model="searchQuery" placeholder="Поиск по ID, ФИО или телефону" />
+          <div class="flex items-center gap-x-3">
+            <span v-if="searchQuery.trim()" class="text-[14px] font-light text-[#71717a] mr-5">
+              {{ searchResultText }}
+            </span>
+            <Button outline @click="filterDrawerOpen = true">
+              <FunnelIcon :size="16" class="shrink-0 aspect-square" style="width:16px;height:16px;" />
+              Фильтры
+              <span v-if="mortgageFilterCount > 0" class="inline-flex items-center justify-center size-[18px] rounded-full bg-indigo-600 text-white text-[11px] font-medium leading-none">{{ mortgageFilterCount }}</span>
+            </Button>
+            <SortDropdown v-model="mortgageSortOrder" />
+            <ExportPopover :count="filteredApplications.length" />
+          </div>
+        </template>
       </div>
 
       <!-- Applied filters strip (Ипотека) -->
@@ -367,11 +408,50 @@
       <div class="flex-1 overflow-auto" @scroll="isScrolled = $event.target.scrollTop > 0">
 
         <!-- Ипотека -->
-        <div v-if="activeModule === 'Ипотека'" class="pt-6 pb-10">
+        <div v-if="activeModule === 'Ипотека'" class="pt-6 pb-10 relative">
+        <!-- Reload: opacity-50 wrapper when reloading but skeleton not yet shown -->
+        <div :class="(mortgageIsReloading && !showReloadSkeleton) ? 'opacity-50 pointer-events-none transition-opacity duration-150' : ''">
         <table class="w-full border-separate border-spacing-0">
         <tbody>
 
-          <tr v-for="app in filteredApplications" :key="app.id" :class="['group cursor-pointer', checkedRows.has(app.id) && 'selected']" @click="openApp(app)">
+          <!-- Скелетон — первая загрузка или смена фильтра (после 500 мс) -->
+          <tr v-if="mortgageIsInitialLoading || showReloadSkeleton" v-for="i in SKELETON_ROWS" :key="`sk-${i}`" class="motion-safe:animate-pulse">
+            <td class="pt-[16px] pb-3 pl-8 pr-2"><div class="size-4 rounded-sm bg-zinc-100" /></td>
+            <td class="px-3 py-4">
+              <div class="h-3 w-20 rounded bg-zinc-100" />
+              <div class="mt-1.5 h-2.5 w-12 rounded bg-zinc-100" />
+            </td>
+            <td class="px-3 py-4">
+              <div class="flex items-start gap-x-3">
+                <div class="size-8 shrink-0 rounded-full bg-zinc-100" />
+                <div>
+                  <div class="h-3 w-28 rounded bg-zinc-100" />
+                  <div class="mt-1.5 h-2.5 w-24 rounded bg-zinc-100" />
+                </div>
+              </div>
+            </td>
+            <td class="px-3 py-4"><div class="h-5 w-24 rounded-md bg-zinc-100" /></td>
+            <td class="px-3 py-4">
+              <div class="h-3 w-40 rounded bg-zinc-100" />
+              <div class="mt-1.5 h-2.5 w-20 rounded bg-zinc-100" />
+            </td>
+            <td class="px-3 py-4">
+              <div class="h-3 w-28 rounded bg-zinc-100" />
+              <div class="mt-1.5 h-2.5 w-16 rounded bg-zinc-100" />
+            </td>
+            <td class="px-3 py-4">
+              <div class="h-3 w-24 rounded bg-zinc-100" />
+              <div class="mt-1.5 h-2.5 w-16 rounded bg-zinc-100" />
+            </td>
+            <td class="px-3 py-4">
+              <div class="h-3 w-20 rounded bg-zinc-100" />
+              <div class="mt-1.5 h-2.5 w-14 rounded bg-zinc-100" />
+            </td>
+            <td class="pl-3 pr-8 py-4"><div class="h-7 w-28 rounded bg-zinc-100" /></td>
+          </tr>
+
+          <!-- Реальные строки -->
+          <tr v-if="!mortgageIsInitialLoading && !showReloadSkeleton" v-for="(app, idx) in visibleApplications" :key="app.id" :class="['group cursor-pointer', checkedRows.has(app.id) && 'selected']" @click="openApp(app)">
             <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pt-[16px] pb-3 pl-8 pr-2" @click.stop="toggleRow(app.id)">
               <label class="inline-flex cursor-pointer">
                 <span :class="['relative flex size-4 items-center justify-center rounded-sm border', checkedRows.has(app.id) ? 'bg-indigo-600 border-transparent' : 'bg-white border-zinc-950/15 hover:border-zinc-950/30']">
@@ -434,14 +514,60 @@
               />
             </td>
           </tr>
+
+          <!-- Sentinel — триггер подгрузки -->
+          <tr v-if="!mortgageIsInitialLoading && !showReloadSkeleton && mortgageHasMore" ref="mortgageSentinelRef" aria-hidden="true">
+            <td colspan="9" class="p-0 h-0" />
+          </tr>
+
+          <!-- Спиннер подгрузки -->
+          <tr v-if="mortgageIsLoadingMore">
+            <td colspan="9">
+              <div class="flex items-center gap-x-2 py-4 pl-8 text-zinc-500">
+                <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <span class="text-sm font-normal">Загружаем заявки...</span>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Конец списка — только если данных было больше одной страницы -->
+          <tr v-if="!mortgageIsInitialLoading && !showReloadSkeleton && !mortgageHasMore && filteredApplications.length > INITIAL_PAGE_SIZE">
+            <td colspan="9">
+              <div class="py-4 pl-8 text-sm text-zinc-500">
+                Загрузили все заявки ({{ filteredApplications.length }})
+              </div>
+            </td>
+          </tr>
+
         </tbody>
         </table>
+        </div><!-- /reload opacity wrapper -->
+
+        <!-- Градиент fade-out снизу -->
+        <div
+          v-if="!mortgageIsInitialLoading && !showReloadSkeleton && visibleApplications.length > 0"
+          class="pointer-events-none sticky bottom-0 left-0 right-0 h-20"
+          style="background: linear-gradient(to bottom, transparent 0%, white 85%)"
+          aria-hidden="true"
+        />
+
+        <!-- Empty state — список пуст -->
+        <div v-if="filteredApplications.length === 0 && !mortgageIsInitialLoading && !mortgageIsReloading && !searchQuery.trim() && !mortgageFilterCount" class="flex flex-col items-center justify-center py-24 text-center">
+          <FilePlusCornerIcon :size="48" class="mx-auto text-zinc-400" />
+          <h3 class="mt-3 text-sm font-medium text-zinc-900">Пока здесь пусто</h3>
+          <p class="mt-1 text-sm font-light text-zinc-500">В этом списке пока нет заявок</p>
+          <Button outline class="mt-6" @click="createModalOpen = true">
+            <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
+            Создать
+          </Button>
+        </div>
 
         <!-- Empty state при поиске или фильтрации -->
-        <div v-if="filteredApplications.length === 0 && (searchQuery.trim() || mortgageFilterCount > 0)" class="flex flex-col items-center justify-center py-24 text-center">
-          <svg class="mx-auto size-12 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-          </svg>
+        <div v-if="filteredApplications.length === 0 && !mortgageIsInitialLoading && !mortgageIsReloading && (searchQuery.trim() || mortgageFilterCount > 0)" class="flex flex-col items-center justify-center py-24 text-center">
+          <FileSearchCornerIcon :size="48" class="mx-auto text-zinc-400" />
           <h3 class="mt-3 text-sm font-medium text-zinc-900">Заявки не найдены</h3>
           <p class="mt-1 text-sm font-light text-zinc-500">Попробуйте изменить параметры поиска или фильтрации</p>
           <Button v-if="searchQuery.trim() && !mortgageFilterCount" outline class="mt-6" @click="searchQuery = ''">Сбросить поиск</Button>
@@ -454,22 +580,22 @@
         <CalculatorPage v-else-if="activeModule === 'Калькулятор ипотеки'" @open-bank="openBankDrawer" />
 
         <!-- Скоринг -->
-        <ScoringPage v-else-if="activeModule === 'Скоринг'" :active-sub-item="activeSubItem" :filter-count="scoringFilterCount" :filters="scoringFilters" :filter-tags="scoringFilterTags" @open-filter="scoringFilterDrawerOpen = true" @open-preview="openScoringDrawer" @update:count="activeCount = $event" @reset-filters="scoringFilterDrawerRef?.resetAll()" />
+        <ScoringPage v-else-if="activeModule === 'Скоринг'" :active-sub-item="activeSubItem" :filter-count="scoringFilterCount" :filters="scoringFilters" :filter-tags="scoringFilterTags" @open-filter="scoringFilterDrawerOpen = true" @open-preview="openScoringDrawer" @update:count="activeCount = $event" @reset-filters="scoringFilterDrawerRef?.resetAll()" @create="createModalOpen = true" />
 
         <!-- Пакеты документов -->
-        <DocumentPackagesPage v-else-if="activeModule === 'Пакеты документов'" :active-sub-item="activeSubItem" :filter-count="docPackagesFilterCount" :filters="docPackagesFilters" :filter-tags="docPackagesFilterTags" @open-filter="docPackagesFilterOpen = true" @open-preview="item => { selectedDocPackage = item; docPackagePreviewOpen = true }" @update:count="activeCount = $event" @reset-filters="docPackagesFilterDrawerRef?.resetAll()" />
+        <DocumentPackagesPage v-else-if="activeModule === 'Пакеты документов'" :active-sub-item="activeSubItem" :filter-count="docPackagesFilterCount" :filters="docPackagesFilters" :filter-tags="docPackagesFilterTags" @open-filter="docPackagesFilterOpen = true" @open-preview="item => { selectedDocPackage = item; docPackagePreviewOpen = true }" @update:count="activeCount = $event" @reset-filters="docPackagesFilterDrawerRef?.resetAll()" @create="createModalOpen = true" />
 
         <!-- Регистрация -->
-        <RegistrationPage v-else-if="activeModule === 'Регистрация'" :active-sub-item="activeSubItem" :filter-count="registrationFilterCount" :filters="registrationFilters" :filter-tags="registrationFilterTags" @open-filter="registrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="registrationFilterDrawerRef?.resetAll()" />
+        <RegistrationPage v-else-if="activeModule === 'Регистрация'" :active-sub-item="activeSubItem" :filter-count="registrationFilterCount" :filters="registrationFilters" :filter-tags="registrationFilterTags" @open-filter="registrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="registrationFilterDrawerRef?.resetAll()" @create="createModalOpen = true" />
 
         <!-- Пакетная регистрация -->
-        <BatchRegistrationPage v-else-if="activeModule === 'Пакетная регистрация'" :active-sub-item="activeSubItem" :filter-count="batchRegistrationFilterCount" :filters="batchRegistrationFilters" :filter-tags="batchRegistrationFilterTags" @open-filter="batchRegistrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="batchRegistrationFilterDrawerRef?.resetAll()" />
+        <BatchRegistrationPage v-else-if="activeModule === 'Пакетная регистрация'" :active-sub-item="activeSubItem" :filter-count="batchRegistrationFilterCount" :filters="batchRegistrationFilters" :filter-tags="batchRegistrationFilterTags" @open-filter="batchRegistrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="batchRegistrationFilterDrawerRef?.resetAll()" @create="createModalOpen = true" />
 
         <!-- Страховка -->
-        <InsurancePage v-else-if="activeModule === 'Страховка'" :active-sub-item="activeSubItem" :filter-count="insuranceFilterCount" :filters="insuranceFilters" :filter-tags="insuranceFilterTags" @open-filter="insuranceFilterOpen = true" @open-preview="openInsurancePreview" @update:count="activeCount = $event" @reset-filters="insuranceFilterDrawerRef?.resetAll()" />
+        <InsurancePage v-else-if="activeModule === 'Страховка'" :active-sub-item="activeSubItem" :filter-count="insuranceFilterCount" :filters="insuranceFilters" :filter-tags="insuranceFilterTags" @open-filter="insuranceFilterOpen = true" @open-preview="openInsurancePreview" @update:count="activeCount = $event" @reset-filters="insuranceFilterDrawerRef?.resetAll()" @create="createModalOpen = true" />
 
         <!-- Цифровые подписи -->
-        <DigitalSignaturesPage v-else-if="activeModule === 'Цифровые подписи'" :active-sub-item="activeSubItem" :filter-count="digitalSignaturesFilterCount" :filters="digitalSignaturesFilters" :filter-tags="digitalSignaturesFilterTags" @open-filter="digitalSignaturesFilterOpen = true" @open-preview="openDigitalSignaturesPreview" @update:count="activeCount = $event" @reset-filters="digitalSignaturesFilterDrawerRef?.resetAll()" />
+        <DigitalSignaturesPage v-else-if="activeModule === 'Цифровые подписи'" :active-sub-item="activeSubItem" :filter-count="digitalSignaturesFilterCount" :filters="digitalSignaturesFilters" :filter-tags="digitalSignaturesFilterTags" @open-filter="digitalSignaturesFilterOpen = true" @open-preview="openDigitalSignaturesPreview" @update:count="activeCount = $event" @reset-filters="digitalSignaturesFilterDrawerRef?.resetAll()" @create="createModalOpen = true" />
 
         <!-- Аналитика -->
         <AnalyticsPage v-else-if="activeModule === 'Аналитика'" />
@@ -484,7 +610,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, reactive } from 'vue'
+import { ref, computed, watch, watchEffect, onMounted, onUnmounted, reactive } from 'vue'
 
 const props = defineProps({
   mode: { type: String, default: 'all' }
@@ -557,12 +683,23 @@ import {
   ArrowUpToLine as ArrowUpFromLineIcon,
   Layers as LayersIcon,
   House as HouseIcon,
+  FilePlusCorner as FilePlusCornerIcon,
+  FileSearchCorner as FileSearchCornerIcon,
 } from 'lucide-vue-next'
 
 const isOffline = ref(true)
 onMounted(() => {
   window.addEventListener('online',  () => { isOffline.value = false })
   window.addEventListener('offline', () => { isOffline.value = true  })
+
+  // Simulate initial page load: sidebar/header/filterbar skeleton after 500 ms delay
+  const sidebarDelayTimer = setTimeout(() => { showSidebarSkeleton.value = true }, 500)
+  setTimeout(() => {
+    appIsInitialLoading.value = false
+    showSidebarSkeleton.value = false
+    clearTimeout(sidebarDelayTimer)
+    mortgageIsInitialLoading.value = false
+  }, 900)
 })
 onUnmounted(() => {
   window.removeEventListener('online',  () => { isOffline.value = false })
@@ -781,6 +918,72 @@ const filteredApplications = computed(() => {
 
   return result
 })
+
+
+const INITIAL_PAGE_SIZE = 25
+const NEXT_PAGE_SIZE = 20
+const PRELOAD_THRESHOLD = 3
+const SKELETON_ROWS = 12
+
+const mortgageVisibleCount = ref(INITIAL_PAGE_SIZE)
+const mortgageIsInitialLoading = ref(true)
+const mortgageIsLoadingMore = ref(false)
+const mortgageIsReloading = ref(false)
+
+// Initial app loading — controls sidebar / header / filterbar skeleton
+const appIsInitialLoading = ref(true)
+const showSidebarSkeleton = ref(false)
+
+// Reload skeleton — delayed (500 ms) version of mortgageIsReloading
+const showReloadSkeleton = ref(false)
+
+const visibleApplications = computed(() =>
+  filteredApplications.value.slice(0, mortgageVisibleCount.value)
+)
+const mortgageHasMore = computed(() =>
+  mortgageVisibleCount.value < filteredApplications.value.length
+)
+
+const loadMoreMortgage = () => {
+  if (mortgageIsLoadingMore.value || !mortgageHasMore.value) return
+  mortgageIsLoadingMore.value = true
+  setTimeout(() => {
+    mortgageVisibleCount.value += NEXT_PAGE_SIZE
+    mortgageIsLoadingMore.value = false
+  }, 600)
+}
+
+const mortgageSentinelRef = ref(null)
+watchEffect((onCleanup) => {
+  const el = mortgageSentinelRef.value
+  if (!el) return
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting) loadMoreMortgage()
+    },
+    { threshold: 0.1, rootMargin: '120px 0px' }
+  )
+  observer.observe(el)
+  onCleanup(() => observer.disconnect())
+})
+
+// Сбрасываем при смене фильтра/поиска/сортировки/подраздела
+watch(
+  [activeSubItem, mortgageSortOrder, searchQuery, () => JSON.stringify(mortgageFilters.value)],
+  () => {
+    if (activeModule.value !== 'Ипотека') return
+    mortgageVisibleCount.value = INITIAL_PAGE_SIZE
+    // Reload state: old data goes opacity-50 immediately; skeleton kicks in after 500 ms
+    mortgageIsReloading.value = true
+    showReloadSkeleton.value = false
+    const reloadDelayTimer = setTimeout(() => { showReloadSkeleton.value = true }, 500)
+    setTimeout(() => {
+      mortgageIsReloading.value = false
+      showReloadSkeleton.value = false
+      clearTimeout(reloadDelayTimer)
+    }, 900)
+  }
+)
 
 const checkedRows = ref(new Set())
 const toggleRow = (id) => {
@@ -1161,6 +1364,606 @@ const applications = [
     amount: '6 125 000 ₽', pv: '30%', term: '20 лет',
     houseType: 'Первичное жильё', mortgageType: 'Семейная',
     createdAt: '27.04.2026', updatedAt: '28.04.2026 08:55',
+  },
+  {
+    id: 'ИП 1257822', date: '26.04',
+    status: 'Новая заявка',
+    initials: 'ЗА', client: 'Захаров А.И.', phone: '+7 916 ***-**-42',
+    fullName: 'Захаров Алексей Игоревич', fullPhone: '+7 916 548-23-42',
+    complex: 'ПИК/Мякинино', complexPrice: '7 400 000 ₽',
+    amount: null, pv: null, term: null,
+    houseType: null, mortgageType: null,
+    createdAt: '26.04.2026', updatedAt: '26.04.2026 09:00',
+  },
+  {
+    id: 'ИП 1257821', date: '25.04',
+    status: 'Консультация',
+    initials: 'ПВ', client: 'Попов В.М.', phone: '+7 499 ***-**-11',
+    fullName: 'Попов Виктор Михайлович', fullPhone: '+7 499 312-67-11',
+    complex: 'Самолет/Квартал Лайково', complexPrice: '6 200 000 ₽',
+    amount: '4 600 000 ₽', pv: '25%', term: '15 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '25.04.2026', updatedAt: '25.04.2026 10:07',
+  },
+  {
+    id: 'ИП 1257820', date: '24.04',
+    status: 'Подготовка',
+    initials: 'ТН', client: 'Тимофеев Н.П.', phone: '+7 922 ***-**-55',
+    fullName: 'Тимофеев Николай Павлович', fullPhone: '+7 922 445-38-55',
+    complex: 'А101/Новые Ватутинки-3', complexPrice: '8 900 000 ₽',
+    amount: '7 100 000 ₽', pv: '30%', term: '17 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '24.04.2026', updatedAt: '24.04.2026 11:14',
+  },
+  {
+    id: 'ИП 1257819', date: '23.04',
+    status: 'Ожидает решения',
+    initials: 'КС', client: 'Крылов С.А.', phone: '+7 911 ***-**-03',
+    fullName: 'Крылов Сергей Андреевич', fullPhone: '+7 911 871-90-03',
+    complex: 'ФСК/Первый Нагатинский', complexPrice: '13 500 000 ₽',
+    amount: '9 400 000 ₽', pv: '35%', term: '20 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '23.04.2026', updatedAt: '23.04.2026 12:21',
+  },
+  {
+    id: 'ИП 1257818', date: '22.04',
+    status: 'Одобрена',
+    initials: 'СП', client: 'Сергеев П.Р.', phone: '+7 933 ***-**-77',
+    fullName: 'Сергеев Павел Романович', fullPhone: '+7 933 123-54-77',
+    complex: 'Эталон/Медовая долина', complexPrice: '11 200 000 ₽',
+    amount: '8 400 000 ₽', pv: '40%', term: '22 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
+    createdAt: '22.04.2026', updatedAt: '22.04.2026 13:28',
+  },
+  {
+    id: 'ИП 1257817', date: '21.04',
+    status: 'Отказано',
+    initials: 'РО', client: 'Романова О.В.', phone: '+7 920 ***-**-29',
+    fullName: 'Романова Ольга Викторовна', fullPhone: '+7 920 654-21-29',
+    complex: 'MR Group/Метрополия', complexPrice: '21 000 000 ₽',
+    amount: '16 800 000 ₽', pv: '20%', term: '25 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '21.04.2026', updatedAt: '21.04.2026 14:35',
+  },
+  {
+    id: 'ИП 1257816', date: '20.04',
+    status: 'Банк выбран',
+    initials: 'ГН', client: 'Гусева Н.А.', phone: '+7 966 ***-**-14',
+    fullName: 'Гусева Надежда Алексеевна', fullPhone: '+7 966 789-43-14',
+    complex: 'Донстрой/Сердце Столицы', complexPrice: '26 500 000 ₽',
+    amount: '18 500 000 ₽', pv: '25%', term: '27 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '20.04.2026', updatedAt: '20.04.2026 15:42',
+  },
+  {
+    id: 'ИП 1257815', date: '19.04',
+    status: 'Новая заявка',
+    initials: 'БК', client: 'Белова К.Д.', phone: '+7 904 ***-**-68',
+    fullName: 'Белова Ксения Дмитриевна', fullPhone: '+7 904 237-15-68',
+    complex: 'ЛСР/Нагатино Простор', complexPrice: '9 800 000 ₽',
+    amount: null, pv: null, term: null,
+    houseType: null, mortgageType: null,
+    createdAt: '19.04.2026', updatedAt: '19.04.2026 16:49',
+  },
+  {
+    id: 'ИП 1257814', date: '18.04',
+    status: 'Консультация',
+    initials: 'ЗИ', client: 'Зубков И.Е.', phone: '+7 913 ***-**-82',
+    fullName: 'Зубков Игорь Евгеньевич', fullPhone: '+7 913 560-84-82',
+    complex: 'Группа ПСН/Флотилия (СПб)', complexPrice: '10 400 000 ₽',
+    amount: '8 300 000 ₽', pv: '35%', term: '12 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
+    createdAt: '18.04.2026', updatedAt: '18.04.2026 17:56',
+  },
+  {
+    id: 'ИП 1257813', date: '17.04',
+    status: 'Подготовка',
+    initials: 'ТМ', client: 'Туров М.О.', phone: '+7 944 ***-**-36',
+    fullName: 'Туров Михаил Олегович', fullPhone: '+7 944 903-27-36',
+    complex: 'LEGENDA/Лиговский (СПб)', complexPrice: '14 700 000 ₽',
+    amount: '10 200 000 ₽', pv: '40%', term: '15 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '17.04.2026', updatedAt: '17.04.2026 18:03',
+  },
+  {
+    id: 'ИП 1257812', date: '16.04',
+    status: 'Ожидает решения',
+    initials: 'ША', client: 'Широков А.В.', phone: '+7 956 ***-**-51',
+    fullName: 'Широков Андрей Вячеславович', fullPhone: '+7 956 148-73-51',
+    complex: 'ПИК/Аквилон Митино', complexPrice: '8 100 000 ₽',
+    amount: '6 000 000 ₽', pv: '20%', term: '17 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '16.04.2026', updatedAt: '16.04.2026 19:10',
+  },
+  {
+    id: 'ИП 1257811', date: '15.04',
+    status: 'Одобрена',
+    initials: 'РЕ', client: 'Рябова Е.С.', phone: '+7 907 ***-**-94',
+    fullName: 'Рябова Елена Сергеевна', fullPhone: '+7 907 492-06-94',
+    complex: 'Самолет/Некрасовка Парк', complexPrice: '5 800 000 ₽',
+    amount: '4 600 000 ₽', pv: '25%', term: '20 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '15.04.2026', updatedAt: '15.04.2026 00:17',
+  },
+  {
+    id: 'ИП 1257810', date: '14.04',
+    status: 'Отказано',
+    initials: 'ЛГ', client: 'Лунев Г.П.', phone: '+7 935 ***-**-17',
+    fullName: 'Лунев Григорий Петрович', fullPhone: '+7 935 315-62-17',
+    complex: 'Унистрой/Арбан (Казань)', complexPrice: '6 700 000 ₽',
+    amount: '4 600 000 ₽', pv: '30%', term: '22 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
+    createdAt: '14.04.2026', updatedAt: '14.04.2026 01:24',
+  },
+  {
+    id: 'ИП 1257809', date: '13.04',
+    status: 'Банк выбран',
+    initials: 'ПД', client: 'Пирогов Д.А.', phone: '+7 960 ***-**-43',
+    fullName: 'Пирогов Денис Алексеевич', fullPhone: '+7 960 724-38-43',
+    complex: 'DOGMA/Европейский (Краснодар)', complexPrice: '5 200 000 ₽',
+    amount: '3 900 000 ₽', pv: '35%', term: '25 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '13.04.2026', updatedAt: '13.04.2026 02:31',
+  },
+  {
+    id: 'ИП 1257808', date: '12.04',
+    status: 'Новая заявка',
+    initials: 'СИ', client: 'Семёнова И.Б.', phone: '+7 927 ***-**-08',
+    fullName: 'Семёнова Ирина Борисовна', fullPhone: '+7 927 081-59-08',
+    complex: 'Setl Group/Панорама 360 (СПб)', complexPrice: '12 300 000 ₽',
+    amount: null, pv: null, term: null,
+    houseType: null, mortgageType: null,
+    createdAt: '12.04.2026', updatedAt: '12.04.2026 03:38',
+  },
+  {
+    id: 'ИП 1257807', date: '11.04',
+    status: 'Консультация',
+    initials: 'ЗА', client: 'Захаров А.И.', phone: '+7 916 ***-**-42',
+    fullName: 'Захаров Алексей Игоревич', fullPhone: '+7 916 548-23-42',
+    complex: 'ПИК/Мякинино', complexPrice: '7 400 000 ₽',
+    amount: '5 100 000 ₽', pv: '20%', term: '30 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '11.04.2026', updatedAt: '11.04.2026 04:45',
+  },
+  {
+    id: 'ИП 1257806', date: '10.04',
+    status: 'Подготовка',
+    initials: 'ПВ', client: 'Попов В.М.', phone: '+7 499 ***-**-11',
+    fullName: 'Попов Виктор Михайлович', fullPhone: '+7 499 312-67-11',
+    complex: 'Самолет/Квартал Лайково', complexPrice: '6 200 000 ₽',
+    amount: '4 600 000 ₽', pv: '25%', term: '12 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
+    createdAt: '10.04.2026', updatedAt: '10.04.2026 05:52',
+  },
+  {
+    id: 'ИП 1257805', date: '09.04',
+    status: 'Ожидает решения',
+    initials: 'ТН', client: 'Тимофеев Н.П.', phone: '+7 922 ***-**-55',
+    fullName: 'Тимофеев Николай Павлович', fullPhone: '+7 922 445-38-55',
+    complex: 'А101/Новые Ватутинки-3', complexPrice: '8 900 000 ₽',
+    amount: '7 100 000 ₽', pv: '30%', term: '15 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '09.04.2026', updatedAt: '09.04.2026 06:59',
+  },
+  {
+    id: 'ИП 1257804', date: '08.04',
+    status: 'Одобрена',
+    initials: 'КС', client: 'Крылов С.А.', phone: '+7 911 ***-**-03',
+    fullName: 'Крылов Сергей Андреевич', fullPhone: '+7 911 871-90-03',
+    complex: 'ФСК/Первый Нагатинский', complexPrice: '13 500 000 ₽',
+    amount: '9 400 000 ₽', pv: '35%', term: '17 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '08.04.2026', updatedAt: '08.04.2026 07:06',
+  },
+  {
+    id: 'ИП 1257803', date: '07.04',
+    status: 'Отказано',
+    initials: 'СП', client: 'Сергеев П.Р.', phone: '+7 933 ***-**-77',
+    fullName: 'Сергеев Павел Романович', fullPhone: '+7 933 123-54-77',
+    complex: 'Эталон/Медовая долина', complexPrice: '11 200 000 ₽',
+    amount: '8 400 000 ₽', pv: '40%', term: '20 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '07.04.2026', updatedAt: '07.04.2026 08:13',
+  },
+  {
+    id: 'ИП 1257802', date: '06.04',
+    status: 'Банк выбран',
+    initials: 'РО', client: 'Романова О.В.', phone: '+7 920 ***-**-29',
+    fullName: 'Романова Ольга Викторовна', fullPhone: '+7 920 654-21-29',
+    complex: 'MR Group/Метрополия', complexPrice: '21 000 000 ₽',
+    amount: '16 800 000 ₽', pv: '20%', term: '22 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
+    createdAt: '06.04.2026', updatedAt: '06.04.2026 09:20',
+  },
+  {
+    id: 'ИП 1257801', date: '05.04',
+    status: 'Новая заявка',
+    initials: 'ГН', client: 'Гусева Н.А.', phone: '+7 966 ***-**-14',
+    fullName: 'Гусева Надежда Алексеевна', fullPhone: '+7 966 789-43-14',
+    complex: 'Донстрой/Сердце Столицы', complexPrice: '26 500 000 ₽',
+    amount: null, pv: null, term: null,
+    houseType: null, mortgageType: null,
+    createdAt: '05.04.2026', updatedAt: '05.04.2026 10:27',
+  },
+  {
+    id: 'ИП 1257800', date: '04.04',
+    status: 'Консультация',
+    initials: 'БК', client: 'Белова К.Д.', phone: '+7 904 ***-**-68',
+    fullName: 'Белова Ксения Дмитриевна', fullPhone: '+7 904 237-15-68',
+    complex: 'ЛСР/Нагатино Простор', complexPrice: '9 800 000 ₽',
+    amount: '7 300 000 ₽', pv: '30%', term: '27 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '04.04.2026', updatedAt: '04.04.2026 11:34',
+  },
+  {
+    id: 'ИП 1257799', date: '03.04',
+    status: 'Подготовка',
+    initials: 'ЗИ', client: 'Зубков И.Е.', phone: '+7 913 ***-**-82',
+    fullName: 'Зубков Игорь Евгеньевич', fullPhone: '+7 913 560-84-82',
+    complex: 'Группа ПСН/Флотилия (СПб)', complexPrice: '10 400 000 ₽',
+    amount: '8 300 000 ₽', pv: '35%', term: '30 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '03.04.2026', updatedAt: '03.04.2026 12:41',
+  },
+  {
+    id: 'ИП 1257798', date: '02.04',
+    status: 'Ожидает решения',
+    initials: 'ТМ', client: 'Туров М.О.', phone: '+7 944 ***-**-36',
+    fullName: 'Туров Михаил Олегович', fullPhone: '+7 944 903-27-36',
+    complex: 'LEGENDA/Лиговский (СПб)', complexPrice: '14 700 000 ₽',
+    amount: '10 200 000 ₽', pv: '40%', term: '12 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
+    createdAt: '02.04.2026', updatedAt: '02.04.2026 13:48',
+  },
+  {
+    id: 'ИП 1257797', date: '01.04',
+    status: 'Одобрена',
+    initials: 'ША', client: 'Широков А.В.', phone: '+7 956 ***-**-51',
+    fullName: 'Широков Андрей Вячеславович', fullPhone: '+7 956 148-73-51',
+    complex: 'ПИК/Аквилон Митино', complexPrice: '8 100 000 ₽',
+    amount: '6 000 000 ₽', pv: '20%', term: '15 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '01.04.2026', updatedAt: '01.04.2026 14:55',
+  },
+  {
+    id: 'ИП 1257796', date: '31.03',
+    status: 'Отказано',
+    initials: 'РЕ', client: 'Рябова Е.С.', phone: '+7 907 ***-**-94',
+    fullName: 'Рябова Елена Сергеевна', fullPhone: '+7 907 492-06-94',
+    complex: 'Самолет/Некрасовка Парк', complexPrice: '5 800 000 ₽',
+    amount: '4 600 000 ₽', pv: '25%', term: '17 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '31.03.2026', updatedAt: '31.03.2026 15:02',
+  },
+  {
+    id: 'ИП 1257795', date: '30.03',
+    status: 'Банк выбран',
+    initials: 'ЛГ', client: 'Лунев Г.П.', phone: '+7 935 ***-**-17',
+    fullName: 'Лунев Григорий Петрович', fullPhone: '+7 935 315-62-17',
+    complex: 'Унистрой/Арбан (Казань)', complexPrice: '6 700 000 ₽',
+    amount: '4 600 000 ₽', pv: '30%', term: '20 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '30.03.2026', updatedAt: '30.03.2026 16:09',
+  },
+  {
+    id: 'ИП 1257794', date: '29.03',
+    status: 'Новая заявка',
+    initials: 'ПД', client: 'Пирогов Д.А.', phone: '+7 960 ***-**-43',
+    fullName: 'Пирогов Денис Алексеевич', fullPhone: '+7 960 724-38-43',
+    complex: 'DOGMA/Европейский (Краснодар)', complexPrice: '5 200 000 ₽',
+    amount: null, pv: null, term: null,
+    houseType: null, mortgageType: null,
+    createdAt: '29.03.2026', updatedAt: '29.03.2026 17:16',
+  },
+  {
+    id: 'ИП 1257793', date: '28.03',
+    status: 'Консультация',
+    initials: 'СИ', client: 'Семёнова И.Б.', phone: '+7 927 ***-**-08',
+    fullName: 'Семёнова Ирина Борисовна', fullPhone: '+7 927 081-59-08',
+    complex: 'Setl Group/Панорама 360 (СПб)', complexPrice: '12 300 000 ₽',
+    amount: '9 800 000 ₽', pv: '40%', term: '25 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '28.03.2026', updatedAt: '28.03.2026 18:23',
+  },
+  {
+    id: 'ИП 1257792', date: '27.03',
+    status: 'Подготовка',
+    initials: 'ЗА', client: 'Захаров А.И.', phone: '+7 916 ***-**-42',
+    fullName: 'Захаров Алексей Игоревич', fullPhone: '+7 916 548-23-42',
+    complex: 'ПИК/Мякинино', complexPrice: '7 400 000 ₽',
+    amount: '5 100 000 ₽', pv: '20%', term: '27 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '27.03.2026', updatedAt: '27.03.2026 19:30',
+  },
+  {
+    id: 'ИП 1257791', date: '26.03',
+    status: 'Ожидает решения',
+    initials: 'ПВ', client: 'Попов В.М.', phone: '+7 499 ***-**-11',
+    fullName: 'Попов Виктор Михайлович', fullPhone: '+7 499 312-67-11',
+    complex: 'Самолет/Квартал Лайково', complexPrice: '6 200 000 ₽',
+    amount: '4 600 000 ₽', pv: '25%', term: '30 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '26.03.2026', updatedAt: '26.03.2026 00:37',
+  },
+  {
+    id: 'ИП 1257790', date: '25.03',
+    status: 'Одобрена',
+    initials: 'ТН', client: 'Тимофеев Н.П.', phone: '+7 922 ***-**-55',
+    fullName: 'Тимофеев Николай Павлович', fullPhone: '+7 922 445-38-55',
+    complex: 'А101/Новые Ватутинки-3', complexPrice: '8 900 000 ₽',
+    amount: '7 100 000 ₽', pv: '30%', term: '12 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
+    createdAt: '25.03.2026', updatedAt: '25.03.2026 01:44',
+  },
+  {
+    id: 'ИП 1257789', date: '24.03',
+    status: 'Отказано',
+    initials: 'КС', client: 'Крылов С.А.', phone: '+7 911 ***-**-03',
+    fullName: 'Крылов Сергей Андреевич', fullPhone: '+7 911 871-90-03',
+    complex: 'ФСК/Первый Нагатинский', complexPrice: '13 500 000 ₽',
+    amount: '9 400 000 ₽', pv: '35%', term: '15 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '24.03.2026', updatedAt: '24.03.2026 02:51',
+  },
+  {
+    id: 'ИП 1257788', date: '23.03',
+    status: 'Банк выбран',
+    initials: 'СП', client: 'Сергеев П.Р.', phone: '+7 933 ***-**-77',
+    fullName: 'Сергеев Павел Романович', fullPhone: '+7 933 123-54-77',
+    complex: 'Эталон/Медовая долина', complexPrice: '11 200 000 ₽',
+    amount: '8 400 000 ₽', pv: '40%', term: '17 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '23.03.2026', updatedAt: '23.03.2026 03:58',
+  },
+  {
+    id: 'ИП 1257787', date: '22.03',
+    status: 'Новая заявка',
+    initials: 'РО', client: 'Романова О.В.', phone: '+7 920 ***-**-29',
+    fullName: 'Романова Ольга Викторовна', fullPhone: '+7 920 654-21-29',
+    complex: 'MR Group/Метрополия', complexPrice: '21 000 000 ₽',
+    amount: null, pv: null, term: null,
+    houseType: null, mortgageType: null,
+    createdAt: '22.03.2026', updatedAt: '22.03.2026 04:05',
+  },
+  {
+    id: 'ИП 1257786', date: '21.03',
+    status: 'Консультация',
+    initials: 'ГН', client: 'Гусева Н.А.', phone: '+7 966 ***-**-14',
+    fullName: 'Гусева Надежда Алексеевна', fullPhone: '+7 966 789-43-14',
+    complex: 'Донстрой/Сердце Столицы', complexPrice: '26 500 000 ₽',
+    amount: '18 500 000 ₽', pv: '25%', term: '22 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
+    createdAt: '21.03.2026', updatedAt: '21.03.2026 05:12',
+  },
+  {
+    id: 'ИП 1257785', date: '20.03',
+    status: 'Подготовка',
+    initials: 'БК', client: 'Белова К.Д.', phone: '+7 904 ***-**-68',
+    fullName: 'Белова Ксения Дмитриевна', fullPhone: '+7 904 237-15-68',
+    complex: 'ЛСР/Нагатино Простор', complexPrice: '9 800 000 ₽',
+    amount: '7 300 000 ₽', pv: '30%', term: '25 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '20.03.2026', updatedAt: '20.03.2026 06:19',
+  },
+  {
+    id: 'ИП 1257784', date: '19.03',
+    status: 'Ожидает решения',
+    initials: 'ЗИ', client: 'Зубков И.Е.', phone: '+7 913 ***-**-82',
+    fullName: 'Зубков Игорь Евгеньевич', fullPhone: '+7 913 560-84-82',
+    complex: 'Группа ПСН/Флотилия (СПб)', complexPrice: '10 400 000 ₽',
+    amount: '8 300 000 ₽', pv: '35%', term: '27 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '19.03.2026', updatedAt: '19.03.2026 07:26',
+  },
+  {
+    id: 'ИП 1257783', date: '18.03',
+    status: 'Одобрена',
+    initials: 'ТМ', client: 'Туров М.О.', phone: '+7 944 ***-**-36',
+    fullName: 'Туров Михаил Олегович', fullPhone: '+7 944 903-27-36',
+    complex: 'LEGENDA/Лиговский (СПб)', complexPrice: '14 700 000 ₽',
+    amount: '10 200 000 ₽', pv: '40%', term: '30 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '18.03.2026', updatedAt: '18.03.2026 08:33',
+  },
+  {
+    id: 'ИП 1257782', date: '17.03',
+    status: 'Отказано',
+    initials: 'ША', client: 'Широков А.В.', phone: '+7 956 ***-**-51',
+    fullName: 'Широков Андрей Вячеславович', fullPhone: '+7 956 148-73-51',
+    complex: 'ПИК/Аквилон Митино', complexPrice: '8 100 000 ₽',
+    amount: '6 000 000 ₽', pv: '20%', term: '12 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
+    createdAt: '17.03.2026', updatedAt: '17.03.2026 09:40',
+  },
+  {
+    id: 'ИП 1257781', date: '16.03',
+    status: 'Банк выбран',
+    initials: 'РЕ', client: 'Рябова Е.С.', phone: '+7 907 ***-**-94',
+    fullName: 'Рябова Елена Сергеевна', fullPhone: '+7 907 492-06-94',
+    complex: 'Самолет/Некрасовка Парк', complexPrice: '5 800 000 ₽',
+    amount: '4 600 000 ₽', pv: '25%', term: '15 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '16.03.2026', updatedAt: '16.03.2026 10:47',
+  },
+  {
+    id: 'ИП 1257780', date: '15.03',
+    status: 'Новая заявка',
+    initials: 'ЛГ', client: 'Лунев Г.П.', phone: '+7 935 ***-**-17',
+    fullName: 'Лунев Григорий Петрович', fullPhone: '+7 935 315-62-17',
+    complex: 'Унистрой/Арбан (Казань)', complexPrice: '6 700 000 ₽',
+    amount: null, pv: null, term: null,
+    houseType: null, mortgageType: null,
+    createdAt: '15.03.2026', updatedAt: '15.03.2026 11:54',
+  },
+  {
+    id: 'ИП 1257779', date: '14.03',
+    status: 'Консультация',
+    initials: 'ПД', client: 'Пирогов Д.А.', phone: '+7 960 ***-**-43',
+    fullName: 'Пирогов Денис Алексеевич', fullPhone: '+7 960 724-38-43',
+    complex: 'DOGMA/Европейский (Краснодар)', complexPrice: '5 200 000 ₽',
+    amount: '3 900 000 ₽', pv: '35%', term: '20 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '14.03.2026', updatedAt: '14.03.2026 12:01',
+  },
+  {
+    id: 'ИП 1257778', date: '13.03',
+    status: 'Подготовка',
+    initials: 'СИ', client: 'Семёнова И.Б.', phone: '+7 927 ***-**-08',
+    fullName: 'Семёнова Ирина Борисовна', fullPhone: '+7 927 081-59-08',
+    complex: 'Setl Group/Панорама 360 (СПб)', complexPrice: '12 300 000 ₽',
+    amount: '9 800 000 ₽', pv: '40%', term: '22 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
+    createdAt: '13.03.2026', updatedAt: '13.03.2026 13:08',
+  },
+  {
+    id: 'ИП 1257777', date: '12.03',
+    status: 'Ожидает решения',
+    initials: 'ЗА', client: 'Захаров А.И.', phone: '+7 916 ***-**-42',
+    fullName: 'Захаров Алексей Игоревич', fullPhone: '+7 916 548-23-42',
+    complex: 'ПИК/Мякинино', complexPrice: '7 400 000 ₽',
+    amount: '5 100 000 ₽', pv: '20%', term: '25 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '12.03.2026', updatedAt: '12.03.2026 14:15',
+  },
+  {
+    id: 'ИП 1257776', date: '11.03',
+    status: 'Одобрена',
+    initials: 'ПВ', client: 'Попов В.М.', phone: '+7 499 ***-**-11',
+    fullName: 'Попов Виктор Михайлович', fullPhone: '+7 499 312-67-11',
+    complex: 'Самолет/Квартал Лайково', complexPrice: '6 200 000 ₽',
+    amount: '4 600 000 ₽', pv: '25%', term: '27 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '11.03.2026', updatedAt: '11.03.2026 15:22',
+  },
+  {
+    id: 'ИП 1257775', date: '10.03',
+    status: 'Отказано',
+    initials: 'ТН', client: 'Тимофеев Н.П.', phone: '+7 922 ***-**-55',
+    fullName: 'Тимофеев Николай Павлович', fullPhone: '+7 922 445-38-55',
+    complex: 'А101/Новые Ватутинки-3', complexPrice: '8 900 000 ₽',
+    amount: '7 100 000 ₽', pv: '30%', term: '30 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '10.03.2026', updatedAt: '10.03.2026 16:29',
+  },
+  {
+    id: 'ИП 1257774', date: '09.03',
+    status: 'Банк выбран',
+    initials: 'КС', client: 'Крылов С.А.', phone: '+7 911 ***-**-03',
+    fullName: 'Крылов Сергей Андреевич', fullPhone: '+7 911 871-90-03',
+    complex: 'ФСК/Первый Нагатинский', complexPrice: '13 500 000 ₽',
+    amount: '9 400 000 ₽', pv: '35%', term: '12 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
+    createdAt: '09.03.2026', updatedAt: '09.03.2026 17:36',
+  },
+  {
+    id: 'ИП 1257773', date: '08.03',
+    status: 'Новая заявка',
+    initials: 'СП', client: 'Сергеев П.Р.', phone: '+7 933 ***-**-77',
+    fullName: 'Сергеев Павел Романович', fullPhone: '+7 933 123-54-77',
+    complex: 'Эталон/Медовая долина', complexPrice: '11 200 000 ₽',
+    amount: null, pv: null, term: null,
+    houseType: null, mortgageType: null,
+    createdAt: '08.03.2026', updatedAt: '08.03.2026 18:43',
+  },
+  {
+    id: 'ИП 1257772', date: '07.03',
+    status: 'Консультация',
+    initials: 'РО', client: 'Романова О.В.', phone: '+7 920 ***-**-29',
+    fullName: 'Романова Ольга Викторовна', fullPhone: '+7 920 654-21-29',
+    complex: 'MR Group/Метрополия', complexPrice: '21 000 000 ₽',
+    amount: '16 800 000 ₽', pv: '20%', term: '17 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '07.03.2026', updatedAt: '07.03.2026 19:50',
+  },
+  {
+    id: 'ИП 1257771', date: '06.03',
+    status: 'Подготовка',
+    initials: 'ГН', client: 'Гусева Н.А.', phone: '+7 966 ***-**-14',
+    fullName: 'Гусева Надежда Алексеевна', fullPhone: '+7 966 789-43-14',
+    complex: 'Донстрой/Сердце Столицы', complexPrice: '26 500 000 ₽',
+    amount: '18 500 000 ₽', pv: '25%', term: '20 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '06.03.2026', updatedAt: '06.03.2026 00:57',
+  },
+  {
+    id: 'ИП 1257770', date: '05.03',
+    status: 'Ожидает решения',
+    initials: 'БК', client: 'Белова К.Д.', phone: '+7 904 ***-**-68',
+    fullName: 'Белова Ксения Дмитриевна', fullPhone: '+7 904 237-15-68',
+    complex: 'ЛСР/Нагатино Простор', complexPrice: '9 800 000 ₽',
+    amount: '7 300 000 ₽', pv: '30%', term: '22 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Стандартная',
+    createdAt: '05.03.2026', updatedAt: '05.03.2026 01:04',
+  },
+  {
+    id: 'ИП 1257769', date: '04.03',
+    status: 'Одобрена',
+    initials: 'ЗИ', client: 'Зубков И.Е.', phone: '+7 913 ***-**-82',
+    fullName: 'Зубков Игорь Евгеньевич', fullPhone: '+7 913 560-84-82',
+    complex: 'Группа ПСН/Флотилия (СПб)', complexPrice: '10 400 000 ₽',
+    amount: '8 300 000 ₽', pv: '35%', term: '25 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '04.03.2026', updatedAt: '04.03.2026 02:11',
+  },
+  {
+    id: 'ИП 1257768', date: '03.03',
+    status: 'Отказано',
+    initials: 'ТМ', client: 'Туров М.О.', phone: '+7 944 ***-**-36',
+    fullName: 'Туров Михаил Олегович', fullPhone: '+7 944 903-27-36',
+    complex: 'LEGENDA/Лиговский (СПб)', complexPrice: '14 700 000 ₽',
+    amount: '10 200 000 ₽', pv: '40%', term: '27 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '03.03.2026', updatedAt: '03.03.2026 03:18',
+  },
+  {
+    id: 'ИП 1257767', date: '02.03',
+    status: 'Банк выбран',
+    initials: 'ША', client: 'Широков А.В.', phone: '+7 956 ***-**-51',
+    fullName: 'Широков Андрей Вячеславович', fullPhone: '+7 956 148-73-51',
+    complex: 'ПИК/Аквилон Митино', complexPrice: '8 100 000 ₽',
+    amount: '6 000 000 ₽', pv: '20%', term: '30 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '02.03.2026', updatedAt: '02.03.2026 04:25',
+  },
+  {
+    id: 'ИП 1257766', date: '01.03',
+    status: 'Новая заявка',
+    initials: 'РЕ', client: 'Рябова Е.С.', phone: '+7 907 ***-**-94',
+    fullName: 'Рябова Елена Сергеевна', fullPhone: '+7 907 492-06-94',
+    complex: 'Самолет/Некрасовка Парк', complexPrice: '5 800 000 ₽',
+    amount: null, pv: null, term: null,
+    houseType: null, mortgageType: null,
+    createdAt: '01.03.2026', updatedAt: '01.03.2026 05:32',
+  },
+  {
+    id: 'ИП 1257765', date: '28.02',
+    status: 'Консультация',
+    initials: 'ЛГ', client: 'Лунев Г.П.', phone: '+7 935 ***-**-17',
+    fullName: 'Лунев Григорий Петрович', fullPhone: '+7 935 315-62-17',
+    complex: 'Унистрой/Арбан (Казань)', complexPrice: '6 700 000 ₽',
+    amount: '4 600 000 ₽', pv: '30%', term: '15 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Льготная',
+    createdAt: '28.02.2026', updatedAt: '28.02.2026 06:39',
+  },
+  {
+    id: 'ИП 1257764', date: '27.02',
+    status: 'Подготовка',
+    initials: 'ПД', client: 'Пирогов Д.А.', phone: '+7 960 ***-**-43',
+    fullName: 'Пирогов Денис Алексеевич', fullPhone: '+7 960 724-38-43',
+    complex: 'DOGMA/Европейский (Краснодар)', complexPrice: '5 200 000 ₽',
+    amount: '3 900 000 ₽', pv: '35%', term: '17 лет',
+    houseType: 'Первичное жильё', mortgageType: 'Семейная',
+    createdAt: '27.02.2026', updatedAt: '27.02.2026 07:46',
+  },
+  {
+    id: 'ИП 1257763', date: '26.02',
+    status: 'Ожидает решения',
+    initials: 'СИ', client: 'Семёнова И.Б.', phone: '+7 927 ***-**-08',
+    fullName: 'Семёнова Ирина Борисовна', fullPhone: '+7 927 081-59-08',
+    complex: 'Setl Group/Панорама 360 (СПб)', complexPrice: '12 300 000 ₽',
+    amount: '9 800 000 ₽', pv: '40%', term: '20 лет',
+    houseType: 'Первичное жильё', mortgageType: 'ИТ',
+    createdAt: '26.02.2026', updatedAt: '26.02.2026 08:53',
   },
 ]
 

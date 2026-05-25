@@ -142,11 +142,20 @@
           </tbody>
         </table>
 
+        <!-- Empty state — список пуст -->
+        <div v-if="filteredItems.length === 0 && !searchQuery.trim() && !props.filterCount" class="flex flex-col items-center justify-center py-24 text-center">
+          <FilePlusCornerIcon :size="48" class="mx-auto text-zinc-400" />
+          <h3 class="mt-3 text-sm font-medium text-zinc-900">Пока здесь пусто</h3>
+          <p class="mt-1 text-sm font-light text-zinc-500">В этом списке пока нет заявок</p>
+          <Button outline class="mt-6" @click="emit('create')">
+            <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>
+            Создать
+          </Button>
+        </div>
+
         <!-- Empty state -->
         <div v-if="filteredItems.length === 0 && (searchQuery.trim() || props.filterCount > 0)" class="flex flex-col items-center justify-center py-24 text-center">
-          <svg class="mx-auto size-12 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-          </svg>
+          <FileSearchCornerIcon :size="48" class="mx-auto text-zinc-400" />
           <h3 class="mt-3 text-sm font-medium text-zinc-900">Заявки не найдены</h3>
           <p class="mt-1 text-sm font-light text-zinc-500">Попробуйте изменить параметры поиска или фильтрации</p>
           <Button v-if="searchQuery.trim() && !props.filterCount" outline class="mt-6" @click="searchQuery = ''">Сбросить поиск</Button>
@@ -163,7 +172,7 @@
 
 <script setup>
 import { ref, computed, reactive, watch } from 'vue'
-import { Search as SearchIcon, SlidersHorizontal as FunnelIcon, ChevronDown as ChevronDownIcon, Pin as PinIcon } from 'lucide-vue-next'
+import { Search as SearchIcon, SlidersHorizontal as FunnelIcon, ChevronDown as ChevronDownIcon, Pin as PinIcon, FilePlusCorner as FilePlusCornerIcon, FileSearchCorner as FileSearchCornerIcon } from 'lucide-vue-next'
 import ExportPopover from './ExportPopover.vue'
 import SearchInput from './SearchInput.vue'
 import Button from './Button.vue'
@@ -179,7 +188,7 @@ const props = defineProps({
   filterTags: { type: Array, default: () => [] },
   filters: { type: Object, default: null },
 })
-const emit = defineEmits(['open-filter', 'open-preview', 'update:count', 'reset-filters'])
+const emit = defineEmits(['open-filter', 'open-preview', 'update:count', 'reset-filters', 'create'])
 
 
 const sortOrder = ref('new')
