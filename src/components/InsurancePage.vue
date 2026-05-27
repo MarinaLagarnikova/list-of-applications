@@ -55,7 +55,7 @@
                 <div class="flex items-start gap-x-3">
                   <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] font-medium text-[#71717a]">{{ item.initials }}</span>
                   <div class="flex flex-col gap-y-1">
-                    <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item.client }}</span>
+                    <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ shortName(item.client) }}</span>
                     <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.phone }}</span>
                   </div>
                 </div>
@@ -176,20 +176,30 @@ const statusBadgeClass = (status) => {
   return `${base} bg-gray-50 text-gray-600 inset-ring-gray-500/10`
 }
 
+const shortName = (name) => {
+  if (!name) return ''
+  const parts = name.trim().split(' ')
+  if (parts.length < 2) return parts[0]
+  const last = parts[0]
+  const first = parts[1] ? parts[1][0] + '.' : ''
+  const mid = parts[2] ? parts[2][0] + '.' : ''
+  return `${last} ${first}${mid}`.trim()
+}
+
 const managerOptions = ['Я', 'Смирнова Юлия', 'Орлов Дмитрий', 'Лебедев Игорь', 'Воронова Анна', 'Морозов Сергей']
 const managerSelections = reactive({})
 
 const items = [
-  { id: 'СТ 1047', date: '12.05', initials: 'НЕ', client: 'Новикова Елена',  phone: '+7 916 ***-**-09', fullPhone: '+7 916 234-11-09', company: 'ООО «Ипотека»',     insurer: 'Сбербанк Страхование', insuranceType: 'Имущество + жизнь', address: 'ул. Полярная, 14/2',         price: '14 200 ₽', kv: '1 420 ₽',  status: 'Оформлено',    manager: 'Смирнова Юлия'  },
-  { id: 'СТ 1046', date: '11.05', initials: 'ОД', client: 'Орлов Дмитрий',   phone: '+7 903 ***-**-72', fullPhone: '+7 903 811-45-72', company: 'ООО «ДомФинанс»', insurer: 'ВТБ Страхование',      insuranceType: 'Имущество',         address: 'пр. Ленина, 88, кв. 34',     price: '7 500 ₽',  kv: '525 ₽',    status: 'На оформлении', manager: 'Орлов Дмитрий'  },
-  { id: 'СТ 1045', date: '10.05', initials: 'СЮ', client: 'Смирнова Юлия',   phone: '+7 925 ***-**-18', fullPhone: '+7 925 007-33-18', company: 'ООО «Ипотека»',     insurer: 'Альфастрахование',     insuranceType: 'Жизнь',             address: 'ул. Берёзовая, 5, кв. 12',   price: '9 800 ₽',  kv: '980 ₽',    status: 'В работе',     manager: 'Лебедев Игорь'  },
-  { id: 'СТ 1044', date: '07.05', initials: 'ЛИ', client: 'Лебедев Игорь',   phone: '+7 499 ***-**-55', fullPhone: '+7 499 123-00-55', company: 'ООО «СтройКредит»', insurer: 'Ингосстрах',           insuranceType: 'Имущество + жизнь', address: 'ул. Советская, 3, кв. 201',  price: '18 600 ₽', kv: '2 232 ₽',  status: 'Оформлено',    manager: 'Воронова Анна'  },
-  { id: 'СТ 1043', date: '05.05', initials: 'ВА', client: 'Воронова Анна',    phone: '+7 916 ***-**-77', fullPhone: '+7 916 540-29-77', company: 'ООО «Ипотека»',     insurer: 'Росгосстрах',          insuranceType: 'Имущество',         address: 'ул. Светлая, 22, кв. 7',     price: '6 300 ₽',  kv: '378 ₽',    status: 'На оформлении', manager: 'Смирнова Юлия'  },
-  { id: 'СТ 1042', date: '04.05', initials: 'МС', client: 'Морозов Сергей',   phone: '+7 912 ***-**-88', fullPhone: '+7 912 300-14-88', company: 'ООО «ДомФинанс»', insurer: 'Сбербанк Страхование', insuranceType: 'Жизнь',             address: 'пр. Мира, 101, кв. 56',      price: '11 100 ₽', kv: '1 110 ₽',  status: 'Оформлено',    manager: 'Орлов Дмитрий'  },
-  { id: 'СТ 1041', date: '01.05', initials: 'КМ', client: 'Кузнецова Мария',  phone: '+7 926 ***-**-04', fullPhone: '+7 926 711-88-04', company: 'ООО «РегЦентр»',   insurer: 'ВТБ Страхование',      insuranceType: 'Имущество + жизнь', address: 'ул. Садовая, 9, кв. 3',      price: '15 400 ₽', kv: '1 848 ₽',  status: 'В работе',     manager: 'Морозов Сергей' },
-  { id: 'СТ 1040', date: '28.04', initials: 'АП', client: 'Алексеев Пётр',    phone: '+7 915 ***-**-31', fullPhone: '+7 915 462-55-31', company: 'ООО «Ипотека»',     insurer: 'Альфастрахование',     insuranceType: 'Имущество',         address: 'ул. Новая, 15, кв. 88',      price: '8 900 ₽',  kv: '712 ₽',    status: 'Оформлено',    manager: 'Лебедев Игорь'  },
-  { id: 'СТ 1039', date: '25.04', initials: 'ЗО', client: 'Захарова Ольга',   phone: '+7 968 ***-**-12', fullPhone: '+7 968 224-77-12', company: 'ООО «СтройКредит»', insurer: 'Ингосстрах',           insuranceType: 'Жизнь',             address: 'наб. Невская, 4, кв. 19',    price: '10 200 ₽', kv: '1 275 ₽',  status: 'На оформлении', manager: 'Воронова Анна'  },
-  { id: 'СТ 1038', date: '22.04', initials: 'ТВ', client: 'Тихонов Виктор',   phone: '+7 903 ***-**-45', fullPhone: '+7 903 159-60-45', company: 'ООО «РегЦентр»',   insurer: 'Росгосстрах',          insuranceType: 'Имущество + жизнь', address: 'ул. Промышленная, 7, кв. 2', price: '13 700 ₽', kv: '1 644 ₽',  status: 'Оформлено',    manager: 'Смирнова Юлия'  },
+  { id: 'СТ 1047', date: '12.05', initials: 'НЕ', client: 'Новикова Елена Дмитриевна',  phone: '+7 916 ***-**-09', fullPhone: '+7 916 234-11-09', company: 'ООО «Ипотека»',     insurer: 'Сбербанк Страхование', insuranceType: 'Имущество + жизнь', address: 'ул. Полярная, 14/2',         price: '14 200 ₽', kv: '1 420 ₽',  status: 'Оформлено',    manager: 'Смирнова Юлия'  },
+  { id: 'СТ 1046', date: '11.05', initials: 'ОД', client: 'Орлов Дмитрий Павлович',   phone: '+7 903 ***-**-72', fullPhone: '+7 903 811-45-72', company: 'ООО «ДомФинанс»', insurer: 'ВТБ Страхование',      insuranceType: 'Имущество',         address: 'пр. Ленина, 88, кв. 34',     price: '7 500 ₽',  kv: '525 ₽',    status: 'На оформлении', manager: 'Орлов Дмитрий'  },
+  { id: 'СТ 1045', date: '10.05', initials: 'СЮ', client: 'Смирнова Юлия Александровна',   phone: '+7 925 ***-**-18', fullPhone: '+7 925 007-33-18', company: 'ООО «Ипотека»',     insurer: 'Альфастрахование',     insuranceType: 'Жизнь',             address: 'ул. Берёзовая, 5, кв. 12',   price: '9 800 ₽',  kv: '980 ₽',    status: 'В работе',     manager: 'Лебедев Игорь'  },
+  { id: 'СТ 1044', date: '07.05', initials: 'ЛИ', client: 'Лебедев Игорь Николаевич',   phone: '+7 499 ***-**-55', fullPhone: '+7 499 123-00-55', company: 'ООО «СтройКредит»', insurer: 'Ингосстрах',           insuranceType: 'Имущество + жизнь', address: 'ул. Советская, 3, кв. 201',  price: '18 600 ₽', kv: '2 232 ₽',  status: 'Оформлено',    manager: 'Воронова Анна'  },
+  { id: 'СТ 1043', date: '05.05', initials: 'ВА', client: 'Воронова Анна Сергеевна',    phone: '+7 916 ***-**-77', fullPhone: '+7 916 540-29-77', company: 'ООО «Ипотека»',     insurer: 'Росгосстрах',          insuranceType: 'Имущество',         address: 'ул. Светлая, 22, кв. 7',     price: '6 300 ₽',  kv: '378 ₽',    status: 'На оформлении', manager: 'Смирнова Юлия'  },
+  { id: 'СТ 1042', date: '04.05', initials: 'МС', client: 'Морозов Сергей Владимирович',   phone: '+7 912 ***-**-88', fullPhone: '+7 912 300-14-88', company: 'ООО «ДомФинанс»', insurer: 'Сбербанк Страхование', insuranceType: 'Жизнь',             address: 'пр. Мира, 101, кв. 56',      price: '11 100 ₽', kv: '1 110 ₽',  status: 'Оформлено',    manager: 'Орлов Дмитрий'  },
+  { id: 'СТ 1041', date: '01.05', initials: 'КМ', client: 'Кузнецова Мария Вячеславовна',  phone: '+7 926 ***-**-04', fullPhone: '+7 926 711-88-04', company: 'ООО «РегЦентр»',   insurer: 'ВТБ Страхование',      insuranceType: 'Имущество + жизнь', address: 'ул. Садовая, 9, кв. 3',      price: '15 400 ₽', kv: '1 848 ₽',  status: 'В работе',     manager: 'Морозов Сергей' },
+  { id: 'СТ 1040', date: '28.04', initials: 'АП', client: 'Алексеев Пётр Анатольевич',    phone: '+7 915 ***-**-31', fullPhone: '+7 915 462-55-31', company: 'ООО «Ипотека»',     insurer: 'Альфастрахование',     insuranceType: 'Имущество',         address: 'ул. Новая, 15, кв. 88',      price: '8 900 ₽',  kv: '712 ₽',    status: 'Оформлено',    manager: 'Лебедев Игорь'  },
+  { id: 'СТ 1039', date: '25.04', initials: 'ЗО', client: 'Захарова Ольга Евгеньевна',   phone: '+7 968 ***-**-12', fullPhone: '+7 968 224-77-12', company: 'ООО «СтройКредит»', insurer: 'Ингосстрах',           insuranceType: 'Жизнь',             address: 'наб. Невская, 4, кв. 19',    price: '10 200 ₽', kv: '1 275 ₽',  status: 'На оформлении', manager: 'Воронова Анна'  },
+  { id: 'СТ 1038', date: '22.04', initials: 'ТВ', client: 'Тихонов Виктор Николаевич',   phone: '+7 903 ***-**-45', fullPhone: '+7 903 159-60-45', company: 'ООО «РегЦентр»',   insurer: 'Росгосстрах',          insuranceType: 'Имущество + жизнь', address: 'ул. Промышленная, 7, кв. 2', price: '13 700 ₽', kv: '1 644 ₽',  status: 'Оформлено',    manager: 'Смирнова Юлия'  },
 ]
 
 items.forEach(item => { managerSelections[item.id] = item.manager })

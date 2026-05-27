@@ -334,7 +334,6 @@
         :open="registrationDrawerOpen"
         :app="selectedRegistration ?? {}"
         :rows="selectedRegistration ? registrationDrawerRows(selectedRegistration) : []"
-        :history="registrationHistory"
         :show-documents="true"
         :show-anketa="false"
         @close="registrationDrawerOpen = false"
@@ -348,11 +347,10 @@
         :open="digitalSignaturesDrawerOpen"
         :app="selectedDigitalSignature ?? {}"
         :rows="selectedDigitalSignature ? digitalSignaturesDrawerRows(selectedDigitalSignature) : []"
-        :history="digitalSignaturesHistory"
         :show-anketa="false"
         :hide-icon-buttons="true"
-        :show-history="false"
         :show-signatures="true"
+        :show-signed-banner="selectedDigitalSignature?.status === 'Подписан'"
         @close="digitalSignaturesDrawerOpen = false"
       />
 
@@ -364,7 +362,6 @@
         :open="insuranceDrawerOpen"
         :app="selectedInsurance ?? {}"
         :rows="selectedInsurance ? insuranceDrawerRows(selectedInsurance) : []"
-        :history="insuranceHistory"
         :anketa-phone-mode="true"
         @close="insuranceDrawerOpen = false"
       />
@@ -759,20 +756,11 @@ const digitalSignaturesFilterOpen = ref(false)
 const digitalSignaturesDrawerOpen = ref(false)
 const selectedDigitalSignature = ref(null)
 const openDigitalSignaturesPreview = (item) => { selectedDigitalSignature.value = item; digitalSignaturesDrawerOpen.value = true }
-const digitalSignaturesHistory = [
-  { text: 'Заявка создана',      time: '5 дней назад' },
-  { text: 'Данные проверены',    time: '4 дня назад'  },
-  { text: 'Выпуск одобрен',      time: '2 дня назад'  },
-  { text: 'Подпись активирована', time: '1 час назад'  },
-]
 const digitalSignaturesDrawerRows = (item) => [
-  { label: 'ID',              value: item.id,             copy: item.id },
-  { label: 'Телефон',         value: item.fullPhone,      copy: item.fullPhone },
   { label: 'Центр',           value: item.center },
-  { label: 'Способ подписи',  value: item.signMethod },
-  { label: 'Дата активации',  value: item.activationDate },
-  { label: 'Дата истечения',  value: item.expiryDate },
-  { label: 'Статус',          value: item.status },
+  { label: 'Способ выпуска',  value: item.signMethod, icon: item.signMethod === 'Офис' ? 'office' : item.signMethod === 'Курьер' ? 'courier' : 'passport' },
+  { label: 'Дата активации',  value: item.status === 'Активирована' ? formatCreatedAt(item.activationDate, true) : '' },
+  { label: 'Действует',       value: item.status === 'Активирована' ? item.duration : '' },
   { label: 'Менеджер',        value: item.manager, options: ['Я', 'Смирнова Юлия', 'Орлов Дмитрий', 'Лебедев Игорь', 'Воронова Анна', 'Морозов Сергей'] },
 ]
 
@@ -780,39 +768,22 @@ const insuranceFilterOpen = ref(false)
 const insuranceDrawerOpen = ref(false)
 const selectedInsurance = ref(null)
 const openInsurancePreview = (item) => { selectedInsurance.value = item; insuranceDrawerOpen.value = true }
-const insuranceHistory = [
-  { text: 'Расчет получен',  time: '5 дней назад' },
-  { text: 'Заявление готово', time: '3 дня назад' },
-  { text: 'Полис оплачен',   time: '1 день назад' },
-  { text: 'Полис получен',   time: '2 часа назад' },
-]
 const insuranceDrawerRows = (item) => [
-  { label: 'ID',              value: item.id,           copy: item.id },
-  { label: 'Телефон',         value: item.fullPhone,    copy: item.fullPhone },
-  { label: 'Компания',        value: item.company },
   { label: 'Страховая',       value: item.insurer },
   { label: 'Тип страховки',   value: item.insuranceType },
   { label: 'Цена',            value: item.price },
-  { label: 'Статус',          value: item.status },
+  { label: 'Комиссия',        value: item.kv, icon: 'percent' },
   { label: 'Менеджер',        value: item.manager, options: managerSelectOptions },
 ]
 const openRegistrationPreview = (item) => { selectedRegistration.value = item; registrationDrawerOpen.value = true }
-const registrationHistory = [
-  { text: 'Паспорт сделки готов',   time: '5 дней назад' },
-  { text: 'Подписи выпущены',       time: '4 дня назад' },
-  { text: 'Документы готовы',       time: '2 дня назад' },
-  { text: 'Заявления подписаны',    time: '2 часа назад' },
-  { text: 'Пошлина оплачена',       time: '30 минут назад' },
-  { text: 'Зарегистрировано',       time: '20 минут назад' },
-]
 const registrationDrawerRows = (item) => [
-  { label: 'ID',              value: item.id,           copy: item.id },
-  { label: 'Телефон',         value: item.fullPhone, copy: item.fullPhone },
+  { label: 'Дата создания',   value: formatCreatedAt(item.date) },
+  { label: 'Тип заявления',   value: item.applicationType },
   { label: 'Компания',        value: item.company },
   { label: 'Проект',          value: item.project },
   { label: 'Тип недвижимости', value: item.propertyType },
+  { label: 'Кадастровый номер', value: item.cadastral },
   { label: 'Адрес объекта',   value: item.address },
-  { label: 'Статус',          value: item.status },
   ...(item.regDate ? [{ label: 'Дата регистрации', value: item.regDate }] : []),
   { label: 'РР',   value: 'ВС-2025-12-30-234567',  copy: 'ВС-2025-12-30-234567'  },
   { label: 'КУВД', value: 'КУВД-001/2025-234567', copy: 'КУВД-001/2025-234567' },
@@ -935,15 +906,23 @@ const handleSubAction = (action) => {
 const managerSelectOptions = ['Я', 'Смирнова Юлия', 'Орлов Дмитрий', 'Лебедев Игорь', 'Воронова Анна', 'Морозов Сергей']
 const mortgageManagerSelections = reactive({})
 
+const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']
+const formatCreatedAt = (d, withYear = false) => {
+  if (!d) return ''
+  const parts = d.split('.')
+  const base = `${parseInt(parts[0])} ${months[parseInt(parts[1]) - 1]}`
+  return withYear && parts[2] ? `${base} ${parts[2]}` : base
+}
+
 const drawerRows = (app) => [
-  { label: 'ID', value: app.id, copy: app.id },
-  { label: 'Телефон', value: app.fullPhone, copy: app.fullPhone },
-  ...(app.mortgageType ? [{ label: 'Тип ипотеки', value: app.mortgageType }] : []),
+  { label: 'Дата создания', value: formatCreatedAt(app.createdAt) },
   { label: 'Проект', value: app.complex },
+  ...(app.complexPrice ? [{ label: 'Стоимость объекта', value: app.complexPrice, icon: 'house' }] : []),
   { label: 'Сумма кредита', value: app.amount },
-  { label: 'Стоимость', value: app.complexPrice },
   ...(app.pv ? [{ label: 'ПВ', value: app.pv }] : []),
   ...(app.term ? [{ label: 'Срок', value: app.term }] : []),
+  ...(app.houseType ? [{ label: 'Тип кредита', value: app.houseType }] : []),
+  ...(app.mortgageType ? [{ label: 'Тип ипотеки', value: app.mortgageType }] : []),
   { label: 'Менеджер', value: 'Смирнова Юлия', options: managerSelectOptions },
 ]
 

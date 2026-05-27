@@ -1,96 +1,95 @@
 <template>
   <BaseDrawer :open="open" @close="$emit('close')">
+    <div class="flex flex-col h-full">
     <div class="flex-1 overflow-y-auto">
 
       <!-- Header -->
       <div class="px-6 pt-6 pb-0">
+
+        <!-- Строка бейджей: ID + статус + закрыть -->
         <div class="flex items-center gap-2">
-          <div class="size-8 rounded-full bg-[#e4e4e7] flex items-center justify-center shrink-0">
-            <span class="text-sm font-medium text-[#71717a] leading-none">{{ item.initials }}</span>
-          </div>
-          <span class="flex-1 text-[20px] leading-[32px] font-semibold text-[#18181b]">{{ clientShort }}</span>
-          <button @click="$emit('close')" class="flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors">
-            <XIcon :size="20" />
+          <span class="inline-flex items-center rounded-md bg-zinc-50 px-1.5 py-0.5 text-xs font-medium text-zinc-600 inset-ring inset-ring-zinc-500/10">
+            {{ item.id }}
+          </span>
+          <span v-if="item.status" :class="statusBadgeClass(item.status)">{{ item.status }}</span>
+          <button @click="$emit('close')" class="ml-auto flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors">
+            <XIcon :size="16" />
           </button>
         </div>
 
-        <!-- Action buttons -->
-        <div class="flex items-center gap-x-2 mt-4">
-          <button class="flex flex-1 items-center justify-center gap-x-2 rounded-lg border border-zinc-950/10 bg-white px-3 h-9 text-[14px] leading-[20px] font-medium text-[#09090b] shadow-xs hover:bg-zinc-50 active:bg-zinc-100 transition-colors">
-            <ExternalLinkIcon :size="14" class="shrink-0" />
-            Перейти в заявку
-          </button>
-          <button class="flex size-9 items-center justify-center rounded-lg border border-zinc-950/10 bg-white text-[#09090b] shadow-xs hover:bg-zinc-50 active:bg-zinc-100 transition-colors shrink-0">
-            <RefreshCwIcon :size="14" class="shrink-0" />
+        <!-- Заголовок: ФИО -->
+        <h2 class="mt-2 text-[24px] leading-[32px] font-medium text-[#18181b]">{{ item.fullName }}</h2>
+
+        <!-- Подзаголовок: телефон -->
+        <div class="group/subtitle mt-0.5 flex items-center gap-x-2">
+          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">{{ item.fullPhone ?? item.phone }}</span>
+          <button
+            @click="navigator.clipboard.writeText(item.fullPhone ?? item.phone)"
+            class="invisible group-hover/subtitle:visible text-zinc-900 hover:text-zinc-600 transition-colors"
+          >
+            <CopyIcon :size="14" />
           </button>
         </div>
-        <p class="mt-2 text-center text-[13px] leading-[20px] font-light text-[#71717a]">Обновить можно 8 мая с 12:00</p>
+
+        <!-- Строка действий -->
+        <div class="flex items-center gap-x-2 mt-4">
+          <button class="flex flex-1 items-center justify-center gap-x-1.5 rounded-lg px-3 h-9 text-[14px] leading-[20px] font-medium text-white bg-[#5B4FCF] hover:bg-[#4e44b8] active:bg-[#443aaa] transition-colors">
+            Обновить рейтинг
+            <ArrowUpRightIcon :size="14" class="shrink-0" />
+          </button>
+        </div>
       </div>
 
-      <!-- ID + Телефон -->
-      <div class="px-6 pt-6">
+      <!-- Детали + Проверка -->
+      <div class="px-6 pt-[40px]">
 
-        <!-- ID -->
-        <div class="flex items-start justify-between border-b border-[#f4f4f5] py-3">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">ID</span>
-          <span class="flex items-center gap-x-3 text-[14px] leading-[20px] font-normal text-[#18181b]">
-            <span>{{ item.id }}</span>
-            <button @click="navigator.clipboard.writeText(item.id)" class="text-zinc-900 hover:text-zinc-600 transition-colors">
-              <CopyIcon :size="14" />
-            </button>
-          </span>
+        <!-- Дата создания -->
+        <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
+          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Дата создания</span>
+          <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ formatDate(item.date) }}</span>
         </div>
 
-        <!-- Телефон -->
-        <div class="flex items-start justify-between border-b border-[#f4f4f5] py-3">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Телефон</span>
-          <span class="flex items-center gap-x-3 text-[14px] leading-[20px] font-normal text-[#18181b]">
-            <span>{{ item.fullPhone ?? item.phone }}</span>
-            <button @click="navigator.clipboard.writeText(item.fullPhone ?? item.phone)" class="text-zinc-900 hover:text-zinc-600 transition-colors">
-              <CopyIcon :size="14" />
-            </button>
-          </span>
+        <!-- Дата проверки -->
+        <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
+          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Дата проверки</span>
+          <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item.lastCheckDate ? formatDate(item.lastCheckDate) : '—' }}</span>
         </div>
+
+        <!-- Рейтинг -->
+        <template v-if="checks[0]">
+          <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
+            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Рейтинг</span>
+            <div class="flex items-center gap-x-2">
+              <div class="relative h-2 w-[61px] rounded-full bg-[#e4e4e7] overflow-hidden shrink-0">
+                <div class="absolute inset-y-0 left-0 rounded-full" :style="{ width: scoreBarWidth(checks[0].score), background: scoreDotColor(checks[0].score) }" />
+              </div>
+              <span class="text-[14px] leading-[20px] font-normal text-[#18181b] w-8 text-right">{{ checks[0].score }}</span>
+            </div>
+          </div>
+
+          <!-- Долговая нагрузка -->
+          <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
+            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Долговая нагрузка</span>
+            <div v-if="checks[0].debtLoad != null" class="flex items-center gap-x-2">
+              <div class="relative h-2 w-[61px] rounded-full bg-[#e4e4e7] overflow-hidden shrink-0">
+                <div class="absolute inset-y-0 left-0 rounded-full" :style="{ width: checks[0].debtLoad + '%', background: debtLoadColor(checks[0].debtLoad) }" />
+              </div>
+              <span class="text-[14px] leading-[20px] font-normal text-[#18181b] w-8 text-right">{{ checks[0].debtLoad }}%</span>
+            </div>
+            <span v-else class="text-[14px] leading-[20px] font-light text-[#71717a]">—</span>
+          </div>
+
+          <!-- Сумма платежей -->
+          <div class="flex items-start justify-between border-b border-[#f4f4f5] py-3">
+            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Сумма всех платежей по кредитам</span>
+            <span class="text-[14px] leading-[20px] font-normal text-[#18181b] shrink-0 ml-4">{{ checks[0].totalPayments ?? '—' }}</span>
+          </div>
+        </template>
 
         <!-- Менеджер -->
         <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
           <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Менеджер</span>
           <CatalystListbox :options="managerOptions" v-model="managerValue" placeholder="Менеджер" />
-        </div>
-
-      </div>
-
-      <!-- Блоки проверок -->
-      <div v-for="(check, i) in checks" :key="i" class="px-6 pt-[40px]">
-        <span class="text-[16px] leading-[24px] font-medium text-[#111827]">Рейтинг от {{ check.dateLabel }}</span>
-
-        <!-- Рейтинг -->
-        <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Рейтинг</span>
-          <div class="flex items-center gap-x-2">
-            <div class="relative h-2 w-[61px] rounded-full bg-[#e4e4e7] overflow-hidden shrink-0">
-              <div class="absolute inset-y-0 left-0 rounded-full" :style="{ width: scoreBarWidth(check.score), background: scoreDotColor(check.score) }" />
-            </div>
-            <span class="text-[14px] leading-[20px] font-normal text-[#18181b] w-8 text-right">{{ check.score }}</span>
-          </div>
-        </div>
-
-        <!-- Долговая нагрузка -->
-        <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Долговая нагрузка</span>
-          <div v-if="check.debtLoad != null" class="flex items-center gap-x-2">
-            <div class="relative h-2 w-[61px] rounded-full bg-[#e4e4e7] overflow-hidden shrink-0">
-              <div class="absolute inset-y-0 left-0 rounded-full" :style="{ width: check.debtLoad + '%', background: debtLoadColor(check.debtLoad) }" />
-            </div>
-            <span class="text-[14px] leading-[20px] font-normal text-[#18181b] w-8 text-right">{{ check.debtLoad }}%</span>
-          </div>
-          <span v-else class="text-[14px] leading-[20px] font-light text-[#71717a]">—</span>
-        </div>
-
-        <!-- Сумма платежей -->
-        <div class="flex items-start justify-between border-b border-[#f4f4f5] py-3">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Сумма всех платежей по кредитам</span>
-          <span class="text-[14px] leading-[20px] font-normal text-[#18181b] shrink-0 ml-4">{{ check.totalPayments ?? '—' }}</span>
         </div>
 
       </div>
@@ -107,23 +106,26 @@
       </div>
 
       <!-- Анкета section -->
-      <div class="px-8 pt-6 pb-[40px]">
-        <div class="flex items-center justify-between">
-          <span class="text-[16px] leading-[24px] font-medium text-[#111827]">Анкета</span>
-          <a href="#" class="text-[14px] leading-[20px] font-medium text-indigo-600 hover:text-indigo-700">Открыть</a>
-        </div>
+      <div class="px-6 pt-[40px]">
+        <span class="text-[16px] leading-[24px] font-medium text-[#111827]">Анкета</span>
         <div class="mt-2 flex flex-col">
           <div class="flex items-center py-3">
-            <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-[#71717a]">
-              {{ item.initials }}
-            </span>
+            <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-[#71717a]">{{ item.initials }}</span>
             <div class="flex flex-col gap-y-0.5 pl-4">
-              <span class="text-[14px] leading-[20px] font-medium text-[#18181b]">{{ item.fullName }}</span>
-              <span class="text-[14px] leading-[20px] font-normal text-[#71717a]">{{ item.phone }}</span>
+              <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item.fullName }}</span>
+              <span class="text-[14px] leading-[20px] font-light text-[#71717a]">{{ item.fullPhone ?? item.phone }}</span>
             </div>
+            <a href="#" class="ml-auto text-[14px] leading-[20px] font-medium text-[#5B4FCF] hover:opacity-80">Открыть</a>
           </div>
         </div>
       </div>
+
+    </div>
+
+    <!-- Футер -->
+    <div class="border-t border-[#f4f4f5] bg-[#fafafa] px-6 py-3 shrink-0">
+      <span class="text-[14px] leading-[20px] font-normal text-[#71717a]">Чат с поддержкой</span>
+    </div>
 
     </div>
   </BaseDrawer>
@@ -135,11 +137,18 @@ import BaseDrawer from './BaseDrawer.vue'
 import CatalystListbox from './CatalystListbox.vue'
 import {
   X as XIcon,
-  ExternalLink as ExternalLinkIcon,
-  RefreshCw as RefreshCwIcon,
   Copy as CopyIcon,
   CircleX as CircleXIcon,
+  ArrowUpRight as ArrowUpRightIcon,
 } from 'lucide-vue-next'
+
+const statusBadgeClass = (status) => {
+  const base = 'inline-flex items-center rounded-md px-1.5 py-1 text-[12px] leading-[16px] font-normal inset-ring'
+  if (status === 'Выполнена')       return `${base} bg-green-50 text-green-700 inset-ring-green-600/20`
+  if (status === 'На проверке')     return `${base} bg-amber-50 text-amber-700 inset-ring-amber-600/20`
+  if (status === 'Ошибка проверки') return `${base} bg-red-50 text-red-700 inset-ring-red-600/10`
+  return `${base} bg-gray-50 text-gray-600 inset-ring-gray-500/10`
+}
 
 const managerOptions = ['Я', 'Смирнова Юлия', 'Орлов Дмитрий', 'Лебедев Игорь', 'Воронова Анна', 'Морозов Сергей']
 const managerValue = ref('Смирнова Юлия')
@@ -151,15 +160,6 @@ const props = defineProps({
 
 defineEmits(['close'])
 
-const clientShort = computed(() => {
-  if (!props.item?.fullName) return ''
-  const parts = props.item.fullName.trim().split(' ')
-  if (parts.length < 2) return parts[0]
-  const last = parts[0]
-  const first = parts[1] ? parts[1][0] + '.' : ''
-  const mid = parts[2] ? parts[2][0] + '.' : ''
-  return `${last} ${first} ${mid}`.trim()
-})
 
 const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']
 const formatDate = (d) => {
