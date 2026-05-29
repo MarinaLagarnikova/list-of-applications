@@ -15,7 +15,7 @@
       </svg>
 
       <!-- Buttons -->
-      <div class="flex flex-wrap justify-center gap-4">
+      <div class="grid grid-cols-2 gap-4">
         <button
           @click="$emit('select', 'all')"
           class="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white px-8 py-6 text-left shadow-sm transition hover:border-indigo-300 hover:shadow-md w-64 cursor-pointer"

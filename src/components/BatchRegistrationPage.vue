@@ -5,7 +5,7 @@
     <div :class="['shrink-0 flex items-center justify-between px-8 py-2', isScrolled && !(filterTags && filterTags.length) && 'border-b border-[#f4f4f5]']">
       <SearchInput v-model="searchQuery" placeholder="Поиск по ID, ИНН или названию пакета" />
       <div class="flex items-center gap-x-3">
-        <span v-if="searchQuery.trim()" class="text-[14px] font-light text-[#71717a] mr-5">
+        <span v-if="searchQuery.trim()" class="text-[14px] font-light text-zinc-500 mr-5">
           {{ pluralize(totalCount) }}
         </span>
         <Button outline @click="$emit('open-filter')">
@@ -51,7 +51,7 @@
                     <!-- Название + бейдж + стрелка -->
                     <div class="flex items-center gap-x-2 cursor-pointer" @click="toggleGroup(group.packageName)">
                       <span class="text-[14px] font-medium text-zinc-900">{{ group.packageName }}</span>
-                      <span class="inline-flex items-center rounded-md bg-zinc-50 px-1.5 py-0.5 text-xs font-medium text-zinc-600 inset-ring inset-ring-zinc-500/10">{{ pluralizeApps(group.items.length) }}</span>
+                      <span class="inline-flex items-center rounded-md bg-zinc-50 px-1.5 py-0.5 text-xs font-medium text-zinc-600 inset-ring inset-ring-zinc-500/10">{{ group.items.length }}</span>
                       <ChevronUpIcon
                         :size="18"
                         :class="['shrink-0 text-zinc-900 transition-transform duration-200', collapsedGroups.has(group.packageName) ? 'rotate-180' : '']"
@@ -64,6 +64,17 @@
 
               <!-- Строки заявок -->
               <template v-if="!collapsedGroups.has(group.packageName)">
+                <!-- Пустой пакет -->
+                <tr v-if="group.items.length === 0">
+                  <td colspan="10" class="pl-[70px] py-3">
+                    <span class="text-[14px] font-light text-zinc-500">Пока нет ни одной заявки</span>
+                    <button
+                      class="ml-2 text-[14px] font-normal text-indigo-600 hover:text-indigo-700 hover:underline transition-colors"
+                      @click="openPackagePage(group.packageName)"
+                    >Добавить</button>
+                  </td>
+                </tr>
+
                 <tr
                   v-for="item in group.items"
                   :key="item.id"
@@ -91,18 +102,18 @@
                   <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                     <div class="flex items-start gap-x-3">
                       <template v-if="item.isCompany">
-                        <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[#71717a]">
+                        <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-zinc-500">
                           <LandmarkIcon :size="16" />
                         </span>
                         <div class="flex flex-col gap-y-1">
-                          <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item.companyName }}</span>
+                          <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ item.companyName }}</span>
                           <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.inn }}</span>
                         </div>
                       </template>
                       <template v-else>
-                        <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] font-medium text-[#71717a]">{{ item.initials }}</span>
+                        <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] font-medium text-zinc-500">{{ item.initials }}</span>
                         <div class="flex flex-col gap-y-1">
-                          <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item.client }}</span>
+                          <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ item.client }}</span>
                           <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.phone }}</span>
                         </div>
                       </template>
@@ -117,10 +128,10 @@
                   <!-- Тип заявления + Компания -->
                   <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4">
                     <div class="flex flex-col gap-y-1" style="width: 280px">
-                      <span class="truncate text-[14px] leading-[20px] font-light text-[#18181b]">{{ item.applicationType }}</span>
+                      <span class="truncate text-[14px] leading-[20px] font-light text-zinc-900">{{ item.applicationType }}</span>
                       <div class="relative group/tip" style="width: 280px">
                         <span v-if="item.company" :ref="el => checkOverflow(`company_${item.id}`, el)" class="truncate block text-[14px] leading-[20px] font-light text-zinc-500">{{ item.company }}</span>
-                        <span v-else class="text-[14px] leading-[20px] font-light text-zinc-400">—</span>
+                        <span v-else class="text-[14px] leading-[20px] font-light text-zinc-500">—</span>
                         <div v-if="overflowMap[`company_${item.id}`]" class="pointer-events-none absolute top-full left-0 mt-1.5 z-50 hidden group-hover/tip:block">
                           <div class="relative rounded-md bg-zinc-900 px-2.5 py-1.5 text-[12px] leading-[18px] text-white shadow-lg" style="width: 250px; white-space: normal;">
                             <div class="absolute -top-[5px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-b-[5px] border-b-zinc-900"></div>
@@ -165,7 +176,7 @@
                   <!-- РР + КУВД -->
                   <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                     <div v-if="item.status === 'Зарегистрировано'" class="flex flex-col gap-y-1">
-                      <span class="text-[14px] leading-[20px] font-light text-[#18181b]">РР {{ item.rr }}</span>
+                      <span class="text-[14px] leading-[20px] font-light text-zinc-900">РР {{ item.rr }}</span>
                       <span class="text-[14px] leading-[20px] font-light text-zinc-500">{{ item.kuvd }}</span>
                     </div>
                   </td>
@@ -173,7 +184,7 @@
                   <!-- Регистрация + Отправка -->
                   <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                     <div v-if="item.status === 'Зарегистрировано'" class="flex flex-col gap-y-1">
-                      <span class="text-[14px] leading-[20px] font-light text-[#18181b]">Регистрация {{ item.regDate }}</span>
+                      <span class="text-[14px] leading-[20px] font-light text-zinc-900">Регистрация {{ item.regDate }}</span>
                       <span class="text-[14px] leading-[20px] font-light text-zinc-500">Отправка {{ item.sendDate }}</span>
                     </div>
                   </td>
@@ -217,9 +228,9 @@
       </div>
     </div>
 
-    <SelectionBar :count="checkedRows.size" :deleteLabel="deleteLabel" @clear="checkedRows = new Set()" @delete="handleDelete">
+    <SelectionBar :count="checkedRows.size + checkedEmptyPackages.size" :deleteLabel="deleteLabel" @clear="checkedRows = new Set(); checkedEmptyPackages = new Set()" @delete="handleDelete">
       <template #actions>
-        <button class="flex items-center gap-x-1.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 px-3 py-1.5 text-[14px] font-medium text-white transition-colors">
+        <button v-if="checkedRows.size > 0" class="flex items-center gap-x-1.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 px-3 py-1.5 text-[14px] font-medium text-white transition-colors">
           <PenLineIcon :size="14" />
           Подписать
         </button>
@@ -245,8 +256,9 @@ const props = defineProps({
   filterCount: { type: Number, default: 0 },
   filterTags: { type: Array, default: () => [] },
   filters: { type: Object, default: null },
+  extraPackages: { type: Array, default: () => [] },
 })
-const emit = defineEmits(['open-filter', 'open-preview', 'update:count', 'reset-filters', 'create'])
+const emit = defineEmits(['open-filter', 'open-preview', 'update:count', 'reset-filters', 'create', 'delete-extra-package'])
 
 const sortOrder = ref('new')
 const isScrolled = ref(false)
@@ -258,6 +270,7 @@ const checkOverflow = (key, el) => {
 }
 const searchQuery = ref('')
 const checkedRows = ref(new Set())
+const checkedEmptyPackages = ref(new Set())
 const collapsedGroups = ref(new Set())
 
 const toggleGroup = (name) => {
@@ -274,16 +287,12 @@ const pluralize = (n) => {
   return `найдено ${n} заявок`
 }
 
-const pluralizeApps = (n) => {
-  const m10 = n % 10, m100 = n % 100
-  if (m100 >= 11 && m100 <= 14) return `${n} заявок`
-  if (m10 === 1) return `${n} заявка`
-  if (m10 >= 2 && m10 <= 4) return `${n} заявки`
-  return `${n} заявок`
-}
-
 const deletePackage = (packageName) => {
-  deletedPackages.value = new Set([...deletedPackages.value, packageName])
+  if (props.extraPackages.includes(packageName)) {
+    emit('delete-extra-package', packageName)
+  } else {
+    deletedPackages.value = new Set([...deletedPackages.value, packageName])
+  }
   const s = new Set(checkedRows.value)
   items.filter(i => i.packageName === packageName).forEach(i => s.delete(i.id))
   checkedRows.value = s
@@ -297,12 +306,14 @@ const toggleRow = (id) => {
 
 const isGroupChecked = (packageName) => {
   const group = groupedFilteredItems.value.find(g => g.packageName === packageName)
-  return group && group.items.length > 0 && group.items.every(item => checkedRows.value.has(item.id))
+  if (!group) return false
+  if (group.items.length === 0) return checkedEmptyPackages.value.has(packageName)
+  return group.items.every(item => checkedRows.value.has(item.id))
 }
 
 const isGroupIndeterminate = (packageName) => {
   const group = groupedFilteredItems.value.find(g => g.packageName === packageName)
-  if (!group) return false
+  if (!group || group.items.length === 0) return false
   const checked = group.items.filter(item => checkedRows.value.has(item.id)).length
   return checked > 0 && checked < group.items.length
 }
@@ -310,6 +321,12 @@ const isGroupIndeterminate = (packageName) => {
 const toggleGroupRows = (packageName) => {
   const group = groupedFilteredItems.value.find(g => g.packageName === packageName)
   if (!group) return
+  if (group.items.length === 0) {
+    const s = new Set(checkedEmptyPackages.value)
+    s.has(packageName) ? s.delete(packageName) : s.add(packageName)
+    checkedEmptyPackages.value = s
+    return
+  }
   const s = new Set(checkedRows.value)
   if (isGroupChecked(packageName)) {
     group.items.forEach(item => s.delete(item.id))
@@ -319,15 +336,20 @@ const toggleGroupRows = (packageName) => {
   checkedRows.value = s
 }
 
-// Вычисляем: выбраны ли все заявки ровно одного пакета (и только его)
+// Вычисляем: выбран ли ровно один пакет целиком (с заявками или пустой)
 const selectedPackageForDelete = computed(() => {
+  // Пустой пакет выбран
+  if (checkedEmptyPackages.value.size === 1 && checkedRows.value.size === 0) {
+    return [...checkedEmptyPackages.value][0]
+  }
   if (checkedRows.value.size === 0) return null
   const selectedIds = checkedRows.value
   for (const group of groupedFilteredItems.value) {
+    if (group.items.length === 0) continue
     const groupIds = new Set(group.items.map(i => i.id))
     const allGroupSelected = group.items.every(i => selectedIds.has(i.id))
     const noExtraSelected = [...selectedIds].every(id => groupIds.has(id))
-    if (allGroupSelected && noExtraSelected) return group.packageName
+    if (allGroupSelected && noExtraSelected && checkedEmptyPackages.value.size === 0) return group.packageName
   }
   return null
 })
@@ -337,8 +359,10 @@ const deleteLabel = computed(() => selectedPackageForDelete.value ? 'Удали�
 const handleDelete = () => {
   if (selectedPackageForDelete.value) {
     deletePackage(selectedPackageForDelete.value)
+    checkedEmptyPackages.value = new Set()
   } else {
     checkedRows.value = new Set()
+    checkedEmptyPackages.value = new Set()
   }
 }
 
@@ -374,6 +398,10 @@ items.forEach(item => { managerSelections[item.id] = item.manager })
 
 const openApp = (item) => {
   window.open(`/app-page.html?id=${item.id}&title=${encodeURIComponent('Это страница заявки')}`, '_blank')
+}
+
+const openPackagePage = (packageName) => {
+  window.open(`/app-page.html?id=${encodeURIComponent(packageName)}&title=${encodeURIComponent('Страница пакета')}`, '_blank')
 }
 
 const parseItemDate = (str) => {
@@ -426,14 +454,32 @@ const filteredItems = computed(() => {
   return result
 })
 
-// Группировка по packageName с сохранением порядка групп
+// Группировка по packageName с сортировкой групп по дате создания пакета
 const groupedFilteredItems = computed(() => {
   const map = new Map()
   for (const item of filteredItems.value) {
     if (!map.has(item.packageName)) map.set(item.packageName, [])
     map.get(item.packageName).push(item)
   }
-  return [...map.entries()].map(([packageName, items]) => ({ packageName, items }))
+  // Пустые пакеты (только что созданные, без заявок)
+  for (const name of props.extraPackages) {
+    if (!deletedPackages.value.has(name) && !map.has(name)) {
+      map.set(name, [])
+    }
+  }
+  const groups = [...map.entries()].map(([packageName, items]) => ({ packageName, items }))
+  // Сортируем группы по дате пакета; пустые пакеты — самые новые, порядок между ними по индексу в extraPackages
+  groups.sort((a, b) => {
+    const getDate = (group) => {
+      if (group.items.length > 0) return parseItemDate(group.items[0].date)
+      const idx = props.extraPackages.indexOf(group.packageName)
+      return new Date(9999, 0, 1, 0, 0, 0, idx)
+    }
+    const aDate = getDate(a)
+    const bDate = getDate(b)
+    return sortOrder.value === 'old' ? aDate - bDate : bDate - aDate
+  })
+  return groups
 })
 
 const totalCount = computed(() => filteredItems.value.length)

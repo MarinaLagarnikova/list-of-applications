@@ -42,7 +42,7 @@
       <!-- Sidebar Create button (все модули кроме Калькулятора и Аналитики, когда сайдбар раскрыт) -->
       <div v-if="!sidebarCollapsed && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" class="shrink-0 px-1">
         <!-- mortgage-only: простая кнопка без поповера -->
-        <Button v-if="mode === 'mortgage-only'" color="indigo" class="w-full justify-center" @click="createModalTitle = 'Создание заявки на ипотеку'; createModalOpen = true">
+        <Button v-if="mode === 'mortgage-only'" color="indigo" class="w-full justify-center" @click="createModalTitle = 'Создание заявки на ипотеку'; createModalModule = 'Ипотека'; createModalOpen = true">
           <PlusIcon :size="16" class="shrink-0" />
           Создать
         </Button>
@@ -311,7 +311,7 @@
       <BankDrawer :open="bankDrawerOpen" :bank="selectedBank" @close="bankDrawerOpen = false" />
 
       <!-- ─── Create Application Modal ─────────────── -->
-      <CreateApplicationModal :open="createModalOpen" :mode="mode" :title="createModalTitle" @close="createModalOpen = false" />
+      <CreateApplicationModal :open="createModalOpen" :mode="mode" :title="createModalTitle" :module="createModalModule" @close="createModalOpen = false" @created="handleModalCreated" />
       <ToastNotification />
 
       <!-- ─── App Preview Drawer (Ипотека) ───────────── -->
@@ -615,13 +615,13 @@
         <ScoringPage v-else-if="activeModule === 'Скоринг'" :active-sub-item="activeSubItem" :filter-count="scoringFilterCount" :filters="scoringFilters" :filter-tags="scoringFilterTags" @open-filter="scoringFilterDrawerOpen = true" @open-preview="openScoringDrawer" @update:count="activeCount = $event" @reset-filters="scoringFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" />
 
         <!-- Пакеты документов -->
-        <DocumentPackagesPage v-else-if="activeModule === 'Пакеты документов'" :active-sub-item="activeSubItem" :filter-count="docPackagesFilterCount" :filters="docPackagesFilters" :filter-tags="docPackagesFilterTags" @open-filter="docPackagesFilterOpen = true" @open-preview="item => { selectedDocPackage = item; docPackagePreviewOpen = true }" @update:count="activeCount = $event" @reset-filters="docPackagesFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" />
+        <DocumentPackagesPage v-else-if="activeModule === 'Пакеты документов'" :active-sub-item="activeSubItem" :filter-count="docPackagesFilterCount" :filters="docPackagesFilters" :filter-tags="docPackagesFilterTags" :extra-packages="docExtraPackages" @open-filter="docPackagesFilterOpen = true" @open-preview="item => { selectedDocPackage = item; docPackagePreviewOpen = true }" @update:count="activeCount = $event" @reset-filters="docPackagesFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" />
 
         <!-- Регистрация -->
         <RegistrationPage v-else-if="activeModule === 'Регистрация'" :active-sub-item="activeSubItem" :filter-count="registrationFilterCount" :filters="registrationFilters" :filter-tags="registrationFilterTags" @open-filter="registrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="registrationFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" />
 
         <!-- Пакетная регистрация -->
-        <BatchRegistrationPage v-else-if="activeModule === 'Пакетная регистрация'" :active-sub-item="activeSubItem" :filter-count="batchRegistrationFilterCount" :filters="batchRegistrationFilters" :filter-tags="batchRegistrationFilterTags" @open-filter="batchRegistrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="batchRegistrationFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" />
+        <BatchRegistrationPage v-else-if="activeModule === 'Пакетная регистрация'" :active-sub-item="activeSubItem" :filter-count="batchRegistrationFilterCount" :filters="batchRegistrationFilters" :filter-tags="batchRegistrationFilterTags" :extra-packages="batchExtraPackages" @open-filter="batchRegistrationFilterOpen = true" @open-preview="openRegistrationPreview" @update:count="activeCount = $event" @reset-filters="batchRegistrationFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" @delete-extra-package="batchExtraPackages = batchExtraPackages.filter(n => n !== $event)" />
 
         <!-- Страховка -->
         <InsurancePage v-else-if="activeModule === 'Страховка'" :active-sub-item="activeSubItem" :filter-count="insuranceFilterCount" :filters="insuranceFilters" :filter-tags="insuranceFilterTags" @open-filter="insuranceFilterOpen = true" @open-preview="openInsurancePreview" @update:count="activeCount = $event" @reset-filters="insuranceFilterDrawerRef?.resetAll()" @create="openCreateModalForModule(activeModule)" />
@@ -859,6 +859,7 @@ const activeSubItem = ref('Все заявки')
 const createModalOpen = ref(false)
 const createPopoverOpen = ref(false)
 const createModalTitle = ref('Создание заявки')
+const createModalModule = ref('')
 
 const moduleCreateItemsMap = {
   'Ипотека':              { icon: HomeIcon,             title: 'Создание заявки на ипотеку' },
@@ -881,14 +882,57 @@ const createModuleItems = computed(() => {
 
 const openCreateModal = (item, close) => {
   createModalTitle.value = item.title
+  createModalModule.value = item.name ?? ''
   close()
   createModalOpen.value = true
 }
 
 const openCreateModalForModule = (moduleName) => {
   createModalTitle.value = moduleCreateItemsMap[moduleName]?.title ?? 'Создание заявки'
+  createModalModule.value = moduleName
   createModalOpen.value = true
 }
+
+const batchExtraPackages = ref([])
+const docExtraPackages = ref([])
+
+const todayDDMM = () => {
+  const d = new Date()
+  const dd = String(d.getDate()).padStart(2, '0')
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  return `${dd}.${mm}`
+}
+
+const handleModalCreated = ({ module, name }) => {
+  if (module === 'Ипотека') {
+    window.open(`/app-page.html?id=ИП-new&title=${encodeURIComponent('Страница заявки на ипотеку')}`, '_blank')
+  } else if (module === 'Страховка') {
+    window.open(`/app-page.html?id=СТ-new&title=${encodeURIComponent('Страница заявки на страховку')}`, '_blank')
+  } else if (module === 'Скоринг') {
+    window.open(`/app-page.html?id=СК-new&title=${encodeURIComponent('Страница заявки скоринга')}`, '_blank')
+  } else if (module === 'Пакетная регистрация') {
+    batchExtraPackages.value = [...batchExtraPackages.value, name]
+    window.open(`/app-page.html?id=${encodeURIComponent(name)}&title=${encodeURIComponent('Страница пакета')}`, '_blank')
+  } else if (module === 'Регистрация') {
+    window.open(`/app-page.html?id=РГ-new&title=${encodeURIComponent('Страница заявки на регистрацию')}`, '_blank')
+  } else if (module === 'Цифровые подписи') {
+    window.open(`/app-page.html?id=ЦП-new&title=${encodeURIComponent('Страница заявки на выпуск ЭЦП')}`, '_blank')
+  } else if (module === 'Пакеты документов') {
+    const newItem = {
+      id: `ПД ${1151 + docExtraPackages.value.length}`,
+      name,
+      date: todayDDMM(),
+      status: 'Черновик',
+      signers: 0,
+      signedCount: 0,
+      signersList: [],
+      manager: null,
+    }
+    docExtraPackages.value = [...docExtraPackages.value, newItem]
+    window.open(`/app-page.html?id=${encodeURIComponent(newItem.id)}&title=${encodeURIComponent('Страница пакета')}`, '_blank')
+  }
+}
+
 const drawerOpen = ref(false)
 const selectedApp = ref(null)
 const openDrawer = (app) => { selectedApp.value = app; drawerOpen.value = true }

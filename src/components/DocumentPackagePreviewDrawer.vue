@@ -11,16 +11,16 @@
             {{ item?.id }}
           </span>
           <span v-if="item?.status" :class="statusBadgeClass(item.status)">{{ item.status }}</span>
-          <button @click="$emit('close')" class="ml-auto flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors">
+          <button @click="$emit('close')" class="ml-auto flex size-6 items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors">
             <XIcon :size="16" />
           </button>
         </div>
 
         <!-- Заголовок: название пакета -->
-        <h2 class="mt-2 text-[24px] leading-[32px] font-medium text-[#18181b]">{{ item?.name }}</h2>
+        <h2 class="mt-2 text-[24px] leading-[32px] font-medium text-zinc-900">{{ item?.name }}</h2>
 
         <!-- Подзаголовок: количество подписантов -->
-        <p class="mt-0.5 text-[14px] leading-[20px] font-light text-[#71717a]">{{ pluralizeSigners(item?.signers) }}</p>
+        <p class="mt-0.5 text-[14px] leading-[20px] font-light text-zinc-500">{{ pluralizeSigners(item?.signers) }}</p>
 
         <!-- Строка действий: кнопка на всю ширину -->
         <div class="mt-4">
@@ -36,14 +36,14 @@
         <div class="rounded-2xl bg-green-50 px-4 py-4">
           <div>
             <div>
-              <p class="text-[14px] leading-[20px] font-semibold text-[#18181b]">Документы подписаны!</p>
-              <p class="mt-0.5 text-[14px] leading-[20px] font-normal text-[#71717a]">Скачайте подписанный пакет</p>
+              <p class="text-[14px] leading-[20px] font-semibold text-zinc-900">Документы подписаны!</p>
+              <p class="mt-0.5 text-[14px] leading-[20px] font-normal text-zinc-500">Скачайте подписанный пакет</p>
               <div class="mt-3 flex items-center gap-x-3">
                 <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm">
                   <FileTextIcon :size="20" class="text-zinc-300" />
                 </div>
                 <div class="flex flex-col">
-                  <span class="text-[14px] leading-[20px] font-medium text-[#18181b]">Ипотека Сбербанк — Новикова Е.Д.</span>
+                  <span class="text-[14px] leading-[20px] font-medium text-zinc-900">Ипотека Сбербанк — Новикова Е.Д.</span>
                   <a href="#" class="text-[14px] leading-[20px] font-normal text-indigo-600 hover:text-indigo-700">Скачать</a>
                 </div>
               </div>
@@ -56,17 +56,17 @@
       <div class="px-6 pt-6">
 
         <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Дата создания</span>
-          <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item?.date ? formatDate(item.date) : '—' }}</span>
+          <span class="text-[14px] leading-[20px] font-light text-zinc-500">Дата создания</span>
+          <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ item?.date ? formatDate(item.date) : '—' }}</span>
         </div>
 
         <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Дата подписания</span>
-          <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item?.statusDate ? formatDate(item.statusDate) : '—' }}</span>
+          <span class="text-[14px] leading-[20px] font-light text-zinc-500">Дата подписания</span>
+          <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ item?.statusDate ? formatDate(item.statusDate) : '—' }}</span>
         </div>
 
         <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Менеджер</span>
+          <span class="text-[14px] leading-[20px] font-light text-zinc-500">Менеджер</span>
           <CatalystListbox
             :options="managerOptions"
             :model-value="managerValue"
@@ -78,15 +78,15 @@
       </div>
 
       <!-- Подписи section -->
-      <div class="px-6 pt-[40px] pb-[60px]">
-        <span class="text-[16px] leading-[24px] font-medium text-[#111827]">Подписи</span>
+      <div class="px-6 pt-[40px] pb-[40px]">
+        <span class="text-[16px] leading-[24px] font-medium text-zinc-900">Подписи</span>
         <div class="mt-2 flex flex-col">
           <div v-for="signer in item?.signersList" :key="signer.name" class="flex items-center py-3">
-            <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-[#71717a]">{{ signer.initials }}</span>
+            <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-zinc-500">{{ signer.initials }}</span>
             <div class="flex flex-col gap-y-0.5 pl-4">
-              <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ signer.name }}</span>
+              <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ signer.name }}</span>
               <div class="flex items-center gap-x-1.5">
-                <span class="text-[14px] leading-[20px] font-light text-[#71717a]">{{ signer.phone }}</span>
+                <span class="text-[14px] leading-[20px] font-light text-zinc-500">{{ signer.phone }}</span>
                 <template v-if="signer.signed">
                   <BadgeCheckIcon :size="16" class="text-[#16a34a]" />
                   <span class="text-[14px] leading-[20px] font-normal text-[#16a34a]">Выпущена</span>
@@ -97,11 +97,11 @@
         </div>
       </div>
 
-      <!-- Футер -->
-      <div class="mt-[80px] border-t border-[#f4f4f5] bg-[#fafafa] px-6 py-3">
-        <span class="text-[14px] leading-[20px] font-normal text-[#71717a]">Чат с поддержкой</span>
-      </div>
+    </div>
 
+    <!-- Футер -->
+    <div class="shrink-0 border-t border-[#f4f4f5] bg-[#fafafa] px-6 py-3">
+      <span class="text-[14px] leading-[20px] font-normal text-zinc-500">Чат с поддержкой</span>
     </div>
   </BaseDrawer>
 </template>
