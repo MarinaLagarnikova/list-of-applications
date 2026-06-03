@@ -2,20 +2,34 @@
   <div class="relative flex h-full flex-col overflow-hidden">
 
     <!-- Поиск + фильтры -->
-    <div :class="['shrink-0 flex items-center justify-between px-8 py-2', isScrolled && !(filterTags && filterTags.length) && 'border-b border-[#f4f4f5]']">
+    <div :class="['shrink-0 flex items-center justify-between px-4 md:px-6 py-2', isScrolled && !(filterTags && filterTags.length) && 'sm:border-b sm:border-[#f4f4f5]']">
       <SearchInput v-model="searchQuery" placeholder="Поиск по ID, ФИО, телефону или названию страховой" />
       <div class="flex items-center gap-x-3">
-        <span v-if="searchQuery.trim()" class="text-[14px] font-light text-[#71717a] mr-5">
+        <span v-if="searchQuery.trim()" class="text-[14px] font-light text-zinc-500 mr-5">
           {{ pluralize(filteredItems.length) }}
         </span>
-        <Button outline @click="$emit('open-filter')">
-          <FunnelIcon :size="16" class="shrink-0 aspect-square" style="width:16px;height:16px;" />
-          Фильтры
-          <span v-if="props.filterCount > 0" class="inline-flex items-center justify-center size-[18px] rounded-full bg-indigo-600 text-white text-[11px] font-medium leading-none">{{ props.filterCount }}</span>
-        </Button>
-        <SortDropdown v-model="sortOrder" />
-        <ExportPopover :count="filteredItems.length" />
+        <div class="hidden sm:block">
+          <Button outline @click="$emit('open-filter')">
+            <FunnelIcon :size="16" class="shrink-0 aspect-square" style="width:16px;height:16px;" />
+            Фильтры
+            <span v-if="props.filterCount > 0" class="inline-flex items-center justify-center size-[18px] rounded-full bg-indigo-600 text-white text-[11px] font-medium leading-none">{{ props.filterCount }}</span>
+          </Button>
+        </div>
+        <div class="hidden md:flex items-center gap-x-3">
+          <SortDropdown v-model="sortOrder" />
+          <ExportPopover :count="filteredItems.length" />
+        </div>
       </div>
+    </div>
+
+
+    <!-- xs-only кнопка фильтров -->
+    <div :class="['sm:hidden shrink-0 px-4 py-2', isScrolled && !(filterTags && filterTags.length) && 'border-b border-[#f4f4f5]']">
+      <Button outline class="w-full justify-center" @click="$emit('open-filter')">
+        <FunnelIcon :size="16" class="shrink-0 aspect-square" style="width:16px;height:16px;" />
+        Фильтры
+        <span v-if="props.filterCount > 0" class="inline-flex items-center justify-center size-[18px] rounded-full bg-indigo-600 text-white text-[11px] font-medium leading-none">{{ props.filterCount }}</span>
+      </Button>
     </div>
 
     <!-- Applied filters strip -->
@@ -24,7 +38,7 @@
     </div>
 
     <div class="flex-1 overflow-auto" @scroll="isScrolled = $event.target.scrollTop > 0">
-      <div class="pt-6 pb-10">
+      <div class="pt-2 pb-10">
         <table class="w-full border-separate border-spacing-0">
           <tbody>
             <tr
@@ -34,7 +48,7 @@
               @click="openApp(item)"
             >
               <!-- Checkbox -->
-              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pt-[16px] pb-3 pl-8 pr-2" @click.stop="toggleRow(item.id)">
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pt-[16px] pb-3 pl-4 md:pl-6 pr-2" @click.stop="toggleRow(item.id)">
                 <label class="inline-flex cursor-pointer">
                   <span :class="['relative flex size-4 items-center justify-center rounded-sm border', checkedRows.has(item.id) ? 'bg-indigo-600 border-transparent' : 'bg-white border-zinc-950/15 hover:border-zinc-950/30']">
                     <svg :class="['size-3 stroke-white transition-opacity', checkedRows.has(item.id) ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none"><path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -53,9 +67,9 @@
               <!-- Аватар + ФИО + Телефон -->
               <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                 <div class="flex items-start gap-x-3">
-                  <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] font-medium text-[#71717a]">{{ item.initials }}</span>
+                  <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] font-medium text-zinc-500">{{ item.initials }}</span>
                   <div class="flex flex-col gap-y-1">
-                    <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ shortName(item.client) }}</span>
+                    <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ shortName(item.client) }}</span>
                     <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.phone }}</span>
                   </div>
                 </div>
@@ -69,7 +83,7 @@
               <!-- Страховщик + Тип страховки -->
               <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                 <div class="flex flex-col gap-y-1">
-                  <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ item.insurer }}</span>
+                  <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.insurer }}</span>
                   <span class="text-[14px] leading-[20px] font-light text-zinc-500">{{ item.insuranceType }}</span>
                 </div>
               </td>
@@ -77,7 +91,7 @@
               <!-- Цена + КВ -->
               <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                 <div class="flex flex-col gap-y-1">
-                  <span class="text-[14px] leading-[20px] font-light text-[#18181b]">{{ item.price }}</span>
+                  <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ item.price }}</span>
                   <span class="inline-flex items-center gap-x-[6px] text-[14px] leading-[20px] font-light text-zinc-500">
                     <CirclePercentIcon :size="16" class="shrink-0 text-zinc-500" />
                     {{ item.kv }}

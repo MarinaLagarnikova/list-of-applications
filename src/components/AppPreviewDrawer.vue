@@ -14,17 +14,17 @@
             {{ app.id }}
           </span>
           <span v-if="app.status" :class="statusBadgeClass(app.status)">{{ app.status }}</span>
-          <button @click="$emit('close')" class="ml-auto flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors">
+          <button @click="$emit('close')" class="ml-auto flex size-6 items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors">
             <XIcon :size="16" />
           </button>
         </div>
 
         <!-- Заголовок: ФИО / компания / документ -->
-        <h2 class="mt-2 text-[24px] leading-[32px] font-medium text-[#18181b]">{{ displayName }}</h2>
+        <h2 class="mt-2 text-[24px] leading-[32px] font-medium text-zinc-900">{{ displayName }}</h2>
 
         <!-- Подзаголовок: телефон / ИНН / кол-во подписантов -->
         <div class="group/subtitle mt-0.5 flex items-center gap-x-2">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">{{ subtitle ?? (app.inn ? 'ИНН ' + app.inn : null) ?? app.fullPhone ?? app.phone }}</span>
+          <span class="text-[14px] leading-[20px] font-light text-zinc-500">{{ subtitle ?? (app.inn ? 'ИНН ' + app.inn : null) ?? app.fullPhone ?? app.phone }}</span>
           <button
             @click="navigator.clipboard.writeText(subtitle ?? (app.inn ? 'ИНН ' + app.inn : null) ?? app.fullPhone ?? app.phone)"
             class="invisible group-hover/subtitle:visible text-zinc-900 hover:text-zinc-600 transition-colors"
@@ -44,7 +44,7 @@
               @click="copyLink"
               class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-950/10 bg-white shadow-xs hover:bg-zinc-50 active:bg-zinc-100 transition-colors"
             >
-              <Link2Icon :size="16" class="text-[#18181b]" />
+              <Link2Icon :size="16" class="text-zinc-900" />
             </button>
             <div class="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover/link:flex flex-col items-center z-50">
               <div class="size-0 border-x-4 border-x-transparent border-b-4 border-b-zinc-900" />
@@ -61,7 +61,7 @@
               @click="moreMenuOpen = !moreMenuOpen"
               class="flex size-9 shrink-0 items-center justify-center rounded-lg border border-zinc-950/10 bg-white shadow-xs hover:bg-zinc-50 active:bg-zinc-100 transition-colors"
             >
-              <MoreHorizontalIcon :size="16" class="text-[#18181b]" />
+              <MoreHorizontalIcon :size="16" class="text-zinc-900" />
             </button>
             <Transition
               enter-active-class="transition ease-out duration-100"
@@ -116,11 +116,11 @@
           <div class="flex flex-col">
             <div v-for="bank in approvalBanks" :key="bank.name" class="flex items-center py-3 border-b border-[#f4f4f5] last:border-0">
               <div class="flex flex-1 flex-col gap-y-0.5">
-                <span class="text-[14px] leading-[20px] font-medium text-[#18181b]">{{ bank.name }}</span>
-                <span class="text-[14px] leading-[20px] font-light text-[#71717a]">{{ bank.payment }}</span>
+                <span class="text-[14px] leading-[20px] font-medium text-zinc-900">{{ bank.name }}</span>
+                <span class="text-[14px] leading-[20px] font-light text-zinc-500">{{ bank.payment }}</span>
               </div>
               <div class="flex-1 flex justify-center">
-                <span class="text-[14px] leading-[20px] font-light text-[#71717a] w-12 text-left">{{ bank.rate }}</span>
+                <span class="text-[14px] leading-[20px] font-light text-zinc-500 w-12 text-left">{{ bank.rate }}</span>
               </div>
               <span :class="[
                 'inline-flex items-center rounded-md px-2 py-0.5 text-[12px] leading-[16px] font-medium shrink-0',
@@ -141,7 +141,7 @@
       <div class="px-6 pt-[40px]">
         <template v-for="row in rows" :key="row.label">
           <div class="flex items-start justify-between border-b border-[#f4f4f5] py-3">
-            <span class="shrink-0 whitespace-nowrap text-[14px] leading-[20px] font-light text-[#71717a]">{{ row.label }}</span>
+            <span class="shrink-0 whitespace-nowrap text-[14px] leading-[20px] font-light text-zinc-500">{{ row.label }}</span>
             <CatalystListbox
               v-if="row.options"
               :options="row.options"
@@ -149,14 +149,14 @@
               @update:model-value="selectValues[row.label] = $event"
               placeholder="Выбрать"
             />
-            <span v-else-if="row.date" class="ml-4 flex items-center gap-x-3 text-right text-[14px] leading-[20px] font-normal text-[#18181b]">
+            <span v-else-if="row.date" class="ml-4 flex items-center gap-x-3 text-right text-[14px] leading-[20px] font-normal text-zinc-900">
               <span>{{ row.value }}</span>
-              <span class="text-[#71717a]">{{ row.date }}</span>
+              <span class="text-zinc-500">{{ row.date }}</span>
               <button v-if="row.copy" @click="navigator.clipboard.writeText(row.copy)" class="text-zinc-900 hover:text-zinc-600 transition-colors">
                 <CopyIcon :size="14" />
               </button>
             </span>
-            <span v-else class="ml-4 flex items-center gap-x-1.5 text-right text-[14px] leading-[20px] font-normal text-[#18181b]">
+            <span v-else class="ml-4 flex items-center gap-x-1.5 text-right text-[14px] leading-[20px] font-normal text-zinc-900">
               <HouseIcon     v-if="row.icon === 'house'"   :size="16" class="shrink-0 text-zinc-900" />
               <LandmarkIcon  v-if="row.icon === 'office'"  :size="16" class="shrink-0 text-zinc-500" />
               <UserRoundIcon v-if="row.icon === 'courier'" :size="16" class="shrink-0 text-zinc-500" />
@@ -176,14 +176,14 @@
       <!-- Подписи (цифровые подписи) -->
       <template v-if="showSignatures">
         <div class="px-6 pt-[40px] pb-[40px]">
-          <span class="text-[16px] leading-[24px] font-medium text-[#111827]">Подписи</span>
+          <span class="text-[16px] leading-[24px] font-medium text-zinc-900">Подписи</span>
           <div class="mt-2 flex flex-col">
             <div class="flex items-center py-3">
-              <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-[#71717a]">НЕ</span>
+              <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-zinc-500">НЕ</span>
               <div class="flex flex-col gap-y-0.5 pl-4">
-                <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">Новикова Е.Д.</span>
+                <span class="text-[14px] leading-[20px] font-normal text-zinc-900">Новикова Е.Д.</span>
                 <div class="flex items-center gap-x-1.5">
-                  <span class="text-[14px] leading-[20px] font-light text-[#71717a]">+7 931 208-05-14</span>
+                  <span class="text-[14px] leading-[20px] font-light text-zinc-500">+7 931 208-05-14</span>
                   <template v-if="app?.status === 'Активирована'">
                     <BadgeCheckIcon :size="16" class="text-[#16a34a]" />
                     <span class="text-[14px] leading-[20px] font-light text-[#16a34a]">Выпущена</span>
@@ -197,15 +197,15 @@
 
       <!-- Анкета (ипотека, страховка) -->
       <div v-if="showAnketa" class="px-6 pt-[40px] pb-[40px]">
-        <span class="text-[16px] leading-[24px] font-medium text-[#111827]">Анкета</span>
+        <span class="text-[16px] leading-[24px] font-medium text-zinc-900">Анкета</span>
         <div class="mt-2 flex flex-col">
           <!-- Страховка: один участник с телефоном -->
           <template v-if="anketaPhoneMode">
             <div class="flex items-center py-3">
-              <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-[#71717a]">{{ app.initials }}</span>
+              <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-zinc-500">{{ app.initials }}</span>
               <div class="flex flex-col gap-y-0.5 pl-4">
-                <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ app.client }}</span>
-                <span class="text-[14px] leading-[20px] font-light text-[#71717a]">{{ app.phone }}</span>
+                <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ app.client }}</span>
+                <span class="text-[14px] leading-[20px] font-light text-zinc-500">{{ app.phone }}</span>
               </div>
               <a href="#" class="ml-auto text-[14px] leading-[20px] font-medium text-[#5B4FCF] hover:opacity-80">Открыть</a>
             </div>
@@ -213,21 +213,21 @@
           <!-- Ипотека: два участника с ролями -->
           <template v-else>
             <div class="flex items-center py-3">
-              <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-[#71717a]">НЕ</span>
+              <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-zinc-500">НЕ</span>
               <div class="flex flex-col gap-y-0.5 pl-4">
-                <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">Новикова Е. Д.</span>
+                <span class="text-[14px] leading-[20px] font-normal text-zinc-900">Новикова Е. Д.</span>
                 <div class="flex items-center gap-x-1.5">
-                  <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Заемщик</span>
+                  <span class="text-[14px] leading-[20px] font-light text-zinc-500">Заемщик</span>
                   <BadgeCheckIcon :size="16" class="text-[#16a34a]" />
                 </div>
               </div>
               <a href="#" class="ml-auto text-[14px] leading-[20px] font-medium text-[#5B4FCF] hover:opacity-80">Открыть</a>
             </div>
             <div class="flex items-center py-3">
-              <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-[#71717a]">НА</span>
+              <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-zinc-500">НА</span>
               <div class="flex flex-col gap-y-0.5 pl-4">
-                <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">Новиков А. С.</span>
-                <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Созаемщик</span>
+                <span class="text-[14px] leading-[20px] font-normal text-zinc-900">Новиков А. С.</span>
+                <span class="text-[14px] leading-[20px] font-light text-zinc-500">Созаемщик</span>
               </div>
               <a href="#" class="ml-auto text-[14px] leading-[20px] font-medium text-[#5B4FCF] hover:opacity-80">Открыть</a>
             </div>
@@ -240,14 +240,14 @@
 
         <!-- Подписи -->
         <div class="px-6 pt-[40px] pb-[40px]">
-          <span class="text-[16px] leading-[24px] font-medium text-[#111827]">Подписи</span>
+          <span class="text-[16px] leading-[24px] font-medium text-zinc-900">Подписи</span>
           <div class="mt-2 flex flex-col">
             <div class="flex items-center py-3">
-              <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-[#71717a]">{{ app.initials }}</span>
+              <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-zinc-500">{{ app.initials }}</span>
               <div class="flex flex-col gap-y-0.5 pl-4">
-                <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ app.client }}</span>
+                <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ app.client }}</span>
                 <div class="flex items-center gap-x-1.5">
-                  <span class="text-[14px] leading-[20px] font-light text-[#71717a]">{{ app.fullPhone }}</span>
+                  <span class="text-[14px] leading-[20px] font-light text-zinc-500">{{ app.fullPhone }}</span>
                   <BadgeCheckIcon :size="16" class="text-[#16a34a]" />
                   <span class="text-[14px] leading-[20px] font-light text-[#16a34a]">Выпущена</span>
                 </div>
@@ -260,7 +260,7 @@
 
       <!-- 5. Футер -->
       <div class="mt-auto border-t border-[#f4f4f5] bg-[#fafafa] px-6 py-3">
-        <span class="text-[14px] leading-[20px] font-normal text-[#71717a]">Чат с поддержкой</span>
+        <span class="text-[14px] leading-[20px] font-normal text-zinc-500">Чат с поддержкой</span>
       </div>
 
       </div>

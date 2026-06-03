@@ -4,10 +4,10 @@
     <!-- ─── Sticky header ───────────────────────── -->
     <div class="shrink-0 px-6 pt-6 pb-4">
       <div class="flex items-center justify-between">
-        <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">Выгрузка заявок</span>
+        <span class="text-[20px] leading-[32px] font-medium text-zinc-900">Выгрузка заявок</span>
         <button
           @click="handleClose()"
-          class="flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors"
+          class="flex size-6 items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors"
         >
           <XIcon :size="20" />
         </button>
@@ -18,7 +18,7 @@
     <div class="flex-1 overflow-y-auto min-h-0">
       <div class="px-6 py-4">
         <div class="mb-3">
-          <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Укажите период</span>
+          <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Укажите период</span>
         </div>
         <div class="flex flex-wrap gap-2 mb-3">
           <button
@@ -39,7 +39,7 @@
             placeholder=""
             v-model="dateCustom"
             @input="selectedBadge = null"
-            class="flex-1 min-w-0 bg-transparent text-[14px] font-medium text-[#18181b] placeholder:text-[#a1a1aa] placeholder:font-medium focus:outline-none"
+            class="flex-1 min-w-0 bg-transparent text-[14px] font-medium text-zinc-900 placeholder:text-[#a1a1aa] placeholder:font-medium focus:outline-none"
           />
           <CalendarIcon :size="16" class="shrink-0 text-[#a1a1aa] pointer-events-none" />
         </div>
@@ -51,7 +51,7 @@
     <div class="shrink-0 border-t border-[#f4f4f5] px-6 py-4 flex items-center gap-x-3">
       <button
         @click="handleClose()"
-        class="flex items-center justify-center rounded-lg border border-[#e4e4e7] h-9 px-4 text-[14px] font-medium text-[#18181b] hover:bg-zinc-50 transition-colors"
+        class="flex items-center justify-center rounded-lg border border-[#e4e4e7] h-9 px-4 text-[14px] font-medium text-zinc-900 hover:bg-zinc-50 transition-colors"
       >Отменить</button>
       <button
         :disabled="!hasDate"

@@ -3,10 +3,10 @@
     <!-- ─── Sticky header ───────────────────────── -->
       <div class="shrink-0 px-6 pt-6 pb-4">
         <div class="flex items-center justify-between">
-          <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">Фильтры</span>
+          <span class="text-[20px] leading-[32px] font-medium text-zinc-900">Фильтры</span>
           <button
             @click="$emit('close')"
-            class="flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors"
+            class="flex size-6 items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors"
           >
             <XIcon :size="20" />
           </button>
@@ -19,7 +19,7 @@
         <!-- Дата создания -->
         <div class="px-6 py-4">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Дата создания</span>
+            <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Дата создания</span>
             <button
               v-if="selectedDateBadge || dateCustom"
               @click="resetDate"
@@ -70,7 +70,7 @@
         <!-- Регион -->
         <div class="px-6 py-4">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Регион</span>
+            <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Регион</span>
             <button
               v-if="selectedRegions.size > 0"
               @click="selectedRegions = new Set()"
@@ -100,7 +100,7 @@
         <!-- Тип ипотеки -->
         <div class="px-6 py-4">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Тип ипотеки</span>
+            <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Тип ипотеки</span>
             <button
               v-if="selectedMortgageTypes.size > 0"
               @click="selectedMortgageTypes = new Set()"
@@ -154,7 +154,7 @@
         <!-- Первый взнос -->
         <div class="px-6 py-4">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Первый взнос</span>
+            <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Первый взнос</span>
             <button
               v-if="selectedDownPayments.size > 0"
               @click="selectedDownPayments = new Set()"
@@ -176,7 +176,7 @@
         <!-- Дата отправки -->
         <div class="px-6 py-4">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Дата отправки</span>
+            <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Дата отправки</span>
             <button
               v-if="selectedSendDateBadge || sendDateCustom"
               @click="selectedSendDateBadge = null; sendDateCustom = ''"
@@ -203,7 +203,7 @@
         <!-- Дата выдачи кредита -->
         <div class="px-6 py-4">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Дата выдачи кредита</span>
+            <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Дата выдачи кредита</span>
             <button
               v-if="selectedIssueDateBadge || issueDateCustom"
               @click="selectedIssueDateBadge = null; issueDateCustom = ''"

@@ -3,20 +3,34 @@
 
 
     <!-- Поиск + фильтры -->
-    <div :class="['shrink-0 flex items-center justify-between px-8 py-2', isScrolled && !(filterTags && filterTags.length) && 'border-b border-[#f4f4f5]']">
+    <div :class="['shrink-0 flex items-center justify-between px-4 md:px-6 py-2', isScrolled && !(filterTags && filterTags.length) && 'sm:border-b sm:border-[#f4f4f5]']">
       <SearchInput v-model="searchQuery" placeholder="Поиск по ID или названию" />
       <div class="flex items-center gap-x-3">
-        <span v-if="searchQuery.trim()" class="text-[14px] font-light text-[#71717a] mr-5">
+        <span v-if="searchQuery.trim()" class="text-[14px] font-light text-zinc-500 mr-5">
           {{ pluralize(filteredItems.length) }}
         </span>
-        <Button outline @click="$emit('open-filter')">
-          <FunnelIcon :size="16" class="shrink-0 aspect-square" style="width:16px;height:16px;" />
-          Фильтры
-          <span v-if="props.filterCount > 0" class="inline-flex items-center justify-center size-[18px] rounded-full bg-indigo-600 text-white text-[11px] font-medium leading-none">{{ props.filterCount }}</span>
-        </Button>
-        <SortDropdown v-model="sortOrder" />
-        <ExportPopover :count="filteredItems.length" />
+        <div class="hidden sm:block">
+          <Button outline @click="$emit('open-filter')">
+            <FunnelIcon :size="16" class="shrink-0 aspect-square" style="width:16px;height:16px;" />
+            Фильтры
+            <span v-if="props.filterCount > 0" class="inline-flex items-center justify-center size-[18px] rounded-full bg-indigo-600 text-white text-[11px] font-medium leading-none">{{ props.filterCount }}</span>
+          </Button>
+        </div>
+        <div class="hidden md:flex items-center gap-x-3">
+          <SortDropdown v-model="sortOrder" />
+          <ExportPopover :count="filteredItems.length" />
+        </div>
       </div>
+    </div>
+
+
+    <!-- xs-only кнопка фильтров -->
+    <div :class="['sm:hidden shrink-0 px-4 py-2', isScrolled && !(filterTags && filterTags.length) && 'border-b border-[#f4f4f5]']">
+      <Button outline class="w-full justify-center" @click="$emit('open-filter')">
+        <FunnelIcon :size="16" class="shrink-0 aspect-square" style="width:16px;height:16px;" />
+        Фильтры
+        <span v-if="props.filterCount > 0" class="inline-flex items-center justify-center size-[18px] rounded-full bg-indigo-600 text-white text-[11px] font-medium leading-none">{{ props.filterCount }}</span>
+      </Button>
     </div>
 
     <!-- Applied filters strip -->
@@ -25,17 +39,17 @@
     </div>
 
     <div class="flex-1 overflow-auto" @scroll="isScrolled = $event.target.scrollTop > 0">
-      <div class="pt-6 pb-10">
+      <div class="pt-2 pb-10">
         <table class="w-full border-separate border-spacing-0">
           <tbody>
             <tr
               v-for="item in filteredItems"
               :key="item.id"
-              :class="['group cursor-pointer', checkedRows.has(item.id) && 'selected']"
+              :class="['group cursor-pointer', checkedRows.has(item.id) && 'selected', newItemIds.has(item.id) && 'new-row']"
               @click="openApp(item)"
             >
               <!-- Checkbox -->
-              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pt-[16px] pb-3 pl-8 pr-2" @click.stop="toggleRow(item.id)">
+              <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pt-[16px] pb-3 pl-4 md:pl-6 pr-2" @click.stop="toggleRow(item.id)">
                 <label class="inline-flex cursor-pointer">
                   <span :class="['relative flex size-4 items-center justify-center rounded-sm border', checkedRows.has(item.id) ? 'bg-indigo-600 border-transparent' : 'bg-white border-zinc-950/15 hover:border-zinc-950/30']">
                     <svg :class="['size-3 stroke-white transition-opacity', checkedRows.has(item.id) ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none"><path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -59,7 +73,7 @@
               <!-- Название -->
               <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-[22px] py-4 whitespace-nowrap">
                 <div class="flex flex-col gap-y-1">
-                  <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item.name }}</span>
+                  <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ item.name }}</span>
                   <span v-if="item.status !== 'Черновик'" class="inline-flex items-center gap-x-1 text-[14px] leading-[20px] font-light text-zinc-500">
                     {{ pluralizeSigners(item.signers) }}
                     <span class="inline-flex items-center gap-x-0.5 ml-1">
@@ -124,6 +138,16 @@
 
 </template>
 
+<style scoped>
+@keyframes highlight-fade {
+  0%   { background-color: #eef2ff; }
+  100% { background-color: transparent; }
+}
+.new-row td {
+  animation: highlight-fade 2s ease-out forwards;
+}
+</style>
+
 <script setup>
 import { ref, computed, reactive, watch } from 'vue'
 import { Search as SearchIcon, SlidersHorizontal as FunnelIcon, ChevronDown as ChevronDownIcon, FilePlusCorner as FilePlusCornerIcon, FileSearchCorner as FileSearchCornerIcon } from 'lucide-vue-next'
@@ -141,6 +165,7 @@ const props = defineProps({
   filterCount: { type: Number, default: 0 },
   filters: { type: Object, default: () => ({}) },
   filterTags: { type: Array, default: () => [] },
+  extraPackages: { type: Array, default: () => [] },
 })
 const emit = defineEmits(['open-filter', 'open-preview', 'update:count', 'reset-filters', 'create'])
 
@@ -149,6 +174,7 @@ const sortOrder = ref('new')
 const isScrolled = ref(false)
 const searchQuery = ref('')
 const checkedRows = ref(new Set())
+const newItemIds = ref(new Set())
 
 const toggleRow = (id) => {
   const s = new Set(checkedRows.value)
@@ -248,15 +274,47 @@ items.forEach(item => { managerSelections[item.id] = item.manager })
 
 const openApp = (item) => { window.open(`/app-page.html?id=${item.id}&title=${encodeURIComponent('Это страница пакета')}`, '_blank') }
 
+const parseItemDate = (d) => {
+  if (!d) return new Date(0)
+  const [day, month] = d.split('.').map(Number)
+  return new Date(2026, month - 1, day)
+}
+
 const filteredItems = computed(() => {
-  let result = items
+  const extraItems = props.extraPackages.map((item, idx) => ({
+    ...item,
+    _extraIdx: idx,
+  }))
+  let result = [...extraItems, ...items]
   if (props.activeSubItem === 'Мои') result = result.filter(item => item.manager === 'Новиков Алексей')
   if (props.filters?.statuses?.size > 0) result = result.filter(item => props.filters.statuses.has(item.status))
   if (props.filters?.managers?.size > 0) result = result.filter(item => props.filters.managers.has(item.manager))
-  if (sortOrder.value === 'old') result = [...result].reverse()
+  result = [...result].sort((a, b) => {
+    const getDate = (item) => {
+      if (item._extraIdx !== undefined) return new Date(9999, 0, 1, 0, 0, 0, item._extraIdx)
+      return parseItemDate(item.date)
+    }
+    const aDate = getDate(a)
+    const bDate = getDate(b)
+    return sortOrder.value === 'old' ? aDate - bDate : bDate - aDate
+  })
   const q = searchQuery.value.trim().toLowerCase()
   if (q) result = result.filter(item => item.id.toLowerCase().includes(q) || item.name.toLowerCase().includes(q))
   return result
 })
 watch(filteredItems, v => emit('update:count', v.length), { immediate: true })
+
+watch(() => props.extraPackages, (newVal, oldVal) => {
+  if (newVal.length > oldVal.length) {
+    const added = newVal.slice(oldVal.length)
+    const s = new Set(newItemIds.value)
+    added.forEach(item => s.add(item.id))
+    newItemIds.value = s
+    setTimeout(() => {
+      const cleaned = new Set(newItemIds.value)
+      added.forEach(item => cleaned.delete(item.id))
+      newItemIds.value = cleaned
+    }, 2000)
+  }
+})
 </script>

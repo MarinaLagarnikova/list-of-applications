@@ -1,7 +1,7 @@
 <template>
   <div class="px-6 py-4">
     <div class="flex items-center justify-between mb-3">
-      <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">{{ label }}</span>
+      <span class="text-[14px] leading-[24px] font-medium text-zinc-900">{{ label }}</span>
       <button
         v-if="modelValue.size > 0"
         @click="emit('update:modelValue', new Set())"
@@ -28,7 +28,7 @@
 
     <!-- Все -->
     <div v-if="!searchQuery" class="flex items-center justify-between cursor-pointer" @click="toggleAll">
-      <span class="text-[14px] font-light text-[#18181b]">Все</span>
+      <span class="text-[14px] font-light text-zinc-900">Все</span>
       <span :class="cbClass(allSelected)">
         <svg :class="['size-3 stroke-white transition-opacity', allSelected ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none">
           <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -57,7 +57,7 @@
           >
             <span class="text-xs font-medium" :style="{ color: item.color }">{{ item.initial }}</span>
           </span>
-          <span class="text-[14px] font-light text-[#18181b]">{{ item.name }}</span>
+          <span class="text-[14px] font-light text-zinc-900">{{ item.name }}</span>
         </div>
         <span :class="cbClass(modelValue.has(item.name))">
           <svg :class="['size-3 stroke-white transition-opacity', modelValue.has(item.name) ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none">

@@ -3,10 +3,10 @@
     <!-- ─── Sticky header ───────────────────────── -->
     <div class="shrink-0 px-6 pt-6 pb-4">
       <div class="flex items-center justify-between">
-        <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">Фильтры</span>
+        <span class="text-[20px] leading-[32px] font-medium text-zinc-900">Фильтры</span>
         <button
           @click="$emit('close')"
-          class="flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors"
+          class="flex size-6 items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors"
         >
           <XIcon :size="20" />
         </button>
@@ -19,7 +19,7 @@
       <!-- Дата создания -->
       <div class="px-6 py-4">
         <div class="flex items-center justify-between mb-3">
-          <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Дата создания</span>
+          <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Дата создания</span>
           <button
             v-if="selectedCreatedBadge || createdCustom"
             @click="resetCreated"
@@ -70,7 +70,7 @@
       <!-- Дата подписания -->
       <div class="px-6 py-4">
         <div class="flex items-center justify-between mb-3">
-          <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Дата подписания</span>
+          <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Дата подписания</span>
           <button
             v-if="selectedSignedBadge || signedCustom"
             @click="resetSigned"

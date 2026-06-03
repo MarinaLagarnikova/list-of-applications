@@ -3,10 +3,10 @@
     <!-- ─── Sticky header ───────────────────────── -->
     <div class="shrink-0 px-6 pt-6 pb-4">
       <div class="flex items-center justify-between">
-        <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">Фильтры</span>
+        <span class="text-[20px] leading-[32px] font-medium text-zinc-900">Фильтры</span>
         <button
           @click="$emit('close')"
-          class="flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors"
+          class="flex size-6 items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors"
         >
           <XIcon :size="20" />
         </button>
@@ -19,7 +19,7 @@
       <!-- Дата создания -->
       <div class="px-6 py-4">
         <div class="flex items-center justify-between mb-3">
-          <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Дата создания</span>
+          <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Дата создания</span>
           <button
             v-if="selectedDateBadge || dateCustom"
             @click="selectedDateBadge = null; dateCustom = ''"
@@ -70,7 +70,7 @@
       <!-- Способ идентификации -->
       <div class="px-6 py-4">
         <div class="flex items-center justify-between mb-3">
-          <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Способ идентификации</span>
+          <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Способ идентификации</span>
           <button
             v-if="selectedMethods.size > 0"
             @click="selectedMethods = new Set()"
@@ -95,7 +95,7 @@
       <!-- Дата активации -->
       <div class="px-6 py-4">
         <div class="flex items-center justify-between mb-3">
-          <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Дата активации</span>
+          <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Дата активации</span>
           <button
             v-if="selectedActivationBadge || activationCustom"
             @click="selectedActivationBadge = null; activationCustom = ''"
@@ -130,7 +130,7 @@
       <!-- Действует до -->
       <div class="px-6 py-4">
         <div class="flex items-center justify-between mb-3">
-          <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Действует до</span>
+          <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Действует до</span>
           <button
             v-if="selectedExpiryBadge || expiryCustom"
             @click="selectedExpiryBadge = null; expiryCustom = ''"
@@ -165,7 +165,7 @@
       <!-- Дата встречи с курьером -->
       <div class="px-6 py-4">
         <div class="flex items-center justify-between mb-3">
-          <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Дата встречи с курьером</span>
+          <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Дата встречи с курьером</span>
           <button
             v-if="selectedCourierBadge || courierCustom"
             @click="selectedCourierBadge = null; courierCustom = ''"

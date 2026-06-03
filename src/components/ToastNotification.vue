@@ -16,14 +16,14 @@
                 <CheckCircleIcon class="size-6 text-green-400" aria-hidden="true" />
               </div>
               <div class="ml-3 w-0 flex-1 pt-0.5">
-                <p class="text-[14px] font-medium text-gray-900">Файл готов</p>
-                <p class="mt-1 text-[13px] font-light text-gray-500">{{ count }} {{ pluralLoaded(count) }} выгружены</p>
+                <p class="text-[14px] font-medium text-zinc-900">Файл готов</p>
+                <p class="mt-1 text-[13px] font-light text-zinc-500">{{ count }} {{ pluralLoaded(count) }} выгружены</p>
               </div>
               <div class="ml-4 flex shrink-0">
                 <button
                   type="button"
                   @click="show = false"
-                  class="inline-flex rounded-md text-gray-400 hover:text-gray-500"
+                  class="inline-flex rounded-md text-gray-400 hover:text-zinc-500"
                 >
                   <XMarkIcon class="size-5" aria-hidden="true" />
                 </button>

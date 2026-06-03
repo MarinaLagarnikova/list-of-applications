@@ -1,7 +1,7 @@
 <template>
   <div class="px-6 py-4">
     <div class="flex items-center justify-between mb-3">
-      <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">{{ label }}</span>
+      <span class="text-[14px] leading-[24px] font-medium text-zinc-900">{{ label }}</span>
       <button
         v-if="modelValue.size > 0"
         @click="emit('update:modelValue', new Set())"
@@ -28,7 +28,7 @@
 
     <!-- Все -->
     <div v-if="!searchQuery" class="flex items-center justify-between cursor-pointer" @click="toggleAll">
-      <span class="text-[14px] font-light text-[#18181b]">Все</span>
+      <span class="text-[14px] font-light text-zinc-900">Все</span>
       <span :class="cbClass(allSelected)">
         <svg :class="['size-3 stroke-white transition-opacity', allSelected ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none">
           <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -52,10 +52,10 @@
       >
         <div class="flex items-center gap-x-2.5">
           <span class="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7]">
-            <span class="text-xs font-medium text-[#71717a]">{{ mgr.initials }}</span>
+            <span class="text-xs font-medium text-zinc-500">{{ mgr.initials }}</span>
           </span>
-          <span class="text-[14px] font-light text-[#18181b]">{{ mgr.name }}</span>
-          <span class="text-[14px] font-light text-zinc-400">{{ mgr.role }}</span>
+          <span class="text-[14px] font-light text-zinc-900">{{ mgr.name }}</span>
+          <span class="text-[14px] font-light text-zinc-500">{{ mgr.role }}</span>
         </div>
         <span :class="cbClass(modelValue.has(mgr.name))">
           <svg :class="['size-3 stroke-white transition-opacity', modelValue.has(mgr.name) ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none">

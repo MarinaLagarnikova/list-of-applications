@@ -4,10 +4,10 @@
       <!-- Sticky header -->
       <div class="shrink-0 px-6 pt-6 pb-4">
         <div class="flex items-center justify-between">
-          <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">Фильтры</span>
+          <span class="text-[20px] leading-[32px] font-medium text-zinc-900">Фильтры</span>
           <button
             @click="$emit('close')"
-            class="flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors"
+            class="flex size-6 items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors"
           >
             <XIcon :size="20" />
           </button>
@@ -20,7 +20,7 @@
         <!-- Дата создания -->
         <div class="px-6 py-4">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Дата создания</span>
+            <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Дата создания</span>
             <button v-if="selectedDateBadge || dateCustom" @click="resetDate" class="text-[14px] font-medium text-indigo-600 hover:text-indigo-700">Сбросить</button>
           </div>
           <div class="flex flex-wrap gap-2 mb-3">
@@ -57,7 +57,7 @@
         <!-- Рейтинг -->
         <div class="px-6 py-4">
           <div class="flex items-center justify-between mb-3">
-            <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">Рейтинг</span>
+            <span class="text-[14px] leading-[24px] font-medium text-zinc-900">Рейтинг</span>
             <button
               v-if="selectedRatings.size > 0"
               @click="selectedRatings = new Set()"
@@ -77,7 +77,7 @@
                     <span class="size-2 rounded-full" :style="{ background: rating.dot }" />
                   </span>
                 </span>
-                <span class="text-[14px] font-light text-[#18181b]">{{ rating.label }}</span>
+                <span class="text-[14px] font-light text-zinc-900">{{ rating.label }}</span>
               </div>
               <span :class="['relative flex size-4 shrink-0 items-center justify-center rounded-sm border transition-colors', selectedRatings.has(rating.label) ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-[#d4d4d8] hover:border-[#a1a1aa]']">
                 <svg :class="['size-3 stroke-white transition-opacity', selectedRatings.has(rating.label) ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none">

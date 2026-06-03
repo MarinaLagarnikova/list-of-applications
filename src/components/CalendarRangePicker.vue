@@ -2,17 +2,17 @@
   <div class="select-none">
     <!-- Navigation -->
     <div class="flex items-center">
-      <h2 class="flex-auto text-[14px] font-medium text-gray-900">{{ monthName }} {{ currentYear }}</h2>
-      <button type="button" @click="prevMonth" class="-my-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500 transition-colors">
+      <h2 class="flex-auto text-[14px] font-medium text-zinc-900">{{ monthName }} {{ currentYear }}</h2>
+      <button type="button" @click="prevMonth" class="-my-1.5 flex flex-none items-center justify-center p-1.5 text-zinc-400 hover:text-gray-500 transition-colors">
         <ChevronLeftIcon class="size-4" />
       </button>
-      <button type="button" @click="nextMonth" class="-my-1.5 -mr-1.5 ml-1 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500 transition-colors">
+      <button type="button" @click="nextMonth" class="-my-1.5 -mr-1.5 ml-1 flex flex-none items-center justify-center p-1.5 text-zinc-400 hover:text-gray-500 transition-colors">
         <ChevronRightIcon class="size-4" />
       </button>
     </div>
 
     <!-- Week headers -->
-    <div class="mt-4 grid grid-cols-7 text-center text-xs text-gray-400">
+    <div class="mt-4 grid grid-cols-7 text-center text-xs text-zinc-400">
       <div v-for="d in weekDays" :key="d">{{ d }}</div>
     </div>
 
@@ -127,7 +127,7 @@ const btnClass = (day) => {
     return `${base} font-semibold text-indigo-600 hover:bg-gray-100`
   if (!day.isCurrentMonth)
     return `${base} text-gray-300 hover:bg-gray-100`
-  return `${base} text-gray-900 hover:bg-gray-100`
+  return `${base} text-zinc-900 hover:bg-gray-100`
 }
 
 const selectDay = (day) => {

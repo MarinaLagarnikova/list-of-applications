@@ -1,8 +1,25 @@
 <template>
-  <div :class="['flex h-screen overflow-hidden bg-gray-50 pt-2 pb-2 pr-2 gap-x-2 transition-all duration-300', sidebarCollapsed ? 'pl-2' : 'pl-4']">
+  <div :class="['flex h-screen overflow-hidden bg-gray-50 md:p-2 transition-all duration-300', !sidebarCollapsed && 'lg:pl-4 lg:gap-x-4']">
+
+    <!-- ─── Backdrop (мобильный оверлей) ─────────── -->
+    <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition-opacity duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
+      <div v-if="!isLg && mobileSidebarOpen" class="fixed inset-0 z-40 bg-black/30" @click="mobileSidebarOpen = false">
+        <button
+          class="absolute top-4 left-[290px] flex size-11 items-center justify-center text-white transition-colors"
+          @click.stop="mobileSidebarOpen = false"
+        >
+          <XMarkIcon :size="24" />
+        </button>
+      </div>
+    </Transition>
 
     <!-- ─── Sidebar ───────────────────────────────── -->
-    <div :class="['flex shrink-0 flex-col gap-y-5 overflow-hidden transition-all duration-300', sidebarCollapsed ? 'w-0' : 'w-[250px]']">
+    <div :class="[
+      'flex flex-col gap-y-5 overflow-x-hidden',
+      isLg
+        ? ['shrink-0 transition-[width] duration-300 ease-in-out', sidebarCollapsed ? 'w-0' : 'w-[250px]']
+        : ['fixed inset-y-0 left-0 z-50 w-[282px] bg-gray-50 px-4 transition-transform duration-200 ease-in-out', mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full']
+    ]">
 
       <!-- Logo -->
       <div class="flex h-16 shrink-0 items-center pl-2">
@@ -40,7 +57,7 @@
 
       <template v-else-if="!appIsInitialLoading">
       <!-- Sidebar Create button (все модули кроме Калькулятора и Аналитики, когда сайдбар раскрыт) -->
-      <div v-if="!sidebarCollapsed && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" class="shrink-0 px-1">
+      <div v-if="!sidebarCollapsed" class="shrink-0">
         <!-- mortgage-only: простая кнопка без поповера -->
         <Button v-if="mode === 'mortgage-only'" color="indigo" class="w-full justify-center" @click="createModalTitle = 'Создание заявки на ипотеку'; createModalModule = 'Ипотека'; createModalOpen = true">
           <PlusIcon :size="16" class="shrink-0" />
@@ -83,8 +100,8 @@
       </div>
 
       <!-- Nav -->
-      <nav class="flex flex-1 flex-col">
-        <ul role="list" class="flex flex-1 flex-col gap-y-7">
+      <nav class="flex-1 min-h-0 overflow-y-auto">
+        <ul role="list" class="flex flex-col gap-y-7 min-h-full">
           <li>
             <ul role="list" class="space-y-1">
               <li v-for="item in filteredNavigation" :key="item.name">
@@ -114,7 +131,7 @@
                 </a>
 
                 <!-- Expandable -->
-                <Disclosure v-else as="div" v-slot="{ open }">
+                <Disclosure v-else as="div" v-slot="{ open }" :defaultOpen="(item.name === 'Ипотека' && mode !== 'registration') || (item.name === 'Регистрация' && mode === 'registration')">
                   <DisclosureButton
                     :class="[
                       activeModule === item.name
@@ -198,9 +215,10 @@
             </ul>
           </li>
 
-          <!-- Bottom block (pinned) -->
+          <!-- Support group -->
           <li class="mt-auto">
             <ul role="list" class="space-y-1">
+
               <!-- Написать в поддержку -->
               <li>
                 <a
@@ -237,51 +255,51 @@
 
               <!-- Профиль -->
               <li>
-                <div class="relative">
-                  <div v-if="accountMenuOpen" class="fixed inset-0 z-40" @click="accountMenuOpen = false" />
-                  <button
-                    @click="accountMenuOpen = !accountMenuOpen"
-                    class="group flex w-full items-center gap-x-3 rounded-md p-2 text-sm/6 font-medium text-zinc-700 hover:bg-gray-100 hover:text-indigo-600 transition-colors"
-                  >
-                    <CircleUserIcon class="size-6 shrink-0 text-gray-400 group-hover:text-indigo-600" />
-                    <span class="flex-1 truncate text-left" aria-hidden="true">Администратор</span>
-                    <EllipsisIcon class="size-4 shrink-0 text-gray-400 group-hover:text-indigo-600" />
-                  </button>
+            <div class="relative">
+              <div v-if="accountMenuOpen" class="fixed inset-0 z-40" @click="accountMenuOpen = false" />
+              <button
+                @click="accountMenuOpen = !accountMenuOpen"
+                class="group flex w-full items-center gap-x-3 rounded-md p-2 text-sm/6 font-medium text-zinc-700 hover:bg-gray-100 hover:text-indigo-600 transition-colors"
+              >
+                <CircleUserIcon class="size-6 shrink-0 text-gray-400 group-hover:text-indigo-600" />
+                <span class="flex-1 truncate text-left" aria-hidden="true">Администратор</span>
+                <EllipsisIcon class="size-4 shrink-0 text-gray-400 group-hover:text-indigo-600" />
+              </button>
 
-                  <Transition
-                    enter-active-class="transition ease-out duration-100"
-                    enter-from-class="opacity-0 scale-95"
-                    enter-to-class="opacity-100 scale-100"
-                    leave-active-class="transition ease-in duration-75"
-                    leave-from-class="opacity-100 scale-100"
-                    leave-to-class="opacity-0 scale-95"
-                  >
-                    <div
-                      v-if="accountMenuOpen"
-                      class="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 z-50 w-56 origin-bottom rounded-xl p-1 bg-white/75 backdrop-blur-xl shadow-lg ring-1 ring-zinc-950/10"
-                    >
-                      <!-- User info block -->
-                      <div class="px-3 py-2">
-                        <div class="text-xs text-zinc-500">Администратор</div>
-                        <div class="text-sm font-medium text-zinc-900">Смирнова Юлия</div>
-                      </div>
-                      <div class="mx-3 my-1 h-px bg-zinc-950/5" />
-                      <button class="group flex w-full items-center gap-x-2.5 rounded-lg px-3 py-1.5 text-sm/6 text-zinc-950 hover:bg-indigo-600 hover:text-white transition-colors text-left">
-                        <ArrowLeftRightIcon class="size-4 shrink-0 text-zinc-500 group-hover:text-white" />
-                        Переключить учётку
-                      </button>
-                      <button class="group flex w-full items-center gap-x-2.5 rounded-lg px-3 py-1.5 text-sm/6 text-zinc-950 hover:bg-indigo-600 hover:text-white transition-colors text-left">
-                        <BellIcon class="size-4 shrink-0 text-zinc-500 group-hover:text-white" />
-                        Уведомления
-                      </button>
-                      <div class="mx-3 my-1 h-px bg-zinc-950/5" />
-                      <button class="group flex w-full items-center gap-x-2.5 rounded-lg px-3 py-1.5 text-sm/6 text-zinc-950 hover:bg-indigo-600 hover:text-white transition-colors text-left">
-                        <LogOutIcon class="size-4 shrink-0 text-zinc-500 group-hover:text-white" />
-                        Выход
-                      </button>
-                    </div>
-                  </Transition>
+              <Transition
+                enter-active-class="transition ease-out duration-100"
+                enter-from-class="opacity-0 scale-95"
+                enter-to-class="opacity-100 scale-100"
+                leave-active-class="transition ease-in duration-75"
+                leave-from-class="opacity-100 scale-100"
+                leave-to-class="opacity-0 scale-95"
+              >
+                <div
+                  v-if="accountMenuOpen"
+                  class="absolute left-1/2 -translate-x-1/2 bottom-full mb-1 z-50 w-56 origin-bottom rounded-xl p-1 bg-white/75 backdrop-blur-xl shadow-lg ring-1 ring-zinc-950/10"
+                >
+                  <!-- User info block -->
+                  <div class="px-3 py-2">
+                    <div class="text-xs text-zinc-500">Администратор</div>
+                    <div class="text-sm font-medium text-zinc-900">Смирнова Юлия</div>
+                  </div>
+                  <div class="mx-3 my-1 h-px bg-zinc-950/5" />
+                  <button class="group flex w-full items-center gap-x-2.5 rounded-lg px-3 py-1.5 text-sm/6 text-zinc-950 hover:bg-indigo-600 hover:text-white transition-colors text-left">
+                    <ArrowLeftRightIcon class="size-4 shrink-0 text-zinc-500 group-hover:text-white" />
+                    Переключить учётку
+                  </button>
+                  <button class="group flex w-full items-center gap-x-2.5 rounded-lg px-3 py-1.5 text-sm/6 text-zinc-950 hover:bg-indigo-600 hover:text-white transition-colors text-left">
+                    <BellIcon class="size-4 shrink-0 text-zinc-500 group-hover:text-white" />
+                    Уведомления
+                  </button>
+                  <div class="mx-3 my-1 h-px bg-zinc-950/5" />
+                  <button class="group flex w-full items-center gap-x-2.5 rounded-lg px-3 py-1.5 text-sm/6 text-zinc-950 hover:bg-indigo-600 hover:text-white transition-colors text-left">
+                    <LogOutIcon class="size-4 shrink-0 text-zinc-500 group-hover:text-white" />
+                    Выход
+                  </button>
                 </div>
+              </Transition>
+            </div>
               </li>
             </ul>
           </li>
@@ -291,7 +309,7 @@
     </div>
 
     <!-- ─── Main content ──────────────────────────── -->
-    <div class="relative flex flex-1 flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-200">
+    <div class="relative flex flex-1 flex-col overflow-hidden rounded-none md:rounded-2xl bg-white shadow-none md:shadow-sm ring-0 md:ring-1 md:ring-gray-200">
 
       <!-- ─── Filter Drawer ────────────────────────── -->
       <FilterDrawer ref="mortgageFilterDrawerRef" :open="filterDrawerOpen" :count="activeCount ?? 0" @close="filterDrawerOpen = false" @update:filterCount="mortgageFilterCount = $event" @update:filters="mortgageFilters = $event" @update:filterTags="mortgageFilterTags = $event" />
@@ -374,8 +392,8 @@
       />
 
       <!-- Шапка: строка 1 — toggle + заголовок + кнопки -->
-      <div class="shrink-0 flex items-center gap-x-3 pl-6 pr-8 py-2.5">
-        <Button plain class="size-8 px-0 text-gray-400 hover:text-gray-600" @click="sidebarCollapsed = !sidebarCollapsed">
+      <div class="shrink-0 flex items-center gap-x-3 pl-2 pr-4 md:pl-4 md:pr-6 pt-4 pb-2">
+        <Button plain class="size-8 px-0 text-gray-400 hover:text-gray-600" @click="isLg ? (sidebarCollapsed = !sidebarCollapsed) : (mobileSidebarOpen = !mobileSidebarOpen)">
           <PanelLeftIcon :size="16" :stroke-width="1.5" class="shrink-0 aspect-square" style="width:16px;height:16px;stroke:#18181B;" aria-hidden="true" />
         </Button>
         <div class="flex items-center gap-x-4">
@@ -396,15 +414,25 @@
             </template>
           </div>
 
-          <Button v-if="sidebarCollapsed && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" color="indigo" @click="openCreateModalForModule(activeModule)">
-            <PlusIcon :size="16" class="shrink-0" />
-            Создать
-          </Button>
+          <!-- xs/sm: всегда показываем Создать в шапке -->
+          <div v-if="activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" class="md:hidden">
+            <Button color="indigo" @click="openCreateModalForModule(activeModule)">
+              <PlusIcon :size="16" class="shrink-0" />
+              Создать
+            </Button>
+          </div>
+          <!-- md+: только когда сайдбар скрыт -->
+          <div v-if="sidebarCollapsed && activeModule !== 'Калькулятор ипотеки' && activeModule !== 'Аналитика'" class="hidden md:block">
+            <Button color="indigo" @click="openCreateModalForModule(activeModule)">
+              <PlusIcon :size="16" class="shrink-0" />
+              Создать
+            </Button>
+          </div>
         </div>
       </div>
 
       <!-- Шапка: строка 2 — поиск + фильтры (только Ипотека) -->
-      <div v-if="activeModule === 'Ипотека'" :class="['shrink-0 flex items-center justify-between px-8 py-2', isScrolled && !mortgageFilterTags.length && 'border-b border-[#f4f4f5]']">
+      <div v-if="activeModule === 'Ипотека'" :class="['shrink-0 flex items-center justify-between px-4 md:px-6 py-2', isScrolled && !mortgageFilterTags.length && 'sm:border-b sm:border-[#f4f4f5]']">
         <!-- Filter bar skeleton on initial load -->
         <template v-if="showSidebarSkeleton">
           <div class="flex items-center gap-x-3 animate-pulse">
@@ -420,15 +448,30 @@
             <span v-if="searchQuery.trim()" class="text-[14px] font-light text-[#71717a] mr-5">
               {{ searchResultText }}
             </span>
-            <Button outline @click="filterDrawerOpen = true">
-              <FunnelIcon :size="16" class="shrink-0 aspect-square" style="width:16px;height:16px;" />
-              Фильтры
-              <span v-if="mortgageFilterCount > 0" class="inline-flex items-center justify-center size-[18px] rounded-full bg-indigo-600 text-white text-[11px] font-medium leading-none">{{ mortgageFilterCount }}</span>
-            </Button>
-            <SortDropdown v-model="mortgageSortOrder" />
-            <ExportPopover :count="filteredApplications.length" />
+            <!-- Фильтры: скрыт на xs, виден на sm+ -->
+            <div class="hidden sm:block">
+              <Button outline @click="filterDrawerOpen = true">
+                <FunnelIcon :size="16" class="shrink-0 aspect-square" style="width:16px;height:16px;" />
+                Фильтры
+                <span v-if="mortgageFilterCount > 0" class="inline-flex items-center justify-center size-[18px] rounded-full bg-indigo-600 text-white text-[11px] font-medium leading-none">{{ mortgageFilterCount }}</span>
+              </Button>
+            </div>
+            <!-- Сортировка и экспорт: только md+ -->
+            <div class="hidden md:flex items-center gap-x-3">
+              <SortDropdown v-model="mortgageSortOrder" />
+              <ExportPopover :count="filteredApplications.length" />
+            </div>
           </div>
         </template>
+      </div>
+
+      <!-- Шапка: строка 3 — xs-only кнопка фильтров (полная ширина) -->
+      <div v-if="activeModule === 'Ипотека' && !showSidebarSkeleton && !appIsInitialLoading" :class="['sm:hidden shrink-0 px-4 py-2', isScrolled && !mortgageFilterTags.length && 'border-b border-[#f4f4f5]']">
+        <Button outline class="w-full justify-center" @click="filterDrawerOpen = true">
+          <FunnelIcon :size="16" class="shrink-0 aspect-square" style="width:16px;height:16px;" />
+          Фильтры
+          <span v-if="mortgageFilterCount > 0" class="inline-flex items-center justify-center size-[18px] rounded-full bg-indigo-600 text-white text-[11px] font-medium leading-none">{{ mortgageFilterCount }}</span>
+        </Button>
       </div>
 
       <!-- Applied filters strip (Ипотека) -->
@@ -440,7 +483,7 @@
       <div class="flex-1 overflow-auto" @scroll="isScrolled = $event.target.scrollTop > 0">
 
         <!-- Ипотека -->
-        <div v-if="activeModule === 'Ипотека'" class="pt-6 pb-10 relative">
+        <div v-if="activeModule === 'Ипотека'" class="pt-2 pb-10 relative">
         <!-- Reload: opacity-50 wrapper when reloading but skeleton not yet shown -->
         <div :class="(mortgageIsReloading && !showReloadSkeleton) ? 'opacity-50 pointer-events-none transition-opacity duration-150' : ''">
         <table class="w-full border-separate border-spacing-0">
@@ -448,7 +491,7 @@
 
           <!-- Скелетон — первая загрузка или смена фильтра (после 500 мс) -->
           <tr v-if="mortgageIsInitialLoading || showReloadSkeleton" v-for="i in SKELETON_ROWS" :key="`sk-${i}`" class="motion-safe:animate-pulse">
-            <td class="pt-[16px] pb-3 pl-8 pr-2"><div class="size-4 rounded-sm bg-zinc-100" /></td>
+            <td class="pt-[16px] pb-3 pl-4 md:pl-6 pr-2"><div class="size-4 rounded-sm bg-zinc-100" /></td>
             <td class="px-3 py-4">
               <div class="h-3 w-20 rounded bg-zinc-100" />
               <div class="mt-1.5 h-2.5 w-12 rounded bg-zinc-100" />
@@ -475,16 +518,12 @@
               <div class="h-3 w-24 rounded bg-zinc-100" />
               <div class="mt-1.5 h-2.5 w-16 rounded bg-zinc-100" />
             </td>
-            <td class="px-3 py-4">
-              <div class="h-3 w-20 rounded bg-zinc-100" />
-              <div class="mt-1.5 h-2.5 w-14 rounded bg-zinc-100" />
-            </td>
             <td class="pl-3 pr-8 py-4"><div class="h-7 w-28 rounded bg-zinc-100" /></td>
           </tr>
 
           <!-- Реальные строки -->
           <tr v-if="!mortgageIsInitialLoading && !showReloadSkeleton" v-for="(app, idx) in visibleApplications" :key="app.id" :class="['group cursor-pointer', checkedRows.has(app.id) && 'selected']" @click="openApp(app)">
-            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pt-[16px] pb-3 pl-8 pr-2" @click.stop="toggleRow(app.id)">
+            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pt-[16px] pb-3 pl-4 md:pl-6 pr-2" @click.stop="toggleRow(app.id)">
               <label class="inline-flex cursor-pointer">
                 <span :class="['relative flex size-4 items-center justify-center rounded-sm border', checkedRows.has(app.id) ? 'bg-indigo-600 border-transparent' : 'bg-white border-zinc-950/15 hover:border-zinc-950/30']">
                   <svg :class="['size-3 stroke-white transition-opacity', checkedRows.has(app.id) ? 'opacity-100' : 'opacity-0']" viewBox="0 0 14 14" fill="none"><path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -530,12 +569,6 @@
                 <span v-if="app.mortgageType" class="text-[14px] leading-[20px] font-light text-zinc-900">{{ app.mortgageType }}</span>
               </div>
             </td>
-            <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top px-3 py-4 whitespace-nowrap">
-              <div class="flex flex-col gap-y-1">
-                <span class="text-[14px] leading-[20px] font-light text-[#18181b]">Обновлена</span>
-                <span class="text-[14px] leading-[20px] font-light text-zinc-900">{{ relativeTime(app.updatedAt) }}</span>
-              </div>
-            </td>
             <!-- Менеджер -->
             <td class="group-hover:bg-zinc-50 [.selected_&]:bg-zinc-50 [.selected_&]:group-hover:bg-zinc-100 align-top pl-3 pr-8 py-4 whitespace-nowrap" @click.stop>
               <CatalystListbox
@@ -549,12 +582,12 @@
 
           <!-- Sentinel — триггер подгрузки -->
           <tr v-if="!mortgageIsInitialLoading && !showReloadSkeleton && mortgageHasMore" ref="mortgageSentinelRef" aria-hidden="true">
-            <td colspan="9" class="p-0 h-0" />
+            <td colspan="8" class="p-0 h-0" />
           </tr>
 
           <!-- Спиннер подгрузки -->
           <tr v-if="mortgageIsLoadingMore">
-            <td colspan="9">
+            <td colspan="8">
               <div class="flex items-center gap-x-2 py-4 pl-8 text-zinc-500">
                 <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -567,7 +600,7 @@
 
           <!-- Конец списка — только если данных было больше одной страницы -->
           <tr v-if="!mortgageIsInitialLoading && !showReloadSkeleton && !mortgageHasMore && filteredApplications.length > INITIAL_PAGE_SIZE">
-            <td colspan="9">
+            <td colspan="8">
               <div class="py-4 pl-8 text-sm text-zinc-500">
                 Загрузили все заявки ({{ filteredApplications.length }})
               </div>
@@ -715,14 +748,34 @@ import {
   ArrowUpToLine as ArrowUpFromLineIcon,
   Layers as LayersIcon,
   House as HouseIcon,
+  Building2 as Building2Icon,
+  Hotel as HotelIcon,
+  Car as CarIcon,
+  Package as PackageIcon,
+  Store as StoreIcon,
+  HousePlus as HousePlusIcon,
+  Fence as FenceIcon,
   FilePlusCorner as FilePlusCornerIcon,
   FileSearchCorner as FileSearchCornerIcon,
 } from 'lucide-vue-next'
+
+const propertyTypeIconMap = {
+  'Квартира':                   Building2Icon,
+  'Апартаменты':                HotelIcon,
+  'Машиноместо':                CarIcon,
+  'Кладовка':                   PackageIcon,
+  'Коммерческая недвижимость':  StoreIcon,
+  'Дом':                        HouseIcon,
+  'Таунхаус':                   HousePlusIcon,
+  'Дом с земельным участком':   FenceIcon,
+}
+const getPropertyIcon = (type) => propertyTypeIconMap[type] ?? Building2Icon
 
 const isOffline = ref(true)
 onMounted(() => {
   window.addEventListener('online',  () => { isOffline.value = false })
   window.addEventListener('offline', () => { isOffline.value = true  })
+  window.addEventListener('resize', onResize)
 
   // Simulate initial page load: sidebar/header/filterbar skeleton after 500 ms delay
   const sidebarDelayTimer = setTimeout(() => { showSidebarSkeleton.value = true }, 500)
@@ -736,10 +789,14 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('online',  () => { isOffline.value = false })
   window.removeEventListener('offline', () => { isOffline.value = true  })
+  window.removeEventListener('resize', onResize)
 })
 
 const activeModule = ref(props.mode === 'registration' ? 'Регистрация' : 'Ипотека')
 const sidebarCollapsed = ref(false)
+const mobileSidebarOpen = ref(false)
+const isLg = ref(window.innerWidth >= 1024)
+const onResize = () => { isLg.value = window.innerWidth >= 1024 }
 const mortgageSortOrder = ref('new')
 const isScrolled = ref(false)
 const filterDrawerOpen = ref(false)
@@ -1216,7 +1273,7 @@ const applications = [
     status: 'Новая заявка',
     initials: 'НЕ', client: 'Новикова Е.Д.', phone: '+7 925 ***-**-31',
     fullName: 'Новикова Екатерина Дмитриевна', fullPhone: '+7 925 413-87-31',
-    complex: 'Самолет/Новые Ватутинки', complexPrice: '7 200 000 ₽',
+    complex: 'Самолет/Новые Ватутинки', complexPrice: '7 200 000 ₽', propertyType: 'Квартира',
     amount: '5 400 000 ₽', pv: '25%', term: '20 лет',
     houseType: 'Первичное жильё', mortgageType: 'Семейная',
     createdAt: '05.05.2026', updatedAt: '05.05.2026 10:14',
@@ -1226,7 +1283,7 @@ const applications = [
     status: 'Консультация',
     initials: 'НЕ', client: 'Новикова Е.Д.', phone: '+7 925 ***-**-31',
     fullName: 'Новикова Екатерина Дмитриевна', fullPhone: '+7 925 413-87-31',
-    complex: 'А101/Прокшино', complexPrice: '6 800 000 ₽',
+    complex: 'А101/Прокшино', complexPrice: '6 800 000 ₽', propertyType: 'Апартаменты',
     amount: '4 760 000 ₽', pv: '30%', term: '18 лет',
     houseType: 'Первичное жильё', mortgageType: 'Льготная',
     createdAt: '05.05.2026', updatedAt: '05.05.2026 09:02',
@@ -1236,7 +1293,7 @@ const applications = [
     status: 'Подготовка',
     initials: 'ОД', client: 'Орлов Д.П.', phone: '+7 912 ***-**-07',
     fullName: 'Орлов Дмитрий Павлович', fullPhone: '+7 912 635-20-07',
-    complex: 'MR Group/Савёловский Сити', complexPrice: '18 500 000 ₽',
+    complex: 'MR Group/Савёловский Сити', complexPrice: '18 500 000 ₽', propertyType: 'Таунхаус',
     amount: '13 875 000 ₽', pv: '25%', term: '30 лет',
     houseType: 'Первичное жильё', mortgageType: 'ИТ',
     createdAt: '04.05.2026', updatedAt: '04.05.2026 17:48',
@@ -1246,7 +1303,7 @@ const applications = [
     status: 'Ожидает решения',
     initials: 'ВА', client: 'Воронова А.С.', phone: '+7 926 ***-**-64',
     fullName: 'Воронова Анна Сергеевна', fullPhone: '+7 926 184-53-64',
-    complex: 'ФСК/Южная Битца', complexPrice: '10 100 000 ₽',
+    complex: 'ФСК/Южная Битца', complexPrice: '10 100 000 ₽', propertyType: 'Дом с земельным участком',
     amount: '7 070 000 ₽', pv: '30%', term: '22 лет',
     houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '04.05.2026', updatedAt: '04.05.2026 15:30',
@@ -1256,7 +1313,7 @@ const applications = [
     status: 'Одобрена',
     initials: 'ЛИ', client: 'Лебедев И.Н.', phone: '+7 967 ***-**-19',
     fullName: 'Лебедев Игорь Николаевич', fullPhone: '+7 967 302-58-19',
-    complex: 'ЛСР/Морская набережная (СПб)', complexPrice: '9 600 000 ₽',
+    complex: 'ЛСР/Морская набережная (СПб)', complexPrice: '9 600 000 ₽', propertyType: 'Дом',
     amount: '6 720 000 ₽', pv: '30%', term: '15 лет',
     houseType: 'Первичное жильё', mortgageType: 'Льготная',
     createdAt: '03.05.2026', updatedAt: '04.05.2026 11:22',
@@ -1266,7 +1323,7 @@ const applications = [
     status: 'Консультация',
     initials: 'ЛИ', client: 'Лебедев И.Н.', phone: '+7 967 ***-**-19',
     fullName: 'Лебедев Игорь Николаевич', fullPhone: '+7 967 302-58-19',
-    complex: 'Группа ЛСР/Зенит (СПб)', complexPrice: '8 200 000 ₽',
+    complex: 'Группа ЛСР/Зенит (СПб)', complexPrice: '8 200 000 ₽', propertyType: 'Коммерческая недвижимость',
     amount: '5 740 000 ₽', pv: '30%', term: '15 лет',
     houseType: 'Первичное жильё', mortgageType: 'Льготная',
     createdAt: '03.05.2026', updatedAt: '03.05.2026 14:07',
@@ -1276,7 +1333,7 @@ const applications = [
     status: 'Подготовка',
     initials: 'СЮ', client: 'Смирнова Ю.А.', phone: '+7 918 ***-**-56',
     fullName: 'Смирнова Юлия Андреевна', fullPhone: '+7 918 749-61-56',
-    complex: 'Донстрой/Символ', complexPrice: '22 000 000 ₽',
+    complex: 'Донстрой/Символ', complexPrice: '22 000 000 ₽', propertyType: 'Апартаменты',
     amount: '15 400 000 ₽', pv: '30%', term: '25 лет',
     houseType: 'Первичное жильё', mortgageType: 'ИТ',
     createdAt: '03.05.2026', updatedAt: '03.05.2026 12:45',
@@ -1286,7 +1343,7 @@ const applications = [
     status: 'Ожидает решения',
     initials: 'МС', client: 'Морозов С.В.', phone: '+7 963 ***-**-93',
     fullName: 'Морозов Сергей Владимирович', fullPhone: '+7 963 827-44-93',
-    complex: 'ПИК/Люберцы Парк', complexPrice: '6 300 000 ₽',
+    complex: 'ПИК/Люберцы Парк', complexPrice: '6 300 000 ₽', propertyType: 'Машиноместо',
     amount: '4 410 000 ₽', pv: '30%', term: '20 лет',
     houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '02.05.2026', updatedAt: '02.05.2026 18:55',
@@ -1296,7 +1353,7 @@ const applications = [
     status: 'Консультация',
     initials: 'ФИ', client: 'Фёдорова И.К.', phone: '+7 931 ***-**-27',
     fullName: 'Фёдорова Ирина Константиновна', fullPhone: '+7 931 560-39-27',
-    complex: 'Самолет/Пригород Лесное', complexPrice: '5 900 000 ₽',
+    complex: 'Самолет/Пригород Лесное', complexPrice: '5 900 000 ₽', propertyType: 'Кладовка',
     amount: '4 130 000 ₽', pv: '30%', term: '17 лет',
     houseType: 'Первичное жильё', mortgageType: 'Семейная',
     createdAt: '02.05.2026', updatedAt: '02.05.2026 13:10',
@@ -1306,7 +1363,7 @@ const applications = [
     status: 'Новая заявка',
     initials: 'АР', client: 'Андреев Р.Е.', phone: '+7 909 ***-**-74',
     fullName: 'Андреев Роман Евгеньевич', fullPhone: '+7 909 213-76-74',
-    complex: 'А101/Испанские кварталы', complexPrice: '8 400 000 ₽',
+    complex: 'А101/Испанские кварталы', complexPrice: '8 400 000 ₽', propertyType: 'Квартира',
     amount: null, pv: null, term: null,
     houseType: null, mortgageType: null,
     createdAt: '01.05.2026', updatedAt: '01.05.2026 20:31',
@@ -1316,7 +1373,7 @@ const applications = [
     status: 'Подготовка',
     initials: 'КМ', client: 'Козлова М.П.', phone: '+7 977 ***-**-48',
     fullName: 'Козлова Мария Петровна', fullPhone: '+7 977 094-82-48',
-    complex: 'ЛСР/Цивилизация (СПб)', complexPrice: '11 200 000 ₽',
+    complex: 'ЛСР/Цивилизация (СПб)', complexPrice: '11 200 000 ₽', propertyType: 'Таунхаус',
     amount: '7 840 000 ₽', pv: '30%', term: '25 лет',
     houseType: 'Первичное жильё', mortgageType: 'Льготная',
     createdAt: '01.05.2026', updatedAt: '01.05.2026 16:44',
@@ -1326,7 +1383,7 @@ const applications = [
     status: 'Ожидает решения',
     initials: 'ВА', client: 'Васильев А.Ю.', phone: '+7 915 ***-**-62',
     fullName: 'Васильев Александр Юрьевич', fullPhone: '+7 915 371-05-62',
-    complex: 'Эталон/Галактика', complexPrice: '14 600 000 ₽',
+    complex: 'Эталон/Галактика', complexPrice: '14 600 000 ₽', propertyType: 'Коммерческая недвижимость',
     amount: '10 220 000 ₽', pv: '30%', term: '28 лет',
     houseType: 'Первичное жильё', mortgageType: 'Стандартная',
     createdAt: '30.04.2026', updatedAt: '30.04.2026 19:20',
@@ -1336,7 +1393,7 @@ const applications = [
     status: 'Консультация',
     initials: 'ПН', client: 'Павлова Н.О.', phone: '+7 936 ***-**-85',
     fullName: 'Павлова Надежда Олеговна', fullPhone: '+7 936 458-17-85',
-    complex: 'Самолет/Жилой район Южный', complexPrice: '5 500 000 ₽',
+    complex: 'Самолет/Жилой район Южный', complexPrice: '5 500 000 ₽', propertyType: 'Дом',
     amount: '3 850 000 ₽', pv: '30%', term: '15 лет',
     houseType: 'Первичное жильё', mortgageType: 'Семейная',
     createdAt: '30.04.2026', updatedAt: '30.04.2026 14:55',

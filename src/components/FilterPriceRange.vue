@@ -1,7 +1,7 @@
 <template>
   <div class="px-6 py-4">
     <div class="flex items-center justify-between mb-3">
-      <span class="text-[14px] leading-[24px] font-medium text-[#18181b]">{{ label }}</span>
+      <span class="text-[14px] leading-[24px] font-medium text-zinc-900">{{ label }}</span>
       <button
         v-if="selectedTag || priceFrom || priceTo"
         @click="reset"

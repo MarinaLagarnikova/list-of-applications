@@ -57,46 +57,46 @@
         <div class="flex flex-col">
 
           <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Полная стоимость</span>
-            <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ bank.psk }}</span>
+            <span class="text-[14px] leading-[20px] font-light text-zinc-500">Полная стоимость</span>
+            <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ bank.psk }}</span>
           </div>
 
           <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Ставка</span>
-            <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ bank.rate }}</span>
+            <span class="text-[14px] leading-[20px] font-light text-zinc-500">Ставка</span>
+            <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ bank.rate }}</span>
           </div>
 
           <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Первый взнос</span>
+            <span class="text-[14px] leading-[20px] font-light text-zinc-500">Первый взнос</span>
             <div class="flex items-center gap-2">
-              <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ pvAmount }}</span>
+              <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ pvAmount }}</span>
               <span class="bg-[rgba(82,82,91,0.1)] text-zinc-700 text-xs font-medium px-1.5 py-1 rounded-md leading-4">{{ pvPct }}</span>
             </div>
           </div>
 
           <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Объект</span>
-            <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ bank.cost }}</span>
+            <span class="text-[14px] leading-[20px] font-light text-zinc-500">Объект</span>
+            <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ bank.cost }}</span>
           </div>
 
           <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Кредит</span>
-            <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ bank.credit }}</span>
+            <span class="text-[14px] leading-[20px] font-light text-zinc-500">Кредит</span>
+            <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ bank.credit }}</span>
           </div>
 
           <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Переплата</span>
-            <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ bank.overpayment }}</span>
+            <span class="text-[14px] leading-[20px] font-light text-zinc-500">Переплата</span>
+            <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ bank.overpayment }}</span>
           </div>
 
           <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Доход</span>
-            <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ bank.income }}</span>
+            <span class="text-[14px] leading-[20px] font-light text-zinc-500">Доход</span>
+            <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ bank.income }}</span>
           </div>
 
           <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Страховка</span>
-            <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ bank.insurance }}</span>
+            <span class="text-[14px] leading-[20px] font-light text-zinc-500">Страховка</span>
+            <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ bank.insurance }}</span>
           </div>
 
         </div>

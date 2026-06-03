@@ -4,10 +4,10 @@
     <!-- Header -->
     <div class="shrink-0 px-6 pt-6 pb-4 border-b border-[#f4f4f5]">
       <div class="flex items-center justify-between">
-        <span class="text-[20px] leading-[32px] font-medium text-[#18181b]">Импорт</span>
+        <span class="text-[20px] leading-[32px] font-medium text-zinc-900">Импорт</span>
         <button
           @click="$emit('close')"
-          class="flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors"
+          class="flex size-6 items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors"
         >
           <XIcon :size="20" />
         </button>

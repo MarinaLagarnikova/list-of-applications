@@ -12,17 +12,17 @@
             {{ item.id }}
           </span>
           <span v-if="item.status" :class="statusBadgeClass(item.status)">{{ item.status }}</span>
-          <button @click="$emit('close')" class="ml-auto flex size-6 items-center justify-center text-[#71717a] hover:text-[#18181b] transition-colors">
+          <button @click="$emit('close')" class="ml-auto flex size-6 items-center justify-center text-zinc-500 hover:text-zinc-900 transition-colors">
             <XIcon :size="16" />
           </button>
         </div>
 
         <!-- Заголовок: ФИО -->
-        <h2 class="mt-2 text-[24px] leading-[32px] font-medium text-[#18181b]">{{ item.fullName }}</h2>
+        <h2 class="mt-2 text-[24px] leading-[32px] font-medium text-zinc-900">{{ item.fullName }}</h2>
 
         <!-- Подзаголовок: телефон -->
         <div class="group/subtitle mt-0.5 flex items-center gap-x-2">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">{{ item.fullPhone ?? item.phone }}</span>
+          <span class="text-[14px] leading-[20px] font-light text-zinc-500">{{ item.fullPhone ?? item.phone }}</span>
           <button
             @click="navigator.clipboard.writeText(item.fullPhone ?? item.phone)"
             class="invisible group-hover/subtitle:visible text-zinc-900 hover:text-zinc-600 transition-colors"
@@ -45,50 +45,50 @@
 
         <!-- Дата создания -->
         <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Дата создания</span>
-          <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ formatDate(item.date) }}</span>
+          <span class="text-[14px] leading-[20px] font-light text-zinc-500">Дата создания</span>
+          <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ formatDate(item.date) }}</span>
         </div>
 
         <!-- Дата проверки -->
         <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Дата проверки</span>
-          <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item.lastCheckDate ? formatDate(item.lastCheckDate) : '—' }}</span>
+          <span class="text-[14px] leading-[20px] font-light text-zinc-500">Дата проверки</span>
+          <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ item.lastCheckDate ? formatDate(item.lastCheckDate) : '—' }}</span>
         </div>
 
         <!-- Рейтинг -->
         <template v-if="checks[0]">
           <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Рейтинг</span>
+            <span class="text-[14px] leading-[20px] font-light text-zinc-500">Рейтинг</span>
             <div class="flex items-center gap-x-2">
               <div class="relative h-2 w-[61px] rounded-full bg-[#e4e4e7] overflow-hidden shrink-0">
                 <div class="absolute inset-y-0 left-0 rounded-full" :style="{ width: scoreBarWidth(checks[0].score), background: scoreDotColor(checks[0].score) }" />
               </div>
-              <span class="text-[14px] leading-[20px] font-normal text-[#18181b] w-8 text-right">{{ checks[0].score }}</span>
+              <span class="text-[14px] leading-[20px] font-normal text-zinc-900 w-8 text-right">{{ checks[0].score }}</span>
             </div>
           </div>
 
           <!-- Долговая нагрузка -->
           <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Долговая нагрузка</span>
+            <span class="text-[14px] leading-[20px] font-light text-zinc-500">Долговая нагрузка</span>
             <div v-if="checks[0].debtLoad != null" class="flex items-center gap-x-2">
               <div class="relative h-2 w-[61px] rounded-full bg-[#e4e4e7] overflow-hidden shrink-0">
                 <div class="absolute inset-y-0 left-0 rounded-full" :style="{ width: checks[0].debtLoad + '%', background: debtLoadColor(checks[0].debtLoad) }" />
               </div>
-              <span class="text-[14px] leading-[20px] font-normal text-[#18181b] w-8 text-right">{{ checks[0].debtLoad }}%</span>
+              <span class="text-[14px] leading-[20px] font-normal text-zinc-900 w-8 text-right">{{ checks[0].debtLoad }}%</span>
             </div>
-            <span v-else class="text-[14px] leading-[20px] font-light text-[#71717a]">—</span>
+            <span v-else class="text-[14px] leading-[20px] font-light text-zinc-500">—</span>
           </div>
 
           <!-- Сумма платежей -->
           <div class="flex items-start justify-between border-b border-[#f4f4f5] py-3">
-            <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Сумма всех платежей по кредитам</span>
-            <span class="text-[14px] leading-[20px] font-normal text-[#18181b] shrink-0 ml-4">{{ checks[0].totalPayments ?? '—' }}</span>
+            <span class="text-[14px] leading-[20px] font-light text-zinc-500">Сумма всех платежей по кредитам</span>
+            <span class="text-[14px] leading-[20px] font-normal text-zinc-900 shrink-0 ml-4">{{ checks[0].totalPayments ?? '—' }}</span>
           </div>
         </template>
 
         <!-- Менеджер -->
         <div class="flex items-center justify-between border-b border-[#f4f4f5] py-3">
-          <span class="text-[14px] leading-[20px] font-light text-[#71717a]">Менеджер</span>
+          <span class="text-[14px] leading-[20px] font-light text-zinc-500">Менеджер</span>
           <CatalystListbox :options="managerOptions" v-model="managerValue" placeholder="Менеджер" />
         </div>
 
@@ -107,13 +107,13 @@
 
       <!-- Анкета section -->
       <div class="px-6 pt-[40px]">
-        <span class="text-[16px] leading-[24px] font-medium text-[#111827]">Анкета</span>
+        <span class="text-[16px] leading-[24px] font-medium text-zinc-900">Анкета</span>
         <div class="mt-2 flex flex-col">
           <div class="flex items-center py-3">
-            <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-[#71717a]">{{ item.initials }}</span>
+            <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e7] text-[14px] leading-[20px] font-medium text-zinc-500">{{ item.initials }}</span>
             <div class="flex flex-col gap-y-0.5 pl-4">
-              <span class="text-[14px] leading-[20px] font-normal text-[#18181b]">{{ item.fullName }}</span>
-              <span class="text-[14px] leading-[20px] font-light text-[#71717a]">{{ item.fullPhone ?? item.phone }}</span>
+              <span class="text-[14px] leading-[20px] font-normal text-zinc-900">{{ item.fullName }}</span>
+              <span class="text-[14px] leading-[20px] font-light text-zinc-500">{{ item.fullPhone ?? item.phone }}</span>
             </div>
             <a href="#" class="ml-auto text-[14px] leading-[20px] font-medium text-[#5B4FCF] hover:opacity-80">Открыть</a>
           </div>
@@ -124,7 +124,7 @@
 
     <!-- Футер -->
     <div class="border-t border-[#f4f4f5] bg-[#fafafa] px-6 py-3 shrink-0">
-      <span class="text-[14px] leading-[20px] font-normal text-[#71717a]">Чат с поддержкой</span>
+      <span class="text-[14px] leading-[20px] font-normal text-zinc-500">Чат с поддержкой</span>
     </div>
 
     </div>

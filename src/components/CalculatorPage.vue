@@ -1,12 +1,12 @@
 <template>
   <div class="relative flex-1 flex flex-col overflow-hidden">
-  <div class="flex-1 overflow-auto px-8 py-6 flex flex-col gap-[52px]">
+  <div class="flex-1 overflow-auto px-4 md:px-6 py-6 flex flex-col gap-[52px]">
 
     <!-- ── Форма параметров ─────────────────────────────── -->
     <div class="flex flex-col gap-4">
 
       <!-- Основные поля -->
-      <div class="grid grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
 
         <!-- Жилой комплекс — Combobox -->
         <ComplexCombobox v-model="complexValue" :options="complexOptions" />
@@ -48,7 +48,7 @@
       </div>
 
       <!-- Доп. параметры (раскрываются) -->
-      <div v-if="showExtra" class="grid grid-cols-4 gap-6">
+      <div v-if="showExtra" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
         <CatalystListbox label="Тип занятости" v-model="employmentType" :options="employmentTypeOptions" />
         <CatalystListbox label="Вид подтверждения дохода" v-model="incomeProof" :options="incomeProofOptions" />
       </div>
@@ -74,9 +74,10 @@
       </div>
 
       <!-- Таблица -->
-      <div class="relative">
+      <div class="-mx-4 md:-mx-6 overflow-x-auto">
+      <div class="inline-block min-w-full align-middle px-4 md:px-6">
 
-      <table class="w-full">
+      <table class="min-w-full">
         <thead>
           <tr class="border-b border-zinc-100">
             <th class="w-8 pb-[15px] pt-[13.5px]"></th>
@@ -90,10 +91,10 @@
               </button>
             </th>
             <th class="pb-[15px] pt-[13.5px] pr-6 text-left text-sm font-medium text-zinc-900">Ставка</th>
-            <th class="pb-[15px] pt-[13.5px] pr-6 text-left text-sm font-medium text-zinc-900">ПВ</th>
-            <th class="pb-[15px] pt-[13.5px] pr-6 text-left text-sm font-medium text-zinc-900">Объект</th>
-            <th class="pb-[15px] pt-[13.5px] pr-6 text-left text-sm font-medium text-zinc-900">Кредит</th>
-            <th class="pb-[15px] pt-[13.5px] text-left text-sm font-medium text-zinc-900">Переплата</th>
+            <th class="hidden sm:table-cell pb-[15px] pt-[13.5px] pr-6 text-left text-sm font-medium text-zinc-900">ПВ</th>
+            <th class="hidden md:table-cell pb-[15px] pt-[13.5px] pr-6 text-left text-sm font-medium text-zinc-900">Объект</th>
+            <th class="hidden md:table-cell pb-[15px] pt-[13.5px] pr-6 text-left text-sm font-medium text-zinc-900">Кредит</th>
+            <th class="hidden lg:table-cell pb-[15px] pt-[13.5px] text-left text-sm font-medium text-zinc-900">Переплата</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-zinc-100">
@@ -115,16 +116,17 @@
             <td class="py-4 pr-6">
               <TableLink weight="medium" @click="emit('open-bank', bank)">{{ bank.name }}</TableLink>
             </td>
-            <td class="py-4 pr-6 text-sm font-light text-zinc-900">{{ bank.payment }}</td>
-            <td class="py-4 pr-6 text-sm font-light text-zinc-900">{{ bank.rate }}</td>
-            <td class="py-4 pr-6 text-sm font-light text-zinc-900">{{ bank.pv }}</td>
-            <td class="py-4 pr-6 text-sm font-light text-zinc-900">{{ bank.cost }}</td>
-            <td class="py-4 pr-6 text-sm font-light text-zinc-900">{{ bank.credit }}</td>
-            <td class="py-4 text-sm font-light text-zinc-900">{{ bank.overpayment }}</td>
+            <td class="py-4 pr-6 text-sm font-light text-zinc-900 whitespace-nowrap">{{ bank.payment }}</td>
+            <td class="py-4 pr-6 text-sm font-light text-zinc-900 whitespace-nowrap">{{ bank.rate }}</td>
+            <td class="hidden sm:table-cell py-4 pr-6 text-sm font-light text-zinc-900 whitespace-nowrap">{{ bank.pv }}</td>
+            <td class="hidden md:table-cell py-4 pr-6 text-sm font-light text-zinc-900 whitespace-nowrap">{{ bank.cost }}</td>
+            <td class="hidden md:table-cell py-4 pr-6 text-sm font-light text-zinc-900 whitespace-nowrap">{{ bank.credit }}</td>
+            <td class="hidden lg:table-cell py-4 text-sm font-light text-zinc-900 whitespace-nowrap">{{ bank.overpayment }}</td>
           </tr>
         </tbody>
       </table>
-      </div><!-- /relative wrapper -->
+      </div>
+      </div><!-- /overflow wrapper -->
     </div>
 
   </div><!-- /overflow-auto -->

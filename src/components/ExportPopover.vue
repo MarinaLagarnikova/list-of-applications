@@ -19,7 +19,7 @@
 
           <!-- Header -->
           <div class="px-5 pt-5 pb-0">
-            <span class="text-[16px] leading-[24px] font-medium text-[#18181b]">Выгрузка заявок</span>
+            <span class="text-[16px] leading-[24px] font-medium text-zinc-900">Выгрузка заявок</span>
           </div>
 
           <!-- Subtitle -->
@@ -53,7 +53,7 @@
           <div class="border-t border-[#f4f4f5] px-5 py-3 flex items-center gap-x-2">
             <button
               @click="handleCancel(close)"
-              class="flex items-center justify-center rounded-lg border border-[#e4e4e7] h-8 px-3 text-[13px] font-medium text-[#18181b] hover:bg-zinc-50 transition-colors"
+              class="flex items-center justify-center rounded-lg border border-[#e4e4e7] h-8 px-3 text-[13px] font-medium text-zinc-900 hover:bg-zinc-50 transition-colors"
             >Отменить</button>
             <button
               :disabled="!hasDate"

@@ -10,7 +10,7 @@
       @blur="onBlur"
       @keydown.enter="onEnter"
       @keydown.escape="isOpen = false"
-      class="bg-transparent text-[14px] font-light leading-normal text-[#18181b] placeholder:text-[#71717a] focus:placeholder:text-zinc-400 focus:outline-none w-full"
+      class="bg-transparent text-[14px] font-light leading-normal text-zinc-900 placeholder:text-zinc-500 focus:placeholder:text-zinc-400 focus:outline-none w-full"
     />
 
     <Transition
