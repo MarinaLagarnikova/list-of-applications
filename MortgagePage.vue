@@ -1034,15 +1034,17 @@ const statusColWidth = computed(() => {
   return `${maxLen * 7 + 24}px`
 })
 
-const statusFilterItems = new Set(['Ожидает решения', 'Одобрена', 'Отказано', 'Кредит выдан'])
+const statusFilterItems = new Set(['Ожидает решения', 'Одобрена', 'Отказано'])
 
 const filteredApplications = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
   const statusFilter = statusFilterItems.has(activeSubItem.value) ? activeSubItem.value : null
+  const isStuck = activeSubItem.value === 'Зависли'
   const { statuses, managers: filterManagers, projects: filterProjects } = mortgageFilters.value
 
   let result = applications.filter(app => {
     if (statusFilter && app.status !== statusFilter) return false
+    if (isStuck) return false
     if (statuses?.size > 0 && !statuses.has(app.status)) return false
     if (filterManagers?.size > 0 && !filterManagers.has(mortgageManagerSelections[app.id])) return false
     if (filterProjects?.size > 0 && !filterProjects.has(app.complex)) return false
@@ -1163,7 +1165,7 @@ const navigation = [
       { name: 'Ожидает решения',   href: '#', current: false, count: 143   },
       { name: 'Одобрена',          href: '#', current: false, count: 28    },
       { name: 'Отказано',          href: '#', current: false               },
-      { name: 'Кредит выдан',      href: '#', current: false, count: 5     },
+      { name: 'Зависли',           href: '#', current: false               },
     ],
   },
   {
@@ -1178,13 +1180,14 @@ const navigation = [
     ],
   },
   {
-    name: 'Пакеты документов',
+    name: 'Страховка',
     href: '#',
-    icon: DocumentDuplicateIcon,
+    icon: ShieldCheckIcon,
     current: false,
     children: [
-      { name: 'Все',  href: '#', current: false, count: 8 },
-      { name: 'Мои', href: '#', current: false, count: 2 },
+      { name: 'Все заявки',  href: '#', current: false, count: 28 },
+      { name: 'Мои заявки', href: '#', current: false, count: 7  },
+      { name: 'Продления',   href: '#', current: false, count: 5  },
     ],
   },
   {
@@ -1208,17 +1211,6 @@ const navigation = [
     ],
   },
   {
-    name: 'Страховка',
-    href: '#',
-    icon: ShieldCheckIcon,
-    current: false,
-    children: [
-      { name: 'Все заявки',  href: '#', current: false, count: 28 },
-      { name: 'Мои заявки', href: '#', current: false, count: 7  },
-      { name: 'Продления',   href: '#', current: false, count: 5  },
-    ],
-  },
-  {
     name: 'Цифровые подписи',
     href: '#',
     icon: DocumentCheckIcon,
@@ -1226,6 +1218,16 @@ const navigation = [
     children: [
       { name: 'Все заявки',  href: '#', current: false, count: 10 },
       { name: 'Мои заявки', href: '#', current: false, count: 3  },
+    ],
+  },
+  {
+    name: 'Пакеты документов',
+    href: '#',
+    icon: DocumentDuplicateIcon,
+    current: false,
+    children: [
+      { name: 'Все',  href: '#', current: false, count: 8 },
+      { name: 'Мои', href: '#', current: false, count: 2 },
     ],
   },
 ]

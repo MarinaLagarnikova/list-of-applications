@@ -14,7 +14,7 @@
     <div
       v-if="open"
       class="fixed top-2 bottom-2 right-2 z-50 flex flex-col bg-white shadow-xl rounded-3xl ring-1 ring-gray-200 overflow-hidden"
-      :style="{ width }"
+      :style="{ width, maxWidth: 'calc(100vw - 1rem)' }"
     >
       <slot />
     </div>
